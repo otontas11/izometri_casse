@@ -14,8 +14,9 @@ export const useProfileStore = defineStore('profile', () => {
   const userProfile = ref<UserProfile | null>(null)
   const profileLoadStatus = ref<ApiRequestStatus>('idle')
   const profileSaveStatus = ref<ApiRequestStatus>('idle')
-  const profileErrorMessage = ref('')
-  const profileSuccessMessage = ref('')
+  const profileLoadErrorMessage = ref('')
+  const profileSaveErrorMessage = ref('')
+  const profileSaveSuccessMessage = ref('')
 
   const isProfileLoading = computed(() => profileLoadStatus.value === 'loading')
   const isProfileSaving = computed(() => profileSaveStatus.value === 'loading')
@@ -33,14 +34,14 @@ export const useProfileStore = defineStore('profile', () => {
     }
 
     profileLoadStatus.value = 'loading'
-    profileErrorMessage.value = ''
+    profileLoadErrorMessage.value = ''
 
     try {
       userProfile.value = await profileApi.fetchUserProfile()
       profileLoadStatus.value = 'success'
     } catch (requestError) {
       profileLoadStatus.value = 'error'
-      profileErrorMessage.value = getApiErrorMessage(requestError)
+      profileLoadErrorMessage.value = getApiErrorMessage(requestError)
     }
   }
 
@@ -50,38 +51,43 @@ export const useProfileStore = defineStore('profile', () => {
     }
 
     profileSaveStatus.value = 'loading'
-    profileErrorMessage.value = ''
-    profileSuccessMessage.value = ''
+    profileSaveErrorMessage.value = ''
+    profileSaveSuccessMessage.value = ''
 
     try {
       userProfile.value = await profileApi.updateUserProfile(profileUpdates)
       profileSaveStatus.value = 'success'
-      profileSuccessMessage.value = 'Profil bilgileriniz güncellendi.'
+      profileSaveSuccessMessage.value = 'Profil bilgileriniz güncellendi.'
 
       return true
     } catch (requestError) {
       profileSaveStatus.value = 'error'
-      profileErrorMessage.value = getApiErrorMessage(requestError)
+      profileSaveErrorMessage.value = getApiErrorMessage(requestError)
 
       return false
     }
   }
 
-  const clearProfileFeedback = () => {
-    profileErrorMessage.value = ''
-    profileSuccessMessage.value = ''
+  const clearProfileSaveFeedback = () => {
+    profileSaveErrorMessage.value = ''
+    profileSaveSuccessMessage.value = ''
+
+    if (!isProfileSaving.value) {
+      profileSaveStatus.value = 'idle'
+    }
   }
 
   return {
-    clearProfileFeedback,
+    clearProfileSaveFeedback,
     fetchUserProfile,
     isProfileLoading,
     isProfileSaving,
-    profileErrorMessage,
     profileFullName,
+    profileLoadErrorMessage,
     profileLoadStatus,
+    profileSaveErrorMessage,
     profileSaveStatus,
-    profileSuccessMessage,
+    profileSaveSuccessMessage,
     updateUserProfile,
     userProfile,
   }
