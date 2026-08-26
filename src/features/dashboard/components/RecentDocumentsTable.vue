@@ -48,72 +48,83 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
       <span>{{ archivedDocuments.length }} kayıt gösteriliyor</span>
     </header>
 
-    <div v-if="archivedDocuments.length" class="recent-documents-table__content">
-      <div class="recent-documents-table__column-headings" aria-hidden="true">
-        <span>Belge</span>
-        <span>İşlem</span>
-        <span>Tarih</span>
-        <span>Boyut</span>
-        <span>İşlemler</span>
-      </div>
-
-      <article
-        v-for="archivedDocument in archivedDocuments"
-        :key="archivedDocument.id"
-        class="recent-documents-table__row"
-      >
-        <div class="recent-documents-table__file" data-label="Belge">
-          <span aria-hidden="true">
-            <AppIcon name="document" :size="20" />
-          </span>
-          <div>
-            <strong>{{ archivedDocument.name }}</strong>
-            <small>
-              #IZ-{{ String(archivedDocument.id).padStart(4, '0') }}
-            </small>
-          </div>
-        </div>
-        <div data-label="İşlem">
-          <span
-            :class="[
-              'recent-documents-table__operation',
-              `recent-documents-table__operation--${archivedDocument.operation}`,
-            ]"
-          >
-            {{ documentOperationLabels[archivedDocument.operation] }}
-          </span>
-        </div>
-        <time :datetime="archivedDocument.createdAt" data-label="Tarih">
-          {{ formatDateTime(archivedDocument.createdAt) }}
-        </time>
-        <span data-label="Boyut">
-          {{ formatFileSize(archivedDocument.sizeBytes) }}
-        </span>
-        <div class="recent-documents-table__actions" data-label="İşlemler">
-          <button
-            type="button"
-            :disabled="!archivedDocument.canPreview"
-            :aria-label="`${archivedDocument.name} belgesini önizle`"
-            :title="
-              archivedDocument.canPreview
-                ? 'Belgeyi önizle'
-                : 'Bu dosya türü önizlenemiyor'
-            "
-            @click="handleDocumentPreview(archivedDocument)"
-          >
-            <AppIcon name="eye" :size="18" />
-          </button>
-          <button
-            type="button"
-            :aria-label="`${archivedDocument.name} belgesini indir`"
-            title="Belgeyi indir"
-            @click="handleDocumentDownload(archivedDocument)"
-          >
-            <AppIcon name="download" :size="18" />
-          </button>
-        </div>
-      </article>
-    </div>
+    <table
+      v-if="archivedDocuments.length"
+      class="recent-documents-table__content"
+    >
+      <caption class="visually-hidden">
+        Son arşivlenen belgeler
+      </caption>
+      <thead>
+        <tr class="recent-documents-table__column-headings">
+          <th scope="col">Belge</th>
+          <th scope="col">İşlem</th>
+          <th scope="col">Tarih</th>
+          <th scope="col">Boyut</th>
+          <th scope="col">İşlemler</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="archivedDocument in archivedDocuments"
+          :key="archivedDocument.id"
+          class="recent-documents-table__row"
+        >
+          <td class="recent-documents-table__file" data-label="Belge">
+            <span aria-hidden="true">
+              <AppIcon name="document" :size="20" />
+            </span>
+            <div>
+              <strong>{{ archivedDocument.name }}</strong>
+              <small>
+                #IZ-{{ String(archivedDocument.id).padStart(4, '0') }}
+              </small>
+            </div>
+          </td>
+          <td data-label="İşlem">
+            <span
+              :class="[
+                'recent-documents-table__operation',
+                `recent-documents-table__operation--${archivedDocument.operation}`,
+              ]"
+            >
+              {{ documentOperationLabels[archivedDocument.operation] }}
+            </span>
+          </td>
+          <td data-label="Tarih">
+            <time :datetime="archivedDocument.createdAt">
+              {{ formatDateTime(archivedDocument.createdAt) }}
+            </time>
+          </td>
+          <td data-label="Boyut">
+            {{ formatFileSize(archivedDocument.sizeBytes) }}
+          </td>
+          <td class="recent-documents-table__actions" data-label="İşlemler">
+            <button
+              type="button"
+              :disabled="!archivedDocument.canPreview"
+              :aria-label="`${archivedDocument.name} belgesini önizle`"
+              :title="
+                archivedDocument.canPreview
+                  ? 'Belgeyi önizle'
+                  : 'Bu dosya türü önizlenemiyor'
+              "
+              @click="handleDocumentPreview(archivedDocument)"
+            >
+              <AppIcon name="eye" :size="18" />
+            </button>
+            <button
+              type="button"
+              :aria-label="`${archivedDocument.name} belgesini indir`"
+              title="Belgeyi indir"
+              @click="handleDocumentDownload(archivedDocument)"
+            >
+              <AppIcon name="download" :size="18" />
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <div v-else class="recent-documents-table__empty-state">
       <span aria-hidden="true">
@@ -172,6 +183,16 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
   font-weight: 700;
 }
 
+.recent-documents-table__content {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.recent-documents-table__content > thead,
+.recent-documents-table__content > tbody {
+  display: block;
+}
+
 .recent-documents-table__column-headings,
 .recent-documents-table__row {
   display: grid;
@@ -179,6 +200,17 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
   gap: 1rem;
   align-items: center;
   padding-inline: 1.5rem;
+}
+
+.recent-documents-table__column-headings > th,
+.recent-documents-table__row > td {
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.recent-documents-table__column-headings > th {
+  font-weight: inherit;
 }
 
 .recent-documents-table__column-headings {
@@ -333,7 +365,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
     grid-template-columns: minmax(13rem, 1.7fr) minmax(7rem, 0.8fr) minmax(9rem, 1fr) 5rem;
   }
 
-  .recent-documents-table__column-headings > span:nth-child(4),
+  .recent-documents-table__column-headings > th:nth-child(4),
   .recent-documents-table__row > [data-label='Boyut'] {
     display: none;
   }
@@ -360,14 +392,14 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
     grid-column: 1 / -1;
   }
 
-  .recent-documents-table__row > time,
+  .recent-documents-table__row > [data-label='Tarih'],
   .recent-documents-table__row > [data-label='Boyut'] {
     display: block;
     grid-column: 1;
     font-size: var(--font-size-small);
   }
 
-  .recent-documents-table__row > time::before,
+  .recent-documents-table__row > [data-label='Tarih']::before,
   .recent-documents-table__row > [data-label='Boyut']::before {
     margin-right: 0.35rem;
     color: var(--color-brand-950);

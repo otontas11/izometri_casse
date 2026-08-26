@@ -62,56 +62,64 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
       <span v-for="skeletonIndex in 3" :key="skeletonIndex"></span>
     </div>
 
-    <div
+    <table
       v-else-if="timestampJobs.length"
       class="timestamp-history-table__content"
     >
-      <div class="timestamp-history-table__column-headings" aria-hidden="true">
-        <span>Dosya</span>
-        <span>Durum</span>
-        <span>İşlem tarihi</span>
-        <span>Maliyet</span>
-      </div>
+      <caption class="visually-hidden">
+        Son zaman damgası işlemleri
+      </caption>
+      <thead>
+        <tr class="timestamp-history-table__column-headings">
+          <th scope="col">Dosya</th>
+          <th scope="col">Durum</th>
+          <th scope="col">İşlem tarihi</th>
+          <th scope="col">Maliyet</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="timestampJob in timestampJobs"
+          :key="timestampJob.id"
+          class="timestamp-history-table__row"
+        >
+          <td class="timestamp-history-table__file" data-label="Dosya">
+            <span aria-hidden="true">
+              <AppIcon name="document" :size="20" />
+            </span>
+            <div>
+              <strong>{{ timestampJob.fileName }}</strong>
+              <small>
+                #ZD-{{ String(timestampJob.id).padStart(4, '0') }} ·
+                {{ formatFileSize(timestampJob.fileSize) }}
+              </small>
+            </div>
+          </td>
 
-      <article
-        v-for="timestampJob in timestampJobs"
-        :key="timestampJob.id"
-        class="timestamp-history-table__row"
-      >
-        <div class="timestamp-history-table__file" data-label="Dosya">
-          <span aria-hidden="true">
-            <AppIcon name="document" :size="20" />
-          </span>
-          <div>
-            <strong>{{ timestampJob.fileName }}</strong>
-            <small>
-              #ZD-{{ String(timestampJob.id).padStart(4, '0') }} ·
-              {{ formatFileSize(timestampJob.fileSize) }}
-            </small>
-          </div>
-        </div>
+          <td data-label="Durum">
+            <span
+              :class="[
+                'timestamp-history-table__status',
+                `timestamp-history-table__status--${timestampJob.status}`,
+              ]"
+            >
+              <i aria-hidden="true"></i>
+              {{ timestampJobStatusLabels[timestampJob.status] }}
+            </span>
+          </td>
 
-        <div data-label="Durum">
-          <span
-            :class="[
-              'timestamp-history-table__status',
-              `timestamp-history-table__status--${timestampJob.status}`,
-            ]"
-          >
-            <i aria-hidden="true"></i>
-            {{ timestampJobStatusLabels[timestampJob.status] }}
-          </span>
-        </div>
+          <td data-label="İşlem tarihi">
+            <time :datetime="timestampJob.createdAt">
+              {{ formatDateTime(timestampJob.createdAt) }}
+            </time>
+          </td>
 
-        <time :datetime="timestampJob.createdAt" data-label="İşlem tarihi">
-          {{ formatDateTime(timestampJob.createdAt) }}
-        </time>
-
-        <span class="timestamp-history-table__credit" data-label="Maliyet">
-          {{ timestampJob.creditCost }} kontör
-        </span>
-      </article>
-    </div>
+          <td class="timestamp-history-table__credit" data-label="Maliyet">
+            {{ timestampJob.creditCost }} kontör
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <div v-else-if="!errorMessage" class="timestamp-history-table__empty-state">
       <span aria-hidden="true">
@@ -244,6 +252,16 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
   border-color: color-mix(in srgb, var(--color-danger) 25%, transparent);
 }
 
+.timestamp-history-table__content {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.timestamp-history-table__content > thead,
+.timestamp-history-table__content > tbody {
+  display: block;
+}
+
 .timestamp-history-table__column-headings,
 .timestamp-history-table__row {
   display: grid;
@@ -252,6 +270,17 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
     minmax(9rem, 0.8fr) minmax(5rem, 0.45fr);
   gap: 1rem;
   align-items: center;
+}
+
+.timestamp-history-table__column-headings > th,
+.timestamp-history-table__row > td {
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.timestamp-history-table__column-headings > th {
+  font-weight: inherit;
 }
 
 .timestamp-history-table__column-headings {
@@ -473,7 +502,7 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
     padding: 1rem;
   }
 
-  .timestamp-history-table__row time {
+  .timestamp-history-table__row > [data-label='İşlem tarihi'] {
     grid-column: 1 / -1;
   }
 }
