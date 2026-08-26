@@ -285,7 +285,7 @@ watch(
 
 .profile-form__header small {
   color: var(--color-accent-600);
-  font-size: 0.67rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -303,7 +303,7 @@ watch(
   flex: 0 0 auto;
   padding: 0.38rem 0.65rem;
   color: var(--color-text-secondary);
-  font-size: 0.64rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   background: var(--color-surface-subtle);
   border-radius: 999px;
@@ -336,7 +336,7 @@ watch(
   margin-top: 1rem;
   padding: 0.8rem 0.9rem;
   color: var(--color-danger);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   background: color-mix(in srgb, var(--color-danger) 6%, transparent);
   border: 1px solid
@@ -351,7 +351,7 @@ watch(
   flex: 0 0 auto;
   place-items: center;
   color: var(--color-text-inverse);
-  font-size: 0.65rem;
+  font-size: var(--font-size-small);
   background: var(--color-danger);
   border-radius: 50%;
 }
@@ -368,7 +368,7 @@ watch(
 
 .profile-form__actions p {
   color: var(--color-text-secondary);
-  font-size: 0.67rem;
+  font-size: var(--font-size-small);
   line-height: 1.45;
 }
 
@@ -382,7 +382,7 @@ watch(
   min-height: 2.65rem;
   padding: 0.65rem 0.95rem;
   color: var(--color-brand-950);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   cursor: pointer;
   background: var(--color-surface-subtle);

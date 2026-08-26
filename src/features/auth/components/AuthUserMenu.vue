@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { RouterLink } from 'vue-router'
 
@@ -8,6 +8,9 @@ import { auth0Config } from '@/config/auth0.config'
 const { logout: logoutFromAuth0, user: authenticatedUser } = useAuth0()
 const isUserMenuOpen = ref(false)
 const userMenuElement = ref<HTMLElement | null>(null)
+const userMenuTriggerElement = ref<HTMLButtonElement | null>(null)
+const userMenuPopoverElement = ref<HTMLElement | null>(null)
+const hasAuthenticatedUserPictureError = ref(false)
 
 const authenticatedUserDisplayName = computed(
   () =>
@@ -21,6 +24,11 @@ const authenticatedUserEmail = computed(
 )
 const authenticatedUserPicture = computed(
   () => authenticatedUser.value?.picture ?? '',
+)
+const shouldDisplayAuthenticatedUserPicture = computed(
+  () =>
+    Boolean(authenticatedUserPicture.value) &&
+    !hasAuthenticatedUserPictureError.value,
 )
 const authenticatedUserInitials = computed(() => {
   const displayNameWords = authenticatedUserDisplayName.value
@@ -42,6 +50,42 @@ const closeUserMenu = () => {
   isUserMenuOpen.value = false
 }
 
+const closeUserMenuAndRestoreTriggerFocus = async () => {
+  if (!isUserMenuOpen.value) {
+    return
+  }
+
+  closeUserMenu()
+  await nextTick()
+  userMenuTriggerElement.value?.focus()
+}
+
+const openUserMenuAndFocusFirstAction = async () => {
+  isUserMenuOpen.value = true
+  await nextTick()
+  userMenuPopoverElement.value
+    ?.querySelector<HTMLElement>('a[href], button:not(:disabled)')
+    ?.focus()
+}
+
+const handleUserMenuTriggerKeydown = (keyboardEvent: KeyboardEvent) => {
+  if (keyboardEvent.key === 'ArrowDown') {
+    keyboardEvent.preventDefault()
+    void openUserMenuAndFocusFirstAction()
+  }
+}
+
+const handleUserMenuFocusOut = (focusEvent: FocusEvent) => {
+  const nextFocusedElement = focusEvent.relatedTarget
+
+  if (
+    !(nextFocusedElement instanceof Node) ||
+    !userMenuElement.value?.contains(nextFocusedElement)
+  ) {
+    closeUserMenu()
+  }
+}
+
 const handleOutsidePointerDown = (pointerEvent: PointerEvent) => {
   if (
     pointerEvent.target instanceof Node &&
@@ -60,6 +104,10 @@ const handleLogout = async () => {
   })
 }
 
+watch(authenticatedUserPicture, () => {
+  hasAuthenticatedUserPictureError.value = false
+})
+
 onMounted(() =>
   document.addEventListener('pointerdown', handleOutsidePointerDown),
 )
@@ -69,25 +117,40 @@ onBeforeUnmount(() =>
 </script>
 
 <template>
-  <div ref="userMenuElement" class="auth-user-menu">
+  <div
+    ref="userMenuElement"
+    class="auth-user-menu"
+    @focusout="handleUserMenuFocusOut"
+    @keydown.esc.stop.prevent="closeUserMenuAndRestoreTriggerFocus"
+  >
     <button
+      ref="userMenuTriggerElement"
       class="auth-user-menu__trigger"
       type="button"
       :aria-expanded="isUserMenuOpen"
-      aria-haspopup="menu"
-      aria-label="Kullanıcı menüsünü aç"
+      aria-controls="authenticated-user-popover"
+      :aria-label="
+        isUserMenuOpen ? 'Kullanıcı menüsünü kapat' : 'Kullanıcı menüsünü aç'
+      "
       @click="isUserMenuOpen = !isUserMenuOpen"
+      @keydown="handleUserMenuTriggerKeydown"
     >
       <img
-        v-if="authenticatedUserPicture"
+        v-if="shouldDisplayAuthenticatedUserPicture"
         :src="authenticatedUserPicture"
         alt=""
         referrerpolicy="no-referrer"
+        @error="hasAuthenticatedUserPictureError = true"
       />
       <span v-else>{{ authenticatedUserInitials }}</span>
     </button>
 
-    <div v-if="isUserMenuOpen" class="auth-user-menu__popover" role="menu">
+    <div
+      v-if="isUserMenuOpen"
+      id="authenticated-user-popover"
+      ref="userMenuPopoverElement"
+      class="auth-user-menu__popover"
+    >
       <div class="auth-user-menu__identity">
         <strong>{{ authenticatedUserDisplayName }}</strong>
         <small v-if="authenticatedUserEmail">{{ authenticatedUserEmail }}</small>
@@ -95,12 +158,11 @@ onBeforeUnmount(() =>
 
       <RouterLink
         :to="{ name: 'profile' }"
-        role="menuitem"
         @click="closeUserMenu"
       >
         Profil ve güvenlik
       </RouterLink>
-      <button type="button" role="menuitem" @click="handleLogout">
+      <button type="button" @click="handleLogout">
         Güvenli çıkış
       </button>
     </div>
@@ -120,7 +182,7 @@ onBeforeUnmount(() =>
   place-items: center;
   overflow: hidden;
   color: var(--color-text-inverse);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   cursor: pointer;
   background: var(--color-brand-950);
@@ -179,7 +241,7 @@ onBeforeUnmount(() =>
 .auth-user-menu__identity small {
   overflow: hidden;
   color: var(--color-text-secondary);
-  font-size: 0.7rem;
+  font-size: var(--font-size-small);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

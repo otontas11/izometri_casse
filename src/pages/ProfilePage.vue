@@ -226,7 +226,7 @@ onMounted(() => {
 
 .profile-page__eyebrow {
   color: var(--color-accent-600);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -277,7 +277,7 @@ onMounted(() => {
 
 .profile-page__security-summary small {
   color: var(--color-text-secondary);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
 }
 
 .profile-page__security-summary strong {
@@ -309,7 +309,7 @@ onMounted(() => {
 .profile-page__error-state p {
   margin-top: 0.3rem;
   color: var(--color-text-secondary);
-  font-size: 0.74rem;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -349,7 +349,7 @@ onMounted(() => {
   min-height: 2.5rem;
   padding: 0.6rem 0.85rem;
   color: var(--color-text-inverse);
-  font-size: 0.7rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   cursor: pointer;
   background: var(--color-brand-950);
@@ -373,7 +373,7 @@ onMounted(() => {
   gap: 0.65rem;
   align-items: center;
   padding: 0.85rem 1rem;
-  font-size: 0.73rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   background: var(--color-surface-raised);
   border: 1px solid currentColor;
@@ -387,7 +387,7 @@ onMounted(() => {
   flex: 0 0 auto;
   place-items: center;
   color: var(--color-text-inverse);
-  font-size: 0.64rem;
+  font-size: var(--font-size-small);
   border-radius: 50%;
 }
 

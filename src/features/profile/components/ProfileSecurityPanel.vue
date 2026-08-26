@@ -102,7 +102,7 @@ defineProps<{
 
 .profile-security-panel__header small {
   color: var(--color-accent-600);
-  font-size: 0.64rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -119,7 +119,7 @@ defineProps<{
 .profile-security-panel__description {
   margin-top: 1.1rem;
   color: var(--color-text-secondary);
-  font-size: 0.73rem;
+  font-size: var(--font-size-small);
   line-height: 1.65;
 }
 
@@ -139,7 +139,7 @@ defineProps<{
 
 .profile-security-panel__status-list dt {
   color: var(--color-text-secondary);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
 }
 
 .profile-security-panel__status-list dd {
@@ -147,7 +147,7 @@ defineProps<{
   gap: 0.4rem;
   align-items: center;
   color: var(--color-brand-950);
-  font-size: 0.7rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
 }
 
@@ -190,14 +190,14 @@ defineProps<{
   place-items: center;
   color: var(--color-primary-600);
   font-family: serif;
-  font-size: 0.74rem;
+  font-size: var(--font-size-small);
   font-weight: 700;
   background: var(--color-primary-100);
   border-radius: 50%;
 }
 
 .profile-security-panel__note p {
-  font-size: 0.67rem;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 </style>

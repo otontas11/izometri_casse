@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 
 import AppSidebar from '@/components/layout/AppSidebar.vue'
@@ -7,35 +7,125 @@ import AppTopbar from '@/components/layout/AppTopbar.vue'
 
 const currentRoute = useRoute()
 const isSidebarOpen = ref(false)
+const appTopbarComponent = ref<InstanceType<typeof AppTopbar> | null>(null)
 
-const handleSidebarClose = () => {
+const compactNavigationMediaQueryValue = '(max-width: 63.99rem)'
+let compactNavigationMediaQuery: MediaQueryList | null = null
+let previousBodyOverflowValue = ''
+let isBodyScrollLockedBySidebar = false
+let shouldRestoreSidebarToggleFocus = false
+
+const lockBodyScrollForSidebar = () => {
+  if (isBodyScrollLockedBySidebar) {
+    return
+  }
+
+  previousBodyOverflowValue = document.body.style.overflow
+  document.body.style.overflow = 'hidden'
+  isBodyScrollLockedBySidebar = true
+}
+
+const unlockBodyScrollForSidebar = () => {
+  if (!isBodyScrollLockedBySidebar) {
+    return
+  }
+
+  document.body.style.overflow = previousBodyOverflowValue
+  isBodyScrollLockedBySidebar = false
+}
+
+const handleSidebarClose = (shouldRestoreToggleFocus = true) => {
+  if (!isSidebarOpen.value) {
+    return
+  }
+
+  shouldRestoreSidebarToggleFocus = shouldRestoreToggleFocus
   isSidebarOpen.value = false
 }
 
 const handleSidebarToggle = () => {
-  isSidebarOpen.value = !isSidebarOpen.value
+  if (isSidebarOpen.value) {
+    handleSidebarClose()
+    return
+  }
+
+  shouldRestoreSidebarToggleFocus = false
+  isSidebarOpen.value = true
 }
+
+const handleSidebarNavigation = () => {
+  handleSidebarClose(false)
+}
+
+const handleCompactNavigationBreakpointChange = (
+  breakpointChangeEvent: MediaQueryListEvent,
+) => {
+  if (!breakpointChangeEvent.matches) {
+    handleSidebarClose(false)
+  }
+}
+
+watch(isSidebarOpen, async (isOpen) => {
+  if (isOpen) {
+    lockBodyScrollForSidebar()
+    return
+  }
+
+  unlockBodyScrollForSidebar()
+
+  if (shouldRestoreSidebarToggleFocus) {
+    await nextTick()
+    appTopbarComponent.value?.focusSidebarToggleButton()
+  }
+
+  shouldRestoreSidebarToggleFocus = false
+})
 
 watch(
   () => currentRoute.fullPath,
-  () => handleSidebarClose(),
+  () => handleSidebarClose(false),
 )
+
+onMounted(() => {
+  compactNavigationMediaQuery = window.matchMedia(
+    compactNavigationMediaQueryValue,
+  )
+  compactNavigationMediaQuery.addEventListener(
+    'change',
+    handleCompactNavigationBreakpointChange,
+  )
+})
+
+onBeforeUnmount(() => {
+  compactNavigationMediaQuery?.removeEventListener(
+    'change',
+    handleCompactNavigationBreakpointChange,
+  )
+  unlockBodyScrollForSidebar()
+})
 </script>
 
 <template>
   <div class="app-layout">
-    <AppSidebar :is-open="isSidebarOpen" @close="handleSidebarClose" />
+    <AppSidebar
+      :is-open="isSidebarOpen"
+      @close="handleSidebarClose"
+      @navigate="handleSidebarNavigation"
+    />
 
-    <button
+    <div
       v-if="isSidebarOpen"
       class="app-layout__overlay"
-      type="button"
-      aria-label="Navigasyonu kapat"
-      @click="handleSidebarClose"
-    ></button>
+      aria-hidden="true"
+      @click="handleSidebarClose()"
+    ></div>
 
-    <div class="app-layout__workspace">
-      <AppTopbar @toggle-sidebar="handleSidebarToggle" />
+    <div class="app-layout__workspace" :inert="isSidebarOpen">
+      <AppTopbar
+        ref="appTopbarComponent"
+        :is-sidebar-open="isSidebarOpen"
+        @toggle-sidebar="handleSidebarToggle"
+      />
 
       <main class="app-layout__main">
         <RouterView />

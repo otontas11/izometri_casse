@@ -144,7 +144,7 @@ import AppIcon from '@/components/common/AppIcon.vue'
   width: fit-content;
   padding: 0.45rem 0.65rem;
   color: #bff4e9;
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -228,7 +228,7 @@ import AppIcon from '@/components/common/AppIcon.vue'
 
 .dashboard-quick-actions-panel__timestamp-copy small {
   color: var(--color-text-secondary);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
   font-weight: 600;
 }
 
@@ -262,7 +262,7 @@ import AppIcon from '@/components/common/AppIcon.vue'
 
 .dashboard-quick-actions-panel__trust-heading small {
   color: var(--color-text-secondary);
-  font-size: 0.65rem;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -303,7 +303,7 @@ import AppIcon from '@/components/common/AppIcon.vue'
   height: 2rem;
   place-items: center;
   color: var(--color-accent-600);
-  font-size: 0.62rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   background: var(--color-accent-100);
   border: 3px solid var(--color-surface-raised);
@@ -323,7 +323,7 @@ import AppIcon from '@/components/common/AppIcon.vue'
 
 .dashboard-quick-actions-panel__trust-steps li small {
   color: var(--color-text-secondary);
-  font-size: 0.66rem;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 

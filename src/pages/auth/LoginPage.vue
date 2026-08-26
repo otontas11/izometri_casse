@@ -269,7 +269,7 @@ watch(
   margin-bottom: 1.5rem;
   padding: 0.45rem 0.75rem;
   color: #b8f3e8;
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -329,7 +329,7 @@ watch(
   position: relative;
   z-index: 1;
   color: rgb(255 255 255 / 48%);
-  font-size: 0.7rem;
+  font-size: var(--font-size-small);
 }
 
 .login-page__panel {
@@ -369,7 +369,7 @@ watch(
 
 .login-page__card-heading span {
   color: var(--color-accent-600);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -419,7 +419,7 @@ watch(
 
 .login-page__card-notice code {
   font-family: var(--font-family-mono);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
 }
 
 .login-page__card-actions {
@@ -485,7 +485,7 @@ watch(
 .login-page__card-privacy {
   margin-top: 1.25rem;
   color: var(--color-text-secondary);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   line-height: 1.55;
   text-align: center;
 }

@@ -68,7 +68,7 @@ const notificationSymbols = {
   align-items: center;
   padding: 0.85rem 0.9rem;
   color: var(--color-brand-950);
-  font-size: 0.73rem;
+  font-size: var(--font-size-small);
   font-weight: 700;
   pointer-events: auto;
   background: var(--color-surface-raised);
@@ -99,7 +99,7 @@ const notificationSymbols = {
   height: 1.75rem;
   place-items: center;
   color: var(--notification-color);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   background: var(--notification-background);
   border-radius: 50%;

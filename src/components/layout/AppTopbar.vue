@@ -1,14 +1,26 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import AuthUserMenu from '@/features/auth/components/AuthUserMenu.vue'
 import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
 
+defineProps<{
+  isSidebarOpen: boolean
+}>()
+
 const emit = defineEmits<{
   toggleSidebar: []
 }>()
+
+const sidebarToggleButtonElement = ref<HTMLButtonElement | null>(null)
+
+const focusSidebarToggleButton = () => {
+  sidebarToggleButtonElement.value?.focus()
+}
+
+defineExpose({ focusSidebarToggleButton })
 
 const dashboardStore = useDashboardStore()
 const { dashboardRequestStatus, dashboardSummary } = storeToRefs(dashboardStore)
@@ -23,9 +35,12 @@ onMounted(() => {
 <template>
   <header class="app-topbar">
     <button
+      ref="sidebarToggleButtonElement"
       class="app-topbar__menu"
       type="button"
-      aria-label="Navigasyonu aç"
+      aria-controls="application-navigation"
+      :aria-expanded="isSidebarOpen"
+      :aria-label="isSidebarOpen ? 'Navigasyonu kapat' : 'Navigasyonu aç'"
       @click="emit('toggleSidebar')"
     >
       <AppIcon name="menu" :size="23" />
@@ -86,7 +101,7 @@ onMounted(() => {
 
 .app-topbar__context span {
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
 }
 
 .app-topbar__actions {
@@ -102,7 +117,7 @@ onMounted(() => {
   height: 2.5rem;
   place-items: center;
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   background: var(--color-surface-canvas);
   border: 1px solid var(--color-border);
@@ -123,7 +138,7 @@ onMounted(() => {
 
 .app-topbar__quota small {
   color: var(--color-text-secondary);
-  font-size: 0.7rem;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 

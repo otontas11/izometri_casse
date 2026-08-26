@@ -152,7 +152,7 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
 
 .timestamp-history-table__header span {
   color: var(--color-accent-600);
-  font-size: 0.7rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -168,7 +168,7 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
 .timestamp-history-table__header p {
   margin-top: 0.4rem;
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -182,7 +182,7 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
   min-height: 2.6rem;
   padding: 0.65rem 0.85rem;
   color: var(--color-brand-950);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   cursor: pointer;
   background: var(--color-surface-raised);
@@ -226,14 +226,14 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
   width: 1.5rem;
   height: 1.5rem;
   place-items: center;
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   border: 1px solid currentColor;
   border-radius: 50%;
 }
 
 .timestamp-history-table__error-notice p {
-  font-size: 0.74rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
 }
 
@@ -257,7 +257,7 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
 .timestamp-history-table__column-headings {
   padding: 0.7rem 1.5rem;
   color: var(--color-text-secondary);
-  font-size: 0.66rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -311,7 +311,7 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
 .timestamp-history-table__row time,
 .timestamp-history-table__credit {
   color: var(--color-text-secondary);
-  font-size: 0.7rem;
+  font-size: var(--font-size-small);
 }
 
 .timestamp-history-table__status {
@@ -323,7 +323,7 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
   width: fit-content;
   padding: 0.35rem 0.55rem;
   color: var(--timestamp-status-color);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   background: color-mix(
     in srgb,
@@ -409,7 +409,7 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
   max-width: 28rem;
   margin-top: 0.45rem;
   color: var(--color-text-secondary);
-  font-size: 0.74rem;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -437,7 +437,7 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
     display: block;
     margin-bottom: 0.4rem;
     color: var(--color-text-secondary);
-    font-size: 0.62rem;
+    font-size: var(--font-size-small);
     font-weight: 500;
     letter-spacing: 0.07em;
     content: attr(data-label);

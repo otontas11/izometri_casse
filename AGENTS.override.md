@@ -12,6 +12,8 @@
 
 # Naming and Component Conventions
 
+- Prefer the simplest direct implementation that clearly satisfies the requirement. Avoid unnecessary abstractions, indirection, and layers.
+- Keep functions focused on one responsibility and make control flow easy to follow from top to bottom.
 - Use intention-revealing names for variables, functions, types, and CSS classes. A reader should understand the responsibility of an identifier without needing to inspect its implementation.
 - Avoid vague names such as `data`, `item`, `value`, `info`, `temp`, `result`, `process`, or `handle` when a more domain-specific name is available. Short generic names are acceptable only in very small, unambiguous scopes.
 - Name functions with a verb that describes the action and result, such as `fetchDashboardSummary`, `updateUserProfile`, or `formatFileSize`.

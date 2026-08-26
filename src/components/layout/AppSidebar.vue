@@ -1,37 +1,110 @@
 <script setup lang="ts">
+import { nextTick, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import type { NavigationItem } from '@/types/navigation'
 
-defineProps<{
+const props = defineProps<{
   isOpen: boolean
 }>()
 
 const emit = defineEmits<{
   close: []
+  navigate: []
 }>()
+
+const sidebarElement = ref<HTMLElement | null>(null)
+const sidebarCloseButtonElement = ref<HTMLButtonElement | null>(null)
 
 const navigationItems: NavigationItem[] = [
   { label: 'Anasayfa', icon: 'dashboard', routeName: 'dashboard' },
   { label: 'Zaman Damgala', icon: 'timestamp', routeName: 'timestamp' },
   { label: 'Profil', icon: 'profile', routeName: 'profile' },
 ]
+
+const getFocusableSidebarElements = () =>
+  Array.from(
+    sidebarElement.value?.querySelectorAll<HTMLElement>(
+      'a[href], button:not(:disabled)',
+    ) ?? [],
+  ).filter((focusableElement) => focusableElement.offsetParent !== null)
+
+const handleSidebarKeydown = (keyboardEvent: KeyboardEvent) => {
+  if (!props.isOpen) {
+    return
+  }
+
+  if (keyboardEvent.key === 'Escape') {
+    keyboardEvent.preventDefault()
+    emit('close')
+    return
+  }
+
+  if (keyboardEvent.key !== 'Tab') {
+    return
+  }
+
+  const focusableSidebarElements = getFocusableSidebarElements()
+  const firstFocusableSidebarElement = focusableSidebarElements[0]
+  const lastFocusableSidebarElement = focusableSidebarElements.at(-1)
+
+  if (!firstFocusableSidebarElement || !lastFocusableSidebarElement) {
+    keyboardEvent.preventDefault()
+    return
+  }
+
+  if (
+    keyboardEvent.shiftKey &&
+    document.activeElement === firstFocusableSidebarElement
+  ) {
+    keyboardEvent.preventDefault()
+    lastFocusableSidebarElement.focus()
+    return
+  }
+
+  if (
+    !keyboardEvent.shiftKey &&
+    document.activeElement === lastFocusableSidebarElement
+  ) {
+    keyboardEvent.preventDefault()
+    firstFocusableSidebarElement.focus()
+  }
+}
+
+watch(
+  () => props.isOpen,
+  async (isOpen) => {
+    if (!isOpen) {
+      return
+    }
+
+    await nextTick()
+    sidebarCloseButtonElement.value?.focus()
+  },
+)
 </script>
 
 <template>
-  <aside :class="['app-sidebar', { 'app-sidebar--open': isOpen }]">
+  <aside
+    id="application-navigation"
+    ref="sidebarElement"
+    :class="['app-sidebar', { 'app-sidebar--open': isOpen }]"
+    aria-label="İzİmza ana navigasyonu"
+    @keydown="handleSidebarKeydown"
+  >
     <div class="app-sidebar__brand-row">
       <RouterLink
         class="app-sidebar__brand"
         :to="{ name: 'dashboard' }"
         aria-label="İzİmza anasayfa"
-        @click="emit('close')"
+        @click="emit('navigate')"
       >
         iz<span>imza</span>
       </RouterLink>
 
       <button
+        ref="sidebarCloseButtonElement"
         class="app-sidebar__close"
         type="button"
         aria-label="Navigasyonu kapat"
@@ -52,7 +125,7 @@ const navigationItems: NavigationItem[] = [
         :key="item.routeName"
         class="app-sidebar__link"
         :to="{ name: item.routeName }"
-        @click="emit('close')"
+        @click="emit('navigate')"
       >
         <AppIcon :name="item.icon" :size="21" />
         <span>{{ item.label }}</span>
@@ -78,6 +151,7 @@ const navigationItems: NavigationItem[] = [
   flex-direction: column;
   width: var(--sidebar-width);
   height: 100vh;
+  height: 100dvh;
   padding: 1.5rem 1rem;
   background: var(--color-surface-raised);
   border-right: 1px solid var(--color-border);
@@ -120,7 +194,7 @@ const navigationItems: NavigationItem[] = [
   margin: 1.75rem 0 1rem;
   padding-inline: 0.75rem;
   color: var(--color-text-secondary);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -215,11 +289,11 @@ const navigationItems: NavigationItem[] = [
 
 .app-sidebar__footer strong {
   color: var(--color-brand-950);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
 }
 
 .app-sidebar__footer small {
-  font-size: 0.675rem;
+  font-size: var(--font-size-small);
 }
 
 @media (max-width: 63.99rem) {
@@ -227,13 +301,20 @@ const navigationItems: NavigationItem[] = [
     position: fixed;
     left: 0;
     width: min(19rem, calc(100vw - 3rem));
+    visibility: hidden;
+    pointer-events: none;
     box-shadow: var(--shadow-md);
     transform: translateX(-105%);
-    transition: transform 220ms ease;
+    transition:
+      transform 220ms ease,
+      visibility 0s linear 220ms;
   }
 
   .app-sidebar--open {
+    visibility: visible;
+    pointer-events: auto;
     transform: translateX(0);
+    transition-delay: 0s;
   }
 
   .app-sidebar__close {

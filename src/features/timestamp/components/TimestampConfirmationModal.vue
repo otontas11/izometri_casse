@@ -125,6 +125,7 @@ onBeforeUnmount(() => {
           class="timestamp-confirmation-modal__dialog"
           role="dialog"
           aria-modal="true"
+          :aria-busy="isSubmitting"
           aria-labelledby="timestamp-confirmation-modal-title"
           aria-describedby="timestamp-confirmation-modal-description"
         >
@@ -227,6 +228,7 @@ onBeforeUnmount(() => {
   display: grid;
   width: min(100%, 34rem);
   max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
   padding: clamp(1.25rem, 4vw, 2rem);
   overflow-y: auto;
   background: var(--color-surface-raised);
@@ -261,7 +263,7 @@ onBeforeUnmount(() => {
 
 .timestamp-confirmation-modal__header small {
   color: var(--color-accent-600);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -336,7 +338,7 @@ onBeforeUnmount(() => {
 
 .timestamp-confirmation-modal__file-summary small {
   color: var(--color-text-secondary);
-  font-size: 0.7rem;
+  font-size: var(--font-size-small);
 }
 
 .timestamp-confirmation-modal__details {
@@ -359,7 +361,7 @@ onBeforeUnmount(() => {
 
 .timestamp-confirmation-modal__details dt {
   color: var(--color-text-secondary);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
 }
 
 .timestamp-confirmation-modal__details dd {

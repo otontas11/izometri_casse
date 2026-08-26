@@ -93,7 +93,7 @@ withDefaults(
 
 .dashboard-metric-card__label {
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -112,7 +112,7 @@ withDefaults(
   gap: 0.55rem;
   margin-top: 0.65rem;
   color: var(--color-text-secondary);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
   font-weight: 600;
 }
 

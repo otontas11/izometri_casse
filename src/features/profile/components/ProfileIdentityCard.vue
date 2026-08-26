@@ -143,7 +143,7 @@ watch(
 
 .profile-identity-card__details > small {
   color: color-mix(in srgb, var(--color-text-inverse) 63%, transparent);
-  font-size: 0.67rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -175,7 +175,7 @@ watch(
   margin-top: 0.85rem;
   padding: 0.35rem 0.6rem;
   color: var(--color-accent-100);
-  font-size: 0.65rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   background: color-mix(in srgb, var(--color-accent-600) 24%, transparent);
   border: 1px solid
@@ -189,7 +189,7 @@ watch(
   height: 1.15rem;
   place-items: center;
   color: var(--color-brand-950);
-  font-size: 0.6rem;
+  font-size: var(--font-size-small);
   background: var(--color-accent-100);
   border-radius: 50%;
 }
@@ -217,7 +217,7 @@ watch(
   min-height: 2.75rem;
   padding: 0.7rem 1rem;
   color: var(--color-brand-950);
-  font-size: 0.73rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   cursor: pointer;
   background: var(--color-surface-raised);

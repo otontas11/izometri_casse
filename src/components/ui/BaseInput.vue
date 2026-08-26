@@ -117,7 +117,7 @@ const handleInput = (inputEvent: Event) => {
 
 .base-input label {
   color: var(--color-brand-950);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
 }
 
@@ -176,7 +176,7 @@ const handleInput = (inputEvent: Event) => {
 
 .base-input__hint,
 .base-input__error-message {
-  font-size: 0.67rem;
+  font-size: var(--font-size-small);
   line-height: 1.45;
 }
 

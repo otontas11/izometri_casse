@@ -153,7 +153,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
 
 .recent-documents-table__heading p {
   color: var(--color-accent-600);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -168,7 +168,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
 
 .recent-documents-table__heading > span {
   color: var(--color-text-secondary);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
   font-weight: 700;
 }
 
@@ -184,7 +184,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
 .recent-documents-table__column-headings {
   min-height: 2.8rem;
   color: var(--color-text-secondary);
-  font-size: 0.65rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -194,7 +194,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
 .recent-documents-table__row {
   min-height: 5.25rem;
   color: var(--color-text-secondary);
-  font-size: 0.74rem;
+  font-size: var(--font-size-small);
 }
 
 .recent-documents-table__row + .recent-documents-table__row {
@@ -235,7 +235,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
 
 .recent-documents-table__file small {
   color: var(--color-text-secondary);
-  font-size: 0.63rem;
+  font-size: var(--font-size-small);
   font-weight: 600;
 }
 
@@ -243,7 +243,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
   display: inline-flex;
   width: fit-content;
   padding: 0.38rem 0.55rem;
-  font-size: 0.65rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   border-radius: 999px;
 }
@@ -312,7 +312,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
   max-width: 28rem;
   margin-top: 0.5rem;
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
   line-height: 1.6;
 }
 
@@ -320,7 +320,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
   margin-top: 1.25rem;
   padding: 0.65rem 0.85rem;
   color: var(--color-text-inverse);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   text-decoration: none;
   background: var(--color-brand-950);
@@ -364,7 +364,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
   .recent-documents-table__row > [data-label='Boyut'] {
     display: block;
     grid-column: 1;
-    font-size: 0.68rem;
+    font-size: var(--font-size-small);
   }
 
   .recent-documents-table__row > time::before,

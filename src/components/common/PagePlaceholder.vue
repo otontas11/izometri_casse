@@ -48,7 +48,7 @@ defineProps<{
 
 .page-placeholder__header p {
   color: var(--color-accent-600);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -108,7 +108,7 @@ defineProps<{
   margin-bottom: 1.25rem;
   padding: 0.45rem 0.75rem;
   color: var(--color-success);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   background: var(--color-accent-100);
   border-radius: 999px;

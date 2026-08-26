@@ -227,7 +227,7 @@ onMounted(() => {
 
 .dashboard-page__date {
   color: var(--color-accent-600);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -262,7 +262,7 @@ onMounted(() => {
   min-height: 2.75rem;
   padding: 0.7rem 0.9rem;
   color: var(--color-brand-950);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
   font-weight: 800;
   cursor: pointer;
   background: var(--color-surface-raised);

@@ -248,7 +248,7 @@ onMounted(() => {
 
 .timestamp-page__eyebrow {
   color: var(--color-accent-600);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -316,7 +316,7 @@ onMounted(() => {
 
 .timestamp-page__transaction-summary small {
   color: var(--color-text-secondary);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
 }
 
 .timestamp-page__transaction-summary strong {
@@ -327,7 +327,7 @@ onMounted(() => {
 
 .timestamp-page__transaction-summary .timestamp-page__available-credits {
   color: var(--color-accent-600);
-  font-size: 0.63rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
 }
 
@@ -380,7 +380,7 @@ onMounted(() => {
 .timestamp-page__guide > p {
   margin-top: 1.4rem;
   color: color-mix(in srgb, var(--color-text-inverse) 64%, transparent);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -415,7 +415,7 @@ onMounted(() => {
   place-items: center;
   color: var(--color-accent-100);
   font-family: var(--font-family-mono);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
   border: 1px solid
     color-mix(in srgb, var(--color-text-inverse) 22%, transparent);
   border-radius: 50%;
@@ -433,7 +433,7 @@ onMounted(() => {
 
 .timestamp-page__guide li small {
   color: color-mix(in srgb, var(--color-text-inverse) 65%, transparent);
-  font-size: 0.7rem;
+  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
@@ -454,14 +454,14 @@ onMounted(() => {
   height: 1.35rem;
   place-items: center;
   color: var(--color-brand-950);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   background: var(--color-accent-100);
   border-radius: 50%;
 }
 
 .timestamp-page__guide-note p {
-  font-size: 0.69rem;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 

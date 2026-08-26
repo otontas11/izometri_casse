@@ -28,6 +28,16 @@ const isFileDraggedOver = ref(false)
 const fileValidationErrorMessage = ref('')
 
 const maximumFileSizeLabel = formatFileSize(MAX_TIMESTAMP_FILE_SIZE_BYTES)
+const timestampFileInputDescriptionIds = computed(() =>
+  [
+    'timestamp-file-upload-zone-requirements',
+    fileValidationErrorMessage.value
+      ? 'timestamp-file-upload-zone-validation-error'
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' '),
+)
 const selectedFileExtensionLabel = computed(() => {
   const selectedFileName = props.selectedFile?.name ?? ''
   const fileExtension = selectedFileName.split('.').pop()
@@ -138,10 +148,15 @@ watch(
       @drop.prevent="handleFileDrop"
     >
       <input
+        id="timestamp-file-upload-zone-input"
         ref="fileInputElement"
         class="visually-hidden"
         type="file"
+        tabindex="-1"
         :disabled="isDisabled"
+        aria-label="Zaman damgalanacak dosyayı seçin"
+        :aria-describedby="timestampFileInputDescriptionIds"
+        :aria-invalid="fileValidationErrorMessage ? 'true' : undefined"
         @change="handleFileInputChange"
       />
 
@@ -164,19 +179,21 @@ watch(
         class="timestamp-file-upload-zone__select-button"
         type="button"
         :disabled="isDisabled"
+        :aria-describedby="timestampFileInputDescriptionIds"
         @click="openFilePicker"
       >
         <AppIcon name="document" :size="18" />
         {{ selectedFile ? 'Başka dosya seç' : 'Cihazdan dosya seç' }}
       </button>
 
-      <small>
+      <small id="timestamp-file-upload-zone-requirements">
         Tüm dosya türleri desteklenir · En fazla {{ maximumFileSizeLabel }}
       </small>
     </div>
 
     <p
       v-if="fileValidationErrorMessage"
+      id="timestamp-file-upload-zone-validation-error"
       class="timestamp-file-upload-zone__validation-message"
       role="alert"
     >
@@ -295,7 +312,7 @@ watch(
 
 .timestamp-file-upload-zone__introduction span {
   color: var(--color-accent-600);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -355,7 +372,7 @@ watch(
 .timestamp-file-upload-zone__drop-area > small {
   margin-top: 1rem;
   color: var(--color-text-secondary);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
 }
 
 .timestamp-file-upload-zone__validation-message {
@@ -416,7 +433,7 @@ watch(
 
 .timestamp-file-upload-zone__file-information span {
   color: var(--color-success);
-  font-size: 0.68rem;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -433,7 +450,7 @@ watch(
 
 .timestamp-file-upload-zone__file-information small {
   color: var(--color-text-secondary);
-  font-size: 0.72rem;
+  font-size: var(--font-size-small);
 }
 
 .timestamp-file-upload-zone__remove-button {
@@ -471,7 +488,7 @@ watch(
 
 .timestamp-file-upload-zone__action > span {
   color: var(--color-text-secondary);
-  font-size: 0.74rem;
+  font-size: var(--font-size-small);
 }
 
 .timestamp-file-upload-zone__action > span strong {
