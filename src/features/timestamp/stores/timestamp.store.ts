@@ -1,12 +1,22 @@
 import { computed, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 
-import { getApiErrorMessage } from '@/api/apiError'
+import { getApiErrorMessage, toApiRequestError } from '@/api/apiError'
 import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
 import type { ApiRequestStatus } from '@/types/api.types'
 
 import { timestampApi } from '../api/timestamp.api'
 import type { TimestampJob } from '../types/timestamp.types'
+
+const getTimestampSubmissionErrorMessage = (requestError: unknown) => {
+  const normalizedApiError = toApiRequestError(requestError)
+
+  if (normalizedApiError.statusCode === 404) {
+    return 'Zaman damgalama servisi bulunamadı. Fake API’yi durdurup npm run api komutuyla yeniden başlatın.'
+  }
+
+  return getApiErrorMessage(normalizedApiError)
+}
 
 export const useTimestampStore = defineStore('timestamp', () => {
   const dashboardStore = useDashboardStore()
@@ -101,6 +111,8 @@ export const useTimestampStore = defineStore('timestamp', () => {
         timestampTransaction.recentDocuments,
       )
       timestampJobs.value.unshift(timestampTransaction.timestampJob)
+      timestampHistoryErrorMessage.value = ''
+      timestampJobsLoadStatus.value = 'success'
       selectedTimestampFile.value = null
       timestampSubmissionStatus.value = 'success'
       timestampSubmissionSuccessMessage.value =
@@ -109,7 +121,8 @@ export const useTimestampStore = defineStore('timestamp', () => {
       return true
     } catch (requestError) {
       timestampSubmissionStatus.value = 'error'
-      timestampSubmissionErrorMessage.value = getApiErrorMessage(requestError)
+      timestampSubmissionErrorMessage.value =
+        getTimestampSubmissionErrorMessage(requestError)
 
       return false
     }

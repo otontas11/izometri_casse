@@ -13,6 +13,7 @@ export const auth0Plugin = isAuth0Configured
       {
         domain: auth0Config.domain,
         clientId: auth0Config.clientId,
+        cacheLocation: 'localstorage',
         authorizationParams: auth0AuthorizationParameters,
       },
       {
