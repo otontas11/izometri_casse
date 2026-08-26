@@ -1,13 +1,7 @@
-export type AppIconName =
-  | 'close'
-  | 'dashboard'
-  | 'menu'
-  | 'profile'
-  | 'timestamp'
+import type { AppIconName } from './icon'
 
 export interface NavigationItem {
   label: string
   icon: AppIconName
   routeName: 'dashboard' | 'profile' | 'timestamp'
 }
-

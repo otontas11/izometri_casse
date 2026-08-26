@@ -1,10 +1,23 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+
 import AppIcon from '@/components/ui/AppIcon.vue'
 import AuthUserMenu from '@/features/auth/components/AuthUserMenu.vue'
+import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
 
 const emit = defineEmits<{
   toggleNavigation: []
 }>()
+
+const dashboardStore = useDashboardStore()
+const { status, summary } = storeToRefs(dashboardStore)
+
+onMounted(() => {
+  if (status.value === 'idle') {
+    void dashboardStore.fetchDashboard()
+  }
+})
 </script>
 
 <template>
@@ -25,9 +38,9 @@ const emit = defineEmits<{
 
     <div class="app-topbar__actions">
       <span class="app-topbar__language" aria-label="Seçili dil Türkçe">TR</span>
-      <span class="app-topbar__quota">
+      <span class="app-topbar__quota" aria-live="polite">
         <small>Kalan kontör</small>
-        <strong>19</strong>
+        <strong>{{ summary?.remainingCredits ?? '—' }}</strong>
       </span>
       <AuthUserMenu />
     </div>
