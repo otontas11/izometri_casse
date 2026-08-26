@@ -50,6 +50,16 @@ export const useDashboardStore = defineStore('dashboard', () => {
     dashboardErrorMessage.value = ''
   }
 
+  const synchronizeDashboardAfterTimestamp = (
+    updatedDashboardSummary: DashboardSummary,
+    updatedRecentDocuments: ArchivedDocument[],
+  ) => {
+    dashboardSummary.value = updatedDashboardSummary
+    recentDocuments.value = updatedRecentDocuments
+    dashboardRequestStatus.value = 'success'
+    dashboardErrorMessage.value = ''
+  }
+
   return {
     clearDashboardError,
     dashboardErrorMessage,
@@ -59,5 +69,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
     isDashboardLoading,
     isDashboardReady,
     recentDocuments,
+    synchronizeDashboardAfterTimestamp,
   }
 })

@@ -1,8 +1,9 @@
 import { axiosInstance } from '@/api/axiosInstance'
 
 import type {
-  CreateTimestampJobPayload,
+  CreateTimestampTransactionPayload,
   TimestampJob,
+  TimestampTransactionResponse,
 } from '../types/timestamp.types'
 
 const fetchTimestampJobs = async () => {
@@ -19,18 +20,19 @@ const fetchTimestampJobs = async () => {
   return timestampJobs
 }
 
-const createTimestampJob = async (
-  timestampJobPayload: CreateTimestampJobPayload,
+const createTimestampTransaction = async (
+  timestampTransactionPayload: CreateTimestampTransactionPayload,
 ) => {
-  const { data: createdTimestampJob } = await axiosInstance.post<TimestampJob>(
-    '/timestampJobs',
-    timestampJobPayload,
-  )
+  const { data: timestampTransactionResponse } =
+    await axiosInstance.post<TimestampTransactionResponse>(
+      '/timestamp-transactions',
+      timestampTransactionPayload,
+    )
 
-  return createdTimestampJob
+  return timestampTransactionResponse
 }
 
 export const timestampApi = {
-  createTimestampJob,
+  createTimestampTransaction,
   fetchTimestampJobs,
 }

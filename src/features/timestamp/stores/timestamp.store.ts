@@ -2,12 +2,14 @@ import { computed, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 
 import { getApiErrorMessage } from '@/api/apiError'
+import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
 import type { ApiRequestStatus } from '@/types/api.types'
 
 import { timestampApi } from '../api/timestamp.api'
 import type { TimestampJob } from '../types/timestamp.types'
 
 export const useTimestampStore = defineStore('timestamp', () => {
+  const dashboardStore = useDashboardStore()
   const timestampJobs = ref<TimestampJob[]>([])
   const selectedTimestampFile = shallowRef<File | null>(null)
   const timestampJobsLoadStatus = ref<ApiRequestStatus>('idle')
@@ -47,6 +49,17 @@ export const useTimestampStore = defineStore('timestamp', () => {
     timestampSubmissionSuccessMessage.value = ''
   }
 
+  const reportInsufficientTimestampCredits = () => {
+    if (isTimestampSubmitting.value) {
+      return
+    }
+
+    timestampSubmissionStatus.value = 'error'
+    timestampSubmissionErrorMessage.value =
+      'Zaman damgalama işlemi için yeterli kontörünüz bulunmuyor.'
+    timestampSubmissionSuccessMessage.value = ''
+  }
+
   const submitSelectedTimestampFile = async () => {
     if (isTimestampSubmitting.value) {
       return false
@@ -60,30 +73,38 @@ export const useTimestampStore = defineStore('timestamp', () => {
       return false
     }
 
+    if (
+      dashboardStore.dashboardSummary &&
+      dashboardStore.dashboardSummary.remainingCredits < 1
+    ) {
+      reportInsufficientTimestampCredits()
+      return false
+    }
+
     timestampSubmissionStatus.value = 'loading'
     timestampSubmissionErrorMessage.value = ''
     timestampSubmissionSuccessMessage.value = ''
 
     const submittedTimestampFile = selectedTimestampFile.value
-    const timestampSubmissionDate = new Date().toISOString()
 
     try {
-      const createdTimestampJob = await timestampApi.createTimestampJob({
-        completedAt: timestampSubmissionDate,
-        createdAt: timestampSubmissionDate,
-        creditCost: 1,
-        fileName: submittedTimestampFile.name,
-        fileSize: submittedTimestampFile.size,
-        mimeType:
-          submittedTimestampFile.type || 'application/octet-stream',
-        status: 'completed',
-      })
+      const timestampTransaction =
+        await timestampApi.createTimestampTransaction({
+          fileName: submittedTimestampFile.name,
+          fileSize: submittedTimestampFile.size,
+          mimeType:
+            submittedTimestampFile.type || 'application/octet-stream',
+        })
 
-      timestampJobs.value.unshift(createdTimestampJob)
+      dashboardStore.synchronizeDashboardAfterTimestamp(
+        timestampTransaction.dashboardSummary,
+        timestampTransaction.recentDocuments,
+      )
+      timestampJobs.value.unshift(timestampTransaction.timestampJob)
       selectedTimestampFile.value = null
       timestampSubmissionStatus.value = 'success'
       timestampSubmissionSuccessMessage.value =
-        `${createdTimestampJob.fileName} başarıyla zaman damgalandı.`
+        `${timestampTransaction.timestampJob.fileName} başarıyla zaman damgalandı. 1 kontör kullanıldı.`
 
       return true
     } catch (requestError) {
@@ -108,6 +129,7 @@ export const useTimestampStore = defineStore('timestamp', () => {
     fetchTimestampJobs,
     isTimestampHistoryLoading,
     isTimestampSubmitting,
+    reportInsufficientTimestampCredits,
     selectedTimestampFile,
     selectTimestampFile,
     submitSelectedTimestampFile,

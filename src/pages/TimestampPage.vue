@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import { useToast } from '@/composables/useToast'
+import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
 import TimestampConfirmationModal from '@/features/timestamp/components/TimestampConfirmationModal.vue'
 import TimestampFileUploadZone from '@/features/timestamp/components/TimestampFileUploadZone.vue'
 import TimestampHistoryTable from '@/features/timestamp/components/TimestampHistoryTable.vue'
@@ -11,7 +12,9 @@ import { useTimestampStore } from '@/features/timestamp/stores/timestamp.store'
 import { MAX_TIMESTAMP_FILE_SIZE_BYTES } from '@/features/timestamp/utils/timestampFileValidation'
 import { formatFileSize } from '@/utils/formatters'
 
+const dashboardStore = useDashboardStore()
 const timestampStore = useTimestampStore()
+const { dashboardSummary } = storeToRefs(dashboardStore)
 const {
   isTimestampHistoryLoading,
   isTimestampSubmitting,
@@ -22,11 +25,19 @@ const {
   timestampSubmissionErrorMessage,
   timestampSubmissionSuccessMessage,
 } = storeToRefs(timestampStore)
-const { showErrorToast, showSuccessToast } = useToast()
+const { showErrorToast, showSuccessToast, showWarningToast } = useToast()
 
 const isConfirmationModalOpen = ref(false)
 const maximumTimestampFileSizeLabel = formatFileSize(
   MAX_TIMESTAMP_FILE_SIZE_BYTES,
+)
+const availableTimestampCredits = computed(
+  () => dashboardSummary.value?.remainingCredits ?? null,
+)
+const hasAvailableTimestampCredits = computed(
+  () =>
+    availableTimestampCredits.value === null ||
+    availableTimestampCredits.value > 0,
 )
 
 const handleTimestampFileSelection = (timestampFile: File | null) => {
@@ -39,6 +50,13 @@ const handleTimestampConfirmationRequest = () => {
   }
 
   timestampStore.clearTimestampSubmissionFeedback()
+
+  if (!hasAvailableTimestampCredits.value) {
+    timestampStore.reportInsufficientTimestampCredits()
+    showWarningToast(timestampSubmissionErrorMessage.value)
+    return
+  }
+
   isConfirmationModalOpen.value = true
 }
 
@@ -83,13 +101,30 @@ onMounted(() => {
         </p>
       </div>
 
-      <div class="timestamp-page__transaction-summary">
+      <div
+        :class="[
+          'timestamp-page__transaction-summary',
+          {
+            'timestamp-page__transaction-summary--insufficient':
+              !hasAvailableTimestampCredits,
+          },
+        ]"
+      >
         <span aria-hidden="true">
           <AppIcon name="wallet" :size="21" />
         </span>
         <div>
           <small>İşlem maliyeti</small>
           <strong>1 kontör / dosya</strong>
+          <small class="timestamp-page__available-credits">
+            {{
+              availableTimestampCredits === null
+                ? 'Bakiye yükleniyor…'
+                : availableTimestampCredits > 0
+                  ? `${availableTimestampCredits} kontör kullanılabilir`
+                  : 'Kullanılabilir kontör yok'
+            }}
+          </small>
         </div>
       </div>
     </header>
@@ -257,6 +292,23 @@ onMounted(() => {
   border-radius: var(--radius-sm);
 }
 
+.timestamp-page__transaction-summary--insufficient {
+  border-color: color-mix(
+    in srgb,
+    var(--color-warning) 35%,
+    var(--color-border)
+  );
+}
+
+.timestamp-page__transaction-summary--insufficient > span {
+  color: var(--color-warning);
+  background: color-mix(
+    in srgb,
+    var(--color-warning) 12%,
+    var(--color-surface-raised)
+  );
+}
+
 .timestamp-page__transaction-summary div {
   display: grid;
   gap: 0.2rem;
@@ -271,6 +323,17 @@ onMounted(() => {
   color: var(--color-brand-950);
   font-size: 0.78rem;
   font-weight: 500;
+}
+
+.timestamp-page__transaction-summary .timestamp-page__available-credits {
+  color: var(--color-accent-600);
+  font-size: 0.63rem;
+  font-weight: 500;
+}
+
+.timestamp-page__transaction-summary--insufficient
+  .timestamp-page__available-credits {
+  color: var(--color-warning);
 }
 
 .timestamp-page__workspace {

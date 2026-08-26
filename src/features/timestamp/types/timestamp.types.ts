@@ -1,3 +1,8 @@
+import type {
+  ArchivedDocument,
+  DashboardSummary,
+} from '@/features/dashboard/types/dashboard.types'
+
 export type TimestampJobStatus = 'completed' | 'failed' | 'processing'
 
 export interface TimestampJob {
@@ -11,4 +16,14 @@ export interface TimestampJob {
   completedAt: string | null
 }
 
-export type CreateTimestampJobPayload = Omit<TimestampJob, 'id'>
+export interface CreateTimestampTransactionPayload {
+  fileName: string
+  fileSize: number
+  mimeType: string
+}
+
+export interface TimestampTransactionResponse {
+  dashboardSummary: DashboardSummary
+  recentDocuments: ArchivedDocument[]
+  timestampJob: TimestampJob
+}
