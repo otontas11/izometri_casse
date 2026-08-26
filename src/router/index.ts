@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { requireAuthentication } from '@/features/auth/router/requireAuthentication'
 import AppShell from '@/layouts/AppShell.vue'
 
 declare module 'vue-router' {
   interface RouteMeta {
     title: string
+    requiresAuth?: boolean
   }
 }
 
@@ -12,8 +14,21 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/features/auth/views/LoginView.vue'),
+      meta: { title: 'Giriş' },
+    },
+    {
+      path: '/auth/callback',
+      name: 'auth-callback',
+      component: () => import('@/features/auth/views/AuthCallbackView.vue'),
+      meta: { title: 'Oturum doğrulanıyor' },
+    },
+    {
       path: '/',
       component: AppShell,
+      meta: { title: 'İzİmza', requiresAuth: true },
       children: [
         {
           path: '',
@@ -39,9 +54,10 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 }),
 })
 
+router.beforeEach(requireAuthentication)
+
 router.afterEach((to) => {
   document.title = `${to.meta.title} · İzİmza`
 })
 
 export default router
-

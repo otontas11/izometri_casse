@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
-
 import AppIcon from '@/components/ui/AppIcon.vue'
+import AuthUserMenu from '@/features/auth/components/AuthUserMenu.vue'
 
 const emit = defineEmits<{
   toggleNavigation: []
@@ -30,13 +29,7 @@ const emit = defineEmits<{
         <small>Kalan kontör</small>
         <strong>19</strong>
       </span>
-      <RouterLink
-        class="app-topbar__profile"
-        :to="{ name: 'profile' }"
-        aria-label="Profil sayfasına git"
-      >
-        DK
-      </RouterLink>
+      <AuthUserMenu />
     </div>
   </header>
 </template>
@@ -126,19 +119,6 @@ const emit = defineEmits<{
   font-size: 0.875rem;
 }
 
-.app-topbar__profile {
-  display: grid;
-  width: 2.625rem;
-  height: 2.625rem;
-  place-items: center;
-  color: var(--color-text-inverse);
-  font-size: 0.75rem;
-  font-weight: 800;
-  text-decoration: none;
-  background: var(--color-brand-950);
-  border-radius: 50%;
-}
-
 @media (max-width: 63.99rem) {
   .app-topbar__menu {
     display: grid;
@@ -159,4 +139,3 @@ const emit = defineEmits<{
   }
 }
 </style>
-
