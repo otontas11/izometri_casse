@@ -9,3 +9,15 @@
 - Always ask before destructive, irreversible, costly, or externally visible actions.
 - Preserve unrelated user changes and keep all work within the requested scope.
 - Finish with a concise summary of changes and validation results.
+
+# Naming and Component Conventions
+
+- Use intention-revealing names for variables, functions, types, and CSS classes. A reader should understand the responsibility of an identifier without needing to inspect its implementation.
+- Avoid vague names such as `data`, `item`, `value`, `info`, `temp`, `result`, `process`, or `handle` when a more domain-specific name is available. Short generic names are acceptable only in very small, unambiguous scopes.
+- Name functions with a verb that describes the action and result, such as `fetchDashboardSummary`, `updateUserProfile`, or `formatFileSize`.
+- Prefix boolean variables and computed values with `is`, `has`, `can`, or `should`, such as `isLoading`, `hasInitialError`, or `canPreviewDocument`.
+- Name event-handler functions with the `handle` prefix followed by the event or user action, such as `handleLogout`, `handleFileDrop`, or `handleProfileSubmit`.
+- Name Vue component files in PascalCase. When a component renders a root HTML element, its main CSS class must be the kebab-case form of the component name. For example, `AdminLogin.vue` must use `admin-login`, and `DashboardView.vue` must use `dashboard-view`.
+- Prefix component descendant and modifier classes with the main component class. Prefer a BEM-style structure such as `dashboard-view__header` and `dashboard-view--loading` so class ownership is immediately clear.
+- Pass-through or renderless components that do not render their own HTML root element are exempt from the main-class requirement.
+- When renaming an identifier or CSS class, update every template, style, test, and consumer reference consistently.

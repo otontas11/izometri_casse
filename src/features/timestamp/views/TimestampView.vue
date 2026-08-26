@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PagePlaceholder from '@/components/ui/PagePlaceholder.vue'
+import PagePlaceholder from '@/components/common/PagePlaceholder.vue'
 </script>
 
 <template>
@@ -9,4 +9,3 @@ import PagePlaceholder from '@/components/ui/PagePlaceholder.vue'
     description="Dosya yükleme, kontrol, OTP doğrulama ve sonuç adımları bu alanda geliştirilecek."
   />
 </template>
-
