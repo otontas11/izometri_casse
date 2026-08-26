@@ -1,0 +1,12 @@
+<script setup lang="ts">
+import PagePlaceholder from '@/components/common/PagePlaceholder.vue'
+</script>
+
+<template>
+  <PagePlaceholder
+    class="profile-page"
+    eyebrow="Hesap ayarları"
+    title="Profil ve Güvenlik"
+    description="Kullanıcı bilgileri, OAuth hesabı ve güvenlik seçenekleri bu alanda yer alacak."
+  />
+</template>

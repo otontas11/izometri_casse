@@ -1,0 +1,75 @@
+{
+  "dashboard": {
+    "totalSignedDocuments": 8,
+    "archivedDocumentCount": 12,
+    "remainingCredits": 19,
+    "storageUsedMb": 18.6,
+    "storageLimitMb": 1024
+  },
+  "documents": [
+    {
+      "id": 1,
+      "name": "tedarik-sozlesmesi-2026.pdf",
+      "createdAt": "2026-08-25T20:42:00.000Z",
+      "operation": "timestamp",
+      "sizeBytes": 842752,
+      "canPreview": true
+    },
+    {
+      "id": 2,
+      "name": "fatura-arsivi-agustos.zip",
+      "createdAt": "2026-08-25T20:21:00.000Z",
+      "operation": "timestamp",
+      "sizeBytes": 1456128,
+      "canPreview": false
+    },
+    {
+      "id": 3,
+      "name": "teklif-formu.pdf",
+      "createdAt": "2026-08-24T12:16:00.000Z",
+      "operation": "signature",
+      "sizeBytes": 524288,
+      "canPreview": true
+    }
+  ],
+  "profile": {
+    "id": "current-user",
+    "firstName": "Oktay",
+    "lastName": "Tontaş",
+    "email": "oktay.tontas@example.com",
+    "phone": "+90 555 123 45 67",
+    "avatarUrl": null
+  },
+  "timestampJobs": [
+    {
+      "id": 1,
+      "fileName": "tedarik-sozlesmesi-2026.pdf",
+      "fileSize": 842752,
+      "mimeType": "application/pdf",
+      "status": "completed",
+      "creditCost": 1,
+      "createdAt": "2026-08-25T20:42:00.000Z",
+      "completedAt": "2026-08-25T20:42:03.000Z"
+    },
+    {
+      "id": 2,
+      "fileName": "fatura-arsivi-agustos.zip",
+      "fileSize": 1456128,
+      "mimeType": "application/zip",
+      "status": "completed",
+      "creditCost": 1,
+      "createdAt": "2026-08-25T20:21:00.000Z",
+      "completedAt": "2026-08-25T20:21:04.000Z"
+    },
+    {
+      "completedAt": "2026-08-26T14:42:40.621Z",
+      "createdAt": "2026-08-26T14:42:40.621Z",
+      "creditCost": 1,
+      "fileName": "Basit PDF.pdf",
+      "fileSize": 7582,
+      "mimeType": "application/pdf",
+      "status": "completed",
+      "id": 3
+    }
+  ]
+}

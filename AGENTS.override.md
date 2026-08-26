@@ -21,3 +21,10 @@
 - Prefix component descendant and modifier classes with the main component class. Prefer a BEM-style structure such as `dashboard-view__header` and `dashboard-view--loading` so class ownership is immediately clear.
 - Pass-through or renderless components that do not render their own HTML root element are exempt from the main-class requirement.
 - When renaming an identifier or CSS class, update every template, style, test, and consumer reference consistently.
+
+# Git Visibility
+
+- Keep every non-ignored project file tracked by Git. After creating a file, stage that file with `git add -- <path>` so no project file remains untracked and every change is visible in the Git changes list.
+- Before handing work back, run `git status --short --untracked-files=all` and ensure no non-ignored project file remains as `??`.
+- Stage only in-scope files created or changed during the task. Do not commit or push unless the user explicitly requests that action. Files intentionally excluded by `.gitignore`, such as `.env`, `node_modules/`, and `dist/`, remain untracked.
+- If the execution environment blocks writes to the Git index, report the restriction immediately and provide the exact `git add` command for the user to run locally.
