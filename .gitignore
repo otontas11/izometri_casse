@@ -1,6 +1,10 @@
 node_modules/
 dist/
 coverage/
+storybook-static/
+.wrangler/
+worker/.wrangler/
+worker/.dev.vars
 
 .env
 .env.*
@@ -9,4 +13,3 @@ coverage/
 *.local
 .DS_Store
 .idea/
-

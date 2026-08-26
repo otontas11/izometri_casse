@@ -15,6 +15,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const recentDocuments = ref<ArchivedDocument[]>([])
   const dashboardRequestStatus = ref<ApiRequestStatus>('idle')
   const dashboardErrorMessage = ref('')
+  const downloadingDocumentId = ref<number | null>(null)
+  const documentDownloadErrorMessage = ref('')
 
   const isDashboardLoading = computed(
     () => dashboardRequestStatus.value === 'loading',
@@ -50,6 +52,24 @@ export const useDashboardStore = defineStore('dashboard', () => {
     dashboardErrorMessage.value = ''
   }
 
+  const downloadArchivedDocument = async (documentId: number) => {
+    if (downloadingDocumentId.value !== null) {
+      return null
+    }
+
+    downloadingDocumentId.value = documentId
+    documentDownloadErrorMessage.value = ''
+
+    try {
+      return await dashboardApi.downloadArchivedDocument(documentId)
+    } catch (requestError) {
+      documentDownloadErrorMessage.value = getApiErrorMessage(requestError)
+      return null
+    } finally {
+      downloadingDocumentId.value = null
+    }
+  }
+
   const synchronizeDashboardAfterTimestamp = (
     updatedDashboardSummary: DashboardSummary,
     updatedRecentDocuments: ArchivedDocument[],
@@ -65,6 +85,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
     dashboardErrorMessage,
     dashboardRequestStatus,
     dashboardSummary,
+    documentDownloadErrorMessage,
+    downloadArchivedDocument,
+    downloadingDocumentId,
     fetchDashboardData,
     isDashboardLoading,
     isDashboardReady,

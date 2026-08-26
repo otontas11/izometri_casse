@@ -130,6 +130,7 @@
     "recentDocuments": {
       "previewPreparing": "{fileName} için güvenli önizleme hazırlanıyor.",
       "downloadRequested": "{fileName} için indirme isteği oluşturuldu.",
+      "downloadFailed": "Belge indirilemedi. Lütfen tekrar deneyin.",
       "eyebrow": "Yakın geçmiş",
       "title": "Son arşivlenen belgeler",
       "recordCount": "{count} kayıt gösteriliyor",

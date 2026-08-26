@@ -130,6 +130,7 @@
     "recentDocuments": {
       "previewPreparing": "A secure preview is being prepared for {fileName}.",
       "downloadRequested": "A download request was created for {fileName}.",
+      "downloadFailed": "The document could not be downloaded. Please try again.",
       "eyebrow": "Recent activity",
       "title": "Recently archived documents",
       "recordCount": "Showing {count} records",

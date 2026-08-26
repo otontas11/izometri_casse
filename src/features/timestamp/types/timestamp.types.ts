@@ -16,12 +16,6 @@ export interface TimestampJob {
   completedAt: string | null
 }
 
-export interface CreateTimestampTransactionPayload {
-  fileName: string
-  fileSize: number
-  mimeType: string
-}
-
 export interface TimestampTransactionResponse {
   dashboardSummary: DashboardSummary
   recentDocuments: ArchivedDocument[]

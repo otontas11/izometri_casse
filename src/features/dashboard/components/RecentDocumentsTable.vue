@@ -12,6 +12,11 @@ import { formatDateTime, formatFileSize } from '@/utils/formatters'
 
 defineProps<{
   archivedDocuments: ArchivedDocument[]
+  downloadingDocumentId: number | null
+}>()
+
+const emit = defineEmits<{
+  download: [archivedDocument: ArchivedDocument]
 }>()
 
 const { showInfoToast } = useToast()
@@ -35,11 +40,7 @@ const handleDocumentPreview = (archivedDocument: ArchivedDocument) => {
 }
 
 const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
-  showInfoToast(
-    t('dashboard.recentDocuments.downloadRequested', {
-      fileName: archivedDocument.name,
-    }),
-  )
+  emit('download', archivedDocument)
 }
 </script>
 
@@ -150,6 +151,8 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
             </button>
             <button
               type="button"
+              :disabled="downloadingDocumentId !== null"
+              :aria-busy="downloadingDocumentId === archivedDocument.id"
               :aria-label="
                 t('dashboard.recentDocuments.downloadAriaLabel', {
                   fileName: archivedDocument.name,

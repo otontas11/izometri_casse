@@ -102,12 +102,7 @@ export const useTimestampStore = defineStore('timestamp', () => {
 
     try {
       const timestampTransaction =
-        await timestampApi.createTimestampTransaction({
-          fileName: submittedTimestampFile.name,
-          fileSize: submittedTimestampFile.size,
-          mimeType:
-            submittedTimestampFile.type || 'application/octet-stream',
-        })
+        await timestampApi.createTimestampTransaction(submittedTimestampFile)
 
       dashboardStore.synchronizeDashboardAfterTimestamp(
         timestampTransaction.dashboardSummary,

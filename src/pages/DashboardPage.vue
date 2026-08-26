@@ -5,10 +5,12 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
+import { useToast } from '@/composables/useToast'
 import DashboardMetricCard from '@/features/dashboard/components/DashboardMetricCard.vue'
 import DashboardQuickActionsPanel from '@/features/dashboard/components/DashboardQuickActionsPanel.vue'
 import RecentDocumentsTable from '@/features/dashboard/components/RecentDocumentsTable.vue'
 import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
+import type { ArchivedDocument } from '@/features/dashboard/types/dashboard.types'
 import { getApplicationLocaleCode } from '@/locales'
 
 const dashboardStore = useDashboardStore()
@@ -16,10 +18,13 @@ const {
   dashboardErrorMessage,
   dashboardRequestStatus,
   dashboardSummary,
+  documentDownloadErrorMessage,
+  downloadingDocumentId,
   isDashboardLoading,
   recentDocuments,
 } = storeToRefs(dashboardStore)
 const { user: authenticatedUser } = useAuth0()
+const { showErrorToast, showSuccessToast } = useToast()
 const { t } = useI18n({ useScope: 'global' })
 
 const formattedCurrentDate = computed(() =>
@@ -85,6 +90,41 @@ const formatStorageSize = (storageSizeInMegabytes: number) => {
 
 const handleDashboardRefresh = () => {
   void dashboardStore.fetchDashboardData()
+}
+
+const saveDocumentContent = (
+  documentContent: Blob,
+  documentFileName: string,
+) => {
+  const documentObjectUrl = URL.createObjectURL(documentContent)
+  const documentDownloadLink = document.createElement('a')
+  documentDownloadLink.href = documentObjectUrl
+  documentDownloadLink.download = documentFileName
+  document.body.append(documentDownloadLink)
+  documentDownloadLink.click()
+  documentDownloadLink.remove()
+  window.setTimeout(() => URL.revokeObjectURL(documentObjectUrl), 0)
+}
+
+const handleDocumentDownload = async (archivedDocument: ArchivedDocument) => {
+  const documentContent = await dashboardStore.downloadArchivedDocument(
+    archivedDocument.id,
+  )
+
+  if (!documentContent) {
+    showErrorToast(
+      documentDownloadErrorMessage.value ||
+        t('dashboard.recentDocuments.downloadFailed'),
+    )
+    return
+  }
+
+  saveDocumentContent(documentContent, archivedDocument.name)
+  showSuccessToast(
+    t('dashboard.recentDocuments.downloadRequested', {
+      fileName: archivedDocument.name,
+    }),
+  )
 }
 
 onMounted(() => {
@@ -203,7 +243,11 @@ onMounted(() => {
 
       <DashboardQuickActionsPanel />
 
-      <RecentDocumentsTable :archived-documents="recentDocuments" />
+      <RecentDocumentsTable
+        :archived-documents="recentDocuments"
+        :downloading-document-id="downloadingDocumentId"
+        @download="handleDocumentDownload"
+      />
     </template>
   </section>
 </template>

@@ -27,7 +27,20 @@ const fetchRecentDocuments = async (documentLimit = 5) => {
   return recentDocuments
 }
 
+const downloadArchivedDocument = async (documentId: number) => {
+  const { data: documentContent } = await axiosInstance.get<Blob>(
+    `/documents/${documentId}/download`,
+    {
+      responseType: 'blob',
+      timeout: 60_000,
+    },
+  )
+
+  return documentContent
+}
+
 export const dashboardApi = {
+  downloadArchivedDocument,
   fetchDashboardSummary,
   fetchRecentDocuments,
 }

@@ -10,22 +10,42 @@
     "dev": "vite",
     "api": "node mock/server.cjs",
     "build": "npm run type-check && vite build",
+    "build-storybook": "storybook build",
     "preview": "vite preview",
-    "type-check": "vue-tsc --noEmit"
+    "storybook": "storybook dev -p 6006",
+    "type-check": "vue-tsc --noEmit",
+    "worker:dev": "wrangler dev --config worker/wrangler.jsonc",
+    "worker:migrate:local": "wrangler d1 migrations apply DATABASE --local --config worker/wrangler.jsonc",
+    "worker:type-check": "tsc --project worker/tsconfig.json --noEmit",
+    "worker:types": "wrangler types worker/worker-configuration.d.ts --config worker/wrangler.jsonc"
   },
   "dependencies": {
     "@auth0/auth0-vue": "^2.9.0",
     "axios": "^1.19.0",
+    "jose": "^6.2.10",
     "pinia": "^3.0.4",
     "vue": "^3.5.41",
     "vue-i18n": "^11.4.10",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^10.5.10",
+    "@storybook/addon-docs": "^10.5.10",
+    "@storybook/vue3-vite": "^10.5.10",
     "@vitejs/plugin-vue": "^5.2.4",
     "json-server": "^0.17.4",
+    "msw": "^2.15.0",
+    "msw-storybook-addon": "^3.0.0",
+    "multer": "^2.2.0",
+    "storybook": "^10.5.10",
     "typescript": "~5.9.3",
     "vite": "^6.4.3",
-    "vue-tsc": "^3.3.11"
+    "vue-tsc": "^3.3.11",
+    "wrangler": "^4.126.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

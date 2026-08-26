@@ -1,10 +1,11 @@
 import { axiosInstance } from '@/api/axiosInstance'
 
 import type {
-  CreateTimestampTransactionPayload,
   TimestampJob,
   TimestampTransactionResponse,
 } from '../types/timestamp.types'
+
+const TIMESTAMP_UPLOAD_TIMEOUT_MILLISECONDS = 60_000
 
 const fetchTimestampJobs = async () => {
   const { data: timestampJobs } = await axiosInstance.get<TimestampJob[]>(
@@ -21,12 +22,18 @@ const fetchTimestampJobs = async () => {
 }
 
 const createTimestampTransaction = async (
-  timestampTransactionPayload: CreateTimestampTransactionPayload,
+  timestampFile: File,
 ) => {
+  const timestampFormData = new FormData()
+  timestampFormData.append('file', timestampFile, timestampFile.name)
+
   const { data: timestampTransactionResponse } =
     await axiosInstance.post<TimestampTransactionResponse>(
       '/timestamp-transactions',
-      timestampTransactionPayload,
+      timestampFormData,
+      {
+        timeout: TIMESTAMP_UPLOAD_TIMEOUT_MILLISECONDS,
+      },
     )
 
   return timestampTransactionResponse
