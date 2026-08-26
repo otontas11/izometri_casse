@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import {
   MAX_TIMESTAMP_FILE_SIZE_BYTES,
   validateTimestampFile,
 } from '@/features/timestamp/utils/timestampFileValidation'
+import { getApplicationLocaleCode } from '@/locales'
 import { formatFileSize } from '@/utils/formatters'
 
 const props = withDefaults(
@@ -23,11 +25,14 @@ const emit = defineEmits<{
   'select-file': [timestampFile: File | null]
 }>()
 
+const { t } = useI18n({ useScope: 'global' })
 const fileInputElement = ref<HTMLInputElement | null>(null)
 const isFileDraggedOver = ref(false)
 const fileValidationErrorMessage = ref('')
 
-const maximumFileSizeLabel = formatFileSize(MAX_TIMESTAMP_FILE_SIZE_BYTES)
+const maximumFileSizeLabel = computed(() =>
+  formatFileSize(MAX_TIMESTAMP_FILE_SIZE_BYTES),
+)
 const timestampFileInputDescriptionIds = computed(() =>
   [
     'timestamp-file-upload-zone-requirements',
@@ -43,10 +48,12 @@ const selectedFileExtensionLabel = computed(() => {
   const fileExtension = selectedFileName.split('.').pop()
 
   if (!fileExtension || fileExtension === selectedFileName) {
-    return 'Dosya'
+    return t('timestamp.upload.fileFallback')
   }
 
-  return `${fileExtension.toLocaleUpperCase('tr-TR')} dosyası`
+  return t('timestamp.upload.fileExtension', {
+    extension: fileExtension.toLocaleUpperCase(getApplicationLocaleCode()),
+  })
 })
 
 const openFilePicker = () => {
@@ -102,8 +109,7 @@ const handleFileDrop = (dropEvent: DragEvent) => {
   }
 
   if (droppedFiles.length > 1) {
-    fileValidationErrorMessage.value =
-      'Tek seferde yalnızca bir dosya seçebilirsiniz.'
+    fileValidationErrorMessage.value = t('timestamp.upload.multipleFilesError')
     return
   }
 
@@ -154,7 +160,7 @@ watch(
         type="file"
         tabindex="-1"
         :disabled="isDisabled"
-        aria-label="Zaman damgalanacak dosyayı seçin"
+        :aria-label="t('timestamp.upload.inputAriaLabel')"
         :aria-describedby="timestampFileInputDescriptionIds"
         :aria-invalid="fileValidationErrorMessage ? 'true' : undefined"
         @change="handleFileInputChange"
@@ -165,14 +171,11 @@ watch(
       </span>
 
       <div class="timestamp-file-upload-zone__introduction">
-        <span>Dosya seçimi</span>
+        <span>{{ t('timestamp.upload.eyebrow') }}</span>
         <h2 id="timestamp-file-upload-zone-title">
-          Dosyanızı güvenli alana bırakın
+          {{ t('timestamp.upload.title') }}
         </h2>
-        <p>
-          Sürükleyip bırakabilir veya cihazınızdan seçebilirsiniz. İşlem öncesinde
-          dosya bilgilerini tekrar kontrol edebilirsiniz.
-        </p>
+        <p>{{ t('timestamp.upload.description') }}</p>
       </div>
 
       <button
@@ -183,11 +186,19 @@ watch(
         @click="openFilePicker"
       >
         <AppIcon name="document" :size="18" />
-        {{ selectedFile ? 'Başka dosya seç' : 'Cihazdan dosya seç' }}
+        {{
+          selectedFile
+            ? t('timestamp.upload.selectAnother')
+            : t('timestamp.upload.selectFromDevice')
+        }}
       </button>
 
       <small id="timestamp-file-upload-zone-requirements">
-        Tüm dosya türleri desteklenir · En fazla {{ maximumFileSizeLabel }}
+        {{
+          t('timestamp.upload.requirements', {
+            maximumSize: maximumFileSizeLabel,
+          })
+        }}
       </small>
     </div>
 
@@ -204,14 +215,14 @@ watch(
     <article
       v-if="selectedFile"
       class="timestamp-file-upload-zone__selected-file"
-      aria-label="Seçilen dosya"
+      :aria-label="t('timestamp.upload.selectedFileAriaLabel')"
     >
       <span class="timestamp-file-upload-zone__file-icon" aria-hidden="true">
         <AppIcon name="document" :size="22" />
       </span>
 
       <div class="timestamp-file-upload-zone__file-information">
-        <span>İşleme hazır</span>
+        <span>{{ t('timestamp.upload.ready') }}</span>
         <strong>{{ selectedFile.name }}</strong>
         <small>
           {{ selectedFileExtensionLabel }} · {{ formatFileSize(selectedFile.size) }}
@@ -222,20 +233,27 @@ watch(
         class="timestamp-file-upload-zone__remove-button"
         type="button"
         :disabled="isDisabled"
-        :aria-label="`${selectedFile.name} dosyasını kaldır`"
+        :aria-label="
+          t('timestamp.upload.removeAriaLabel', {
+            fileName: selectedFile.name,
+          })
+        "
         @click="handleSelectedFileRemove"
       >
         <AppIcon name="close" :size="18" />
       </button>
 
       <div class="timestamp-file-upload-zone__action">
-        <span>İşlem maliyeti <strong>1 kontör</strong></span>
+        <span>
+          {{ t('timestamp.upload.transactionCost') }}
+          <strong>{{ t('timestamp.upload.oneCredit') }}</strong>
+        </span>
         <button
           type="button"
           :disabled="isDisabled"
           @click="emit('request-timestamp')"
         >
-          Zaman damgalamaya devam et
+          {{ t('timestamp.upload.continue') }}
           <AppIcon name="arrow-right" :size="18" />
         </button>
       </div>

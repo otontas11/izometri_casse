@@ -2,12 +2,14 @@
 import { computed, onMounted } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import DashboardMetricCard from '@/features/dashboard/components/DashboardMetricCard.vue'
 import DashboardQuickActionsPanel from '@/features/dashboard/components/DashboardQuickActionsPanel.vue'
 import RecentDocumentsTable from '@/features/dashboard/components/RecentDocumentsTable.vue'
 import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
+import { getApplicationLocaleCode } from '@/locales'
 
 const dashboardStore = useDashboardStore()
 const {
@@ -18,17 +20,19 @@ const {
   recentDocuments,
 } = storeToRefs(dashboardStore)
 const { user: authenticatedUser } = useAuth0()
+const { t } = useI18n({ useScope: 'global' })
 
-const dashboardNumberFormatter = new Intl.NumberFormat('tr-TR', {
-  maximumFractionDigits: 1,
-})
-const currentDateFormatter = new Intl.DateTimeFormat('tr-TR', {
-  day: 'numeric',
-  month: 'long',
-  weekday: 'long',
-})
-
-const formattedCurrentDate = currentDateFormatter.format(new Date())
+const formattedCurrentDate = computed(() =>
+  new Intl.DateTimeFormat(getApplicationLocaleCode(), {
+    day: 'numeric',
+    month: 'long',
+    weekday: 'long',
+  }).format(new Date()),
+)
+const formatDashboardNumber = (dashboardNumber: number) =>
+  new Intl.NumberFormat(getApplicationLocaleCode(), {
+    maximumFractionDigits: 1,
+  }).format(dashboardNumber)
 const authenticatedUserFirstName = computed(() => {
   const authProfileNameCandidates = [
     authenticatedUser.value?.given_name,
@@ -43,7 +47,7 @@ const authenticatedUserFirstName = computed(() => {
 
   return (
     authenticatedUserDisplayName?.trim().split(/\s+/)[0] ??
-    'İzİmza kullanıcısı'
+    t('dashboard.page.userFallback')
   )
 })
 const isInitialDashboardLoading = computed(
@@ -73,10 +77,10 @@ const archiveStorageUsagePercentage = computed(() => {
 
 const formatStorageSize = (storageSizeInMegabytes: number) => {
   if (storageSizeInMegabytes >= 1024) {
-    return `${dashboardNumberFormatter.format(storageSizeInMegabytes / 1024)} GB`
+    return `${formatDashboardNumber(storageSizeInMegabytes / 1024)} GB`
   }
 
-  return `${dashboardNumberFormatter.format(storageSizeInMegabytes)} MB`
+  return `${formatDashboardNumber(storageSizeInMegabytes)} MB`
 }
 
 const handleDashboardRefresh = () => {
@@ -96,10 +100,10 @@ onMounted(() => {
       <div>
         <p class="dashboard-page__date">{{ formattedCurrentDate }}</p>
         <h1 id="dashboard-page-title">
-          Merhaba, {{ authenticatedUserFirstName }}
+          {{ t('dashboard.page.greeting', { name: authenticatedUserFirstName }) }}
         </h1>
         <p class="dashboard-page__introduction">
-          Dijital işlemlerinizin özeti ve güvenli işlem araçlarınız burada.
+          {{ t('dashboard.page.introduction') }}
         </p>
       </div>
 
@@ -110,7 +114,11 @@ onMounted(() => {
         @click="handleDashboardRefresh"
       >
         <AppIcon name="refresh" :size="18" />
-        {{ isDashboardLoading ? 'Yenileniyor…' : 'Verileri yenile' }}
+        {{
+          isDashboardLoading
+            ? t('dashboard.page.refreshing')
+            : t('dashboard.page.refreshData')
+        }}
       </button>
     </header>
 
@@ -120,13 +128,15 @@ onMounted(() => {
       role="alert"
     >
       <span>{{ dashboardErrorMessage }}</span>
-      <button type="button" @click="handleDashboardRefresh">Tekrar dene</button>
+      <button type="button" @click="handleDashboardRefresh">
+        {{ t('common.retry') }}
+      </button>
     </div>
 
     <div
       v-if="isInitialDashboardLoading"
       class="dashboard-page__loading-state"
-      aria-label="Dashboard verileri yükleniyor"
+      :aria-label="t('dashboard.page.loadingAriaLabel')"
       aria-busy="true"
     >
       <div class="dashboard-page__metric-skeletons">
@@ -143,53 +153,48 @@ onMounted(() => {
     >
       <span class="dashboard-page__error-icon" aria-hidden="true">!</span>
       <div>
-        <h2>İşlem merkezi yüklenemedi</h2>
+        <h2>{{ t('dashboard.page.loadErrorTitle') }}</h2>
         <p>{{ dashboardErrorMessage }}</p>
       </div>
       <button type="button" @click="handleDashboardRefresh">
-        Yeniden dene
+        {{ t('dashboard.page.retry') }}
       </button>
     </div>
 
     <template v-else-if="dashboardSummary">
-      <section class="dashboard-page__metrics" aria-label="Hesap özeti">
+      <section
+        class="dashboard-page__metrics"
+        :aria-label="t('dashboard.page.accountSummaryAriaLabel')"
+      >
         <DashboardMetricCard
-          label="İmzalanan belge"
-          :value="
-            dashboardNumberFormatter.format(
-              dashboardSummary.totalSignedDocuments,
-            )
-          "
-          detail="Tüm zamanlardaki işlemler"
+          :label="t('dashboard.metrics.signedDocuments')"
+          :value="formatDashboardNumber(dashboardSummary.totalSignedDocuments)"
+          :detail="t('dashboard.metrics.signedDocumentsDetail')"
           icon="signature"
           tone="navy"
         />
         <DashboardMetricCard
-          label="Arşivdeki kayıt"
-          :value="
-            dashboardNumberFormatter.format(
-              dashboardSummary.archivedDocumentCount,
-            )
-          "
-          detail="Güvenle saklanan doküman"
+          :label="t('dashboard.metrics.archivedDocuments')"
+          :value="formatDashboardNumber(dashboardSummary.archivedDocumentCount)"
+          :detail="t('dashboard.metrics.archivedDocumentsDetail')"
           icon="archive"
           tone="violet"
         />
         <DashboardMetricCard
-          label="Kullanılabilir kontör"
-          :value="
-            dashboardNumberFormatter.format(dashboardSummary.remainingCredits)
-          "
-          detail="Her zaman damgası 1 kontör"
+          :label="t('dashboard.metrics.availableCredits')"
+          :value="formatDashboardNumber(dashboardSummary.remainingCredits)"
+          :detail="t('dashboard.metrics.availableCreditsDetail')"
           icon="wallet"
           tone="green"
         />
         <DashboardMetricCard
-          label="Arşiv kapasitesi"
+          :label="t('dashboard.metrics.archiveCapacity')"
           :value="formatStorageSize(dashboardSummary.storageUsedMb)"
-          :detail="`${formatStorageSize(
-            dashboardSummary.storageLimitMb,
-          )} toplam alan`"
+          :detail="
+            t('dashboard.metrics.totalStorage', {
+              size: formatStorageSize(dashboardSummary.storageLimitMb),
+            })
+          "
           :progress="archiveStorageUsagePercentage"
           icon="storage"
           tone="blue"

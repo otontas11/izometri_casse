@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 defineProps<{
   eyebrow: string
   title: string
   description: string
 }>()
+
+const { t } = useI18n({ useScope: 'global' })
 </script>
 
 <template>
@@ -15,12 +19,9 @@ defineProps<{
     </header>
 
     <div class="page-placeholder__surface">
-      <span class="page-placeholder__status">İskelet hazır</span>
-      <h2>Sayfa bileşenleri bir sonraki aşamada eklenecek.</h2>
-      <p>
-        Route, responsive uygulama kabuğu ve temel tasarım token’ları kullanıma
-        hazır.
-      </p>
+      <span class="page-placeholder__status">{{ t('placeholder.ready') }}</span>
+      <h2>{{ t('placeholder.title') }}</h2>
+      <p>{{ t('placeholder.description') }}</p>
     </div>
   </section>
 </template>

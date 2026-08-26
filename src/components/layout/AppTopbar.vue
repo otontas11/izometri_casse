@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
+import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
 import AuthUserMenu from '@/features/auth/components/AuthUserMenu.vue'
 import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
 
@@ -14,6 +16,7 @@ const emit = defineEmits<{
   toggleSidebar: []
 }>()
 
+const { t } = useI18n({ useScope: 'global' })
 const sidebarToggleButtonElement = ref<HTMLButtonElement | null>(null)
 
 const focusSidebarToggleButton = () => {
@@ -40,7 +43,11 @@ onMounted(() => {
       type="button"
       aria-controls="application-navigation"
       :aria-expanded="isSidebarOpen"
-      :aria-label="isSidebarOpen ? 'Navigasyonu kapat' : 'Navigasyonu aç'"
+      :aria-label="
+        isSidebarOpen
+          ? t('layout.topbar.closeNavigation')
+          : t('layout.topbar.openNavigation')
+      "
       @click="emit('toggleSidebar')"
     >
       <AppIcon name="menu" :size="23" />
@@ -48,13 +55,13 @@ onMounted(() => {
 
     <div class="app-topbar__context">
       <strong>İzİmza</strong>
-      <span>Güvenli dijital işlemler</span>
+      <span>{{ t('layout.topbar.context') }}</span>
     </div>
 
     <div class="app-topbar__actions">
-      <span class="app-topbar__language" aria-label="Seçili dil Türkçe">TR</span>
+      <LanguageSwitcher class="app-topbar__language-switcher" />
       <span class="app-topbar__quota" aria-live="polite">
-        <small>Kalan kontör</small>
+        <small>{{ t('layout.topbar.remainingCredits') }}</small>
         <strong>{{ dashboardSummary?.remainingCredits ?? '—' }}</strong>
       </span>
       <AuthUserMenu />
@@ -111,19 +118,6 @@ onMounted(() => {
   margin-left: auto;
 }
 
-.app-topbar__language {
-  display: grid;
-  width: 2.5rem;
-  height: 2.5rem;
-  place-items: center;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-small);
-  font-weight: 800;
-  background: var(--color-surface-canvas);
-  border: 1px solid var(--color-border);
-  border-radius: 50%;
-}
-
 .app-topbar__quota {
   display: flex;
   gap: 0.625rem;
@@ -155,7 +149,7 @@ onMounted(() => {
 
 @media (max-width: 35.99rem) {
   .app-topbar__context,
-  .app-topbar__language,
+  .app-topbar__language-switcher,
   .app-topbar__quota small {
     display: none;
   }

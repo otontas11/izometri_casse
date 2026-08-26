@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 </script>
 
 <template>
   <section
     class="dashboard-quick-actions-panel"
-    aria-label="Hızlı işlemler"
+    :aria-label="t('dashboard.quickActions.ariaLabel')"
   >
     <article class="dashboard-quick-actions-panel__primary-action">
       <div class="dashboard-quick-actions-panel__primary-copy">
         <span class="dashboard-quick-actions-panel__badge">
           <span aria-hidden="true"></span>
-          En hızlı işlem
+          {{ t('dashboard.quickActions.fastestAction') }}
         </span>
-        <h2>Belgenizin zamanını şimdi kanıtlayın.</h2>
-        <p>
-          Dosyanızı yükleyin; bütünlük kontrolü, zaman damgası ve arşiv kaydını
-          tek bir güvenli akışta tamamlayın.
-        </p>
+        <h2>{{ t('dashboard.quickActions.title') }}</h2>
+        <p>{{ t('dashboard.quickActions.description') }}</p>
       </div>
 
       <RouterLink
@@ -33,8 +33,8 @@ import AppIcon from '@/components/common/AppIcon.vue'
           <AppIcon name="upload" :size="24" />
         </span>
         <span class="dashboard-quick-actions-panel__timestamp-copy">
-          <strong>Dosya seçmeye başla</strong>
-          <small>Zaman Damgala ekranına ilerle</small>
+          <strong>{{ t('dashboard.quickActions.startSelectingFile') }}</strong>
+          <small>{{ t('dashboard.quickActions.goToTimestamp') }}</small>
         </span>
         <AppIcon name="arrow-right" :size="20" />
       </RouterLink>
@@ -52,8 +52,10 @@ import AppIcon from '@/components/common/AppIcon.vue'
           <AppIcon name="timestamp" :size="21" />
         </span>
         <div>
-          <small>İzİmza güvencesi</small>
-          <h2 id="dashboard-trust-chain-title">Güven zinciri</h2>
+          <small>{{ t('dashboard.quickActions.assurance') }}</small>
+          <h2 id="dashboard-trust-chain-title">
+            {{ t('dashboard.quickActions.trustChain') }}
+          </h2>
         </div>
       </div>
 
@@ -61,22 +63,26 @@ import AppIcon from '@/components/common/AppIcon.vue'
         <li>
           <span>01</span>
           <div>
-            <strong>Dosya bütünlüğü</strong>
-            <small>Belgenin dijital özeti hazırlanır.</small>
+            <strong>{{ t('dashboard.quickActions.fileIntegrity') }}</strong>
+            <small>
+              {{ t('dashboard.quickActions.fileIntegrityDescription') }}
+            </small>
           </div>
         </li>
         <li>
           <span>02</span>
           <div>
-            <strong>Zaman kanıtı</strong>
-            <small>İşlem zamanı güvenle kayıt altına alınır.</small>
+            <strong>{{ t('dashboard.quickActions.timeProof') }}</strong>
+            <small>{{ t('dashboard.quickActions.timeProofDescription') }}</small>
           </div>
         </li>
         <li>
           <span>03</span>
           <div>
-            <strong>Güvenli arşiv</strong>
-            <small>Sonuç belgeniz hesabınızda saklanır.</small>
+            <strong>{{ t('dashboard.quickActions.secureArchive') }}</strong>
+            <small>
+              {{ t('dashboard.quickActions.secureArchiveDescription') }}
+            </small>
           </div>
         </li>
       </ol>

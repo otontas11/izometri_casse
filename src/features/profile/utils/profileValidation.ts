@@ -1,3 +1,5 @@
+import { translate } from '@/locales'
+
 import type { UpdateProfilePayload } from '../types/profile.types'
 
 export type ProfileEditableFieldName = keyof UpdateProfilePayload
@@ -21,18 +23,22 @@ export const validateProfileName = (
   const trimmedProfileName = profileName.trim()
 
   if (!trimmedProfileName) {
-    return `${fieldLabel} alanı zorunludur.`
+    return translate('profile.validation.required', { fieldLabel })
   }
 
   if (
     trimmedProfileName.length < PROFILE_NAME_MINIMUM_LENGTH ||
     trimmedProfileName.length > PROFILE_NAME_MAXIMUM_LENGTH
   ) {
-    return `${fieldLabel} ${PROFILE_NAME_MINIMUM_LENGTH}-${PROFILE_NAME_MAXIMUM_LENGTH} karakter arasında olmalıdır.`
+    return translate('profile.validation.nameLength', {
+      fieldLabel,
+      maximumLength: PROFILE_NAME_MAXIMUM_LENGTH,
+      minimumLength: PROFILE_NAME_MINIMUM_LENGTH,
+    })
   }
 
   if (!profileNamePattern.test(trimmedProfileName)) {
-    return `${fieldLabel} yalnızca harf, boşluk, tire ve kesme işareti içerebilir.`
+    return translate('profile.validation.nameCharacters', { fieldLabel })
   }
 
   return ''
@@ -42,13 +48,13 @@ export const validateProfilePhone = (phoneNumber: string) => {
   const trimmedPhoneNumber = phoneNumber.trim()
 
   if (!trimmedPhoneNumber) {
-    return 'Telefon numarası alanı zorunludur.'
+    return translate('profile.validation.phoneRequired')
   }
 
   const normalizedPhoneNumber = trimmedPhoneNumber.replace(/[\s()-]/g, '')
 
   if (!normalizedPhonePattern.test(normalizedPhoneNumber)) {
-    return 'Geçerli bir telefon numarası girin. Örnek: +90 555 123 45 67.'
+    return translate('profile.validation.phoneInvalid')
   }
 
   return ''
@@ -57,8 +63,14 @@ export const validateProfilePhone = (phoneNumber: string) => {
 export const validateProfileForm = (
   profileFormValues: UpdateProfilePayload,
 ): ProfileFormErrors => ({
-  firstName: validateProfileName(profileFormValues.firstName, 'Ad'),
-  lastName: validateProfileName(profileFormValues.lastName, 'Soyad'),
+  firstName: validateProfileName(
+    profileFormValues.firstName,
+    translate('profile.form.firstName'),
+  ),
+  lastName: validateProfileName(
+    profileFormValues.lastName,
+    translate('profile.form.lastName'),
+  ),
   phone: validateProfilePhone(profileFormValues.phone),
 })
 

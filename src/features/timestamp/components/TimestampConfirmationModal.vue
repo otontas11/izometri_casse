@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import { formatFileSize } from '@/utils/formatters'
@@ -21,6 +22,7 @@ const emit = defineEmits<{
   confirm: []
 }>()
 
+const { t } = useI18n({ useScope: 'global' })
 const modalDialogElement = ref<HTMLElement | null>(null)
 const confirmationButtonElement = ref<HTMLButtonElement | null>(null)
 let previouslyFocusedElement: HTMLElement | null = null
@@ -134,15 +136,15 @@ onBeforeUnmount(() => {
               <AppIcon name="timestamp" :size="23" />
             </span>
             <div>
-              <small>Son kontrol</small>
+              <small>{{ t('timestamp.modal.eyebrow') }}</small>
               <h2 id="timestamp-confirmation-modal-title">
-                Zaman damgasını onaylayın
+                {{ t('timestamp.modal.title') }}
               </h2>
             </div>
             <button
               type="button"
               :disabled="isSubmitting"
-              aria-label="Onay penceresini kapat"
+              :aria-label="t('timestamp.modal.closeAriaLabel')"
               @click="requestModalClose"
             >
               <AppIcon name="close" :size="19" />
@@ -150,8 +152,7 @@ onBeforeUnmount(() => {
           </header>
 
           <p id="timestamp-confirmation-modal-description">
-            Aşağıdaki dosya için doğrulanabilir bir işlem kaydı oluşturulacak.
-            Onaydan sonra kayıt işlem geçmişinize eklenir.
+            {{ t('timestamp.modal.description') }}
           </p>
 
           <div class="timestamp-confirmation-modal__file-summary">
@@ -166,12 +167,12 @@ onBeforeUnmount(() => {
 
           <dl class="timestamp-confirmation-modal__details">
             <div>
-              <dt>İşlem</dt>
-              <dd>Zaman damgalama</dd>
+              <dt>{{ t('timestamp.modal.operation') }}</dt>
+              <dd>{{ t('timestamp.modal.operationValue') }}</dd>
             </div>
             <div>
-              <dt>Kontör maliyeti</dt>
-              <dd>1 kontör</dd>
+              <dt>{{ t('timestamp.modal.creditCost') }}</dt>
+              <dd>{{ t('timestamp.modal.oneCredit') }}</dd>
             </div>
           </dl>
 
@@ -190,7 +191,7 @@ onBeforeUnmount(() => {
               :disabled="isSubmitting"
               @click="requestModalClose"
             >
-              Vazgeç
+              {{ t('common.cancel') }}
             </button>
             <button
               ref="confirmationButtonElement"
@@ -203,7 +204,11 @@ onBeforeUnmount(() => {
                 class="timestamp-confirmation-modal__spinner"
                 aria-hidden="true"
               ></span>
-              {{ isSubmitting ? 'İşlem oluşturuluyor…' : 'Onayla ve zaman damgala' }}
+              {{
+                isSubmitting
+                  ? t('timestamp.modal.creating')
+                  : t('timestamp.modal.confirm')
+              }}
             </button>
           </footer>
         </section>

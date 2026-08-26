@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import { useToast } from '@/composables/useToast'
@@ -14,10 +15,11 @@ defineProps<{
 }>()
 
 const { showInfoToast } = useToast()
+const { t } = useI18n({ useScope: 'global' })
 
-const documentOperationLabels: Record<DocumentOperation, string> = {
-  signature: 'E-imza',
-  timestamp: 'Zaman damgası',
+const documentOperationTranslationKeys: Record<DocumentOperation, string> = {
+  signature: 'dashboard.recentDocuments.electronicSignature',
+  timestamp: 'dashboard.recentDocuments.timestamp',
 }
 
 const handleDocumentPreview = (archivedDocument: ArchivedDocument) => {
@@ -26,12 +28,18 @@ const handleDocumentPreview = (archivedDocument: ArchivedDocument) => {
   }
 
   showInfoToast(
-    `${archivedDocument.name} için güvenli önizleme hazırlanıyor.`,
+    t('dashboard.recentDocuments.previewPreparing', {
+      fileName: archivedDocument.name,
+    }),
   )
 }
 
 const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
-  showInfoToast(`${archivedDocument.name} için indirme isteği oluşturuldu.`)
+  showInfoToast(
+    t('dashboard.recentDocuments.downloadRequested', {
+      fileName: archivedDocument.name,
+    }),
+  )
 }
 </script>
 
@@ -42,10 +50,18 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
   >
     <header class="recent-documents-table__heading">
       <div>
-        <p>Yakın geçmiş</p>
-        <h2 id="recent-documents-title">Son arşivlenen belgeler</h2>
+        <p>{{ t('dashboard.recentDocuments.eyebrow') }}</p>
+        <h2 id="recent-documents-title">
+          {{ t('dashboard.recentDocuments.title') }}
+        </h2>
       </div>
-      <span>{{ archivedDocuments.length }} kayıt gösteriliyor</span>
+      <span>
+        {{
+          t('dashboard.recentDocuments.recordCount', {
+            count: archivedDocuments.length,
+          })
+        }}
+      </span>
     </header>
 
     <table
@@ -53,15 +69,15 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
       class="recent-documents-table__content"
     >
       <caption class="visually-hidden">
-        Son arşivlenen belgeler
+        {{ t('dashboard.recentDocuments.title') }}
       </caption>
       <thead>
         <tr class="recent-documents-table__column-headings">
-          <th scope="col">Belge</th>
-          <th scope="col">İşlem</th>
-          <th scope="col">Tarih</th>
-          <th scope="col">Boyut</th>
-          <th scope="col">İşlemler</th>
+          <th scope="col">{{ t('dashboard.recentDocuments.document') }}</th>
+          <th scope="col">{{ t('dashboard.recentDocuments.operation') }}</th>
+          <th scope="col">{{ t('dashboard.recentDocuments.date') }}</th>
+          <th scope="col">{{ t('dashboard.recentDocuments.size') }}</th>
+          <th scope="col">{{ t('dashboard.recentDocuments.actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -70,7 +86,10 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
           :key="archivedDocument.id"
           class="recent-documents-table__row"
         >
-          <td class="recent-documents-table__file" data-label="Belge">
+          <td
+            class="recent-documents-table__file"
+            :data-label="t('dashboard.recentDocuments.document')"
+          >
             <span aria-hidden="true">
               <AppIcon name="document" :size="20" />
             </span>
@@ -81,33 +100,49 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
               </small>
             </div>
           </td>
-          <td data-label="İşlem">
+          <td
+            class="recent-documents-table__operation-cell"
+            :data-label="t('dashboard.recentDocuments.operation')"
+          >
             <span
               :class="[
                 'recent-documents-table__operation',
                 `recent-documents-table__operation--${archivedDocument.operation}`,
               ]"
             >
-              {{ documentOperationLabels[archivedDocument.operation] }}
+              {{ t(documentOperationTranslationKeys[archivedDocument.operation]) }}
             </span>
           </td>
-          <td data-label="Tarih">
+          <td
+            class="recent-documents-table__date-cell"
+            :data-label="t('dashboard.recentDocuments.date')"
+          >
             <time :datetime="archivedDocument.createdAt">
               {{ formatDateTime(archivedDocument.createdAt) }}
             </time>
           </td>
-          <td data-label="Boyut">
+          <td
+            class="recent-documents-table__size-cell"
+            :data-label="t('dashboard.recentDocuments.size')"
+          >
             {{ formatFileSize(archivedDocument.sizeBytes) }}
           </td>
-          <td class="recent-documents-table__actions" data-label="İşlemler">
+          <td
+            class="recent-documents-table__actions"
+            :data-label="t('dashboard.recentDocuments.actions')"
+          >
             <button
               type="button"
               :disabled="!archivedDocument.canPreview"
-              :aria-label="`${archivedDocument.name} belgesini önizle`"
+              :aria-label="
+                t('dashboard.recentDocuments.previewAriaLabel', {
+                  fileName: archivedDocument.name,
+                })
+              "
               :title="
                 archivedDocument.canPreview
-                  ? 'Belgeyi önizle'
-                  : 'Bu dosya türü önizlenemiyor'
+                  ? t('dashboard.recentDocuments.previewTitle')
+                  : t('dashboard.recentDocuments.previewUnavailableTitle')
               "
               @click="handleDocumentPreview(archivedDocument)"
             >
@@ -115,8 +150,12 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
             </button>
             <button
               type="button"
-              :aria-label="`${archivedDocument.name} belgesini indir`"
-              title="Belgeyi indir"
+              :aria-label="
+                t('dashboard.recentDocuments.downloadAriaLabel', {
+                  fileName: archivedDocument.name,
+                })
+              "
+              :title="t('dashboard.recentDocuments.downloadTitle')"
               @click="handleDocumentDownload(archivedDocument)"
             >
               <AppIcon name="download" :size="18" />
@@ -130,9 +169,11 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
       <span aria-hidden="true">
         <AppIcon name="archive" :size="26" />
       </span>
-      <h3>Arşiviniz henüz boş</h3>
-      <p>İlk zaman damgası işleminiz tamamlandığında belgeniz burada görünür.</p>
-      <RouterLink :to="{ name: 'timestamp' }">İlk işlemi oluştur</RouterLink>
+      <h3>{{ t('dashboard.recentDocuments.emptyTitle') }}</h3>
+      <p>{{ t('dashboard.recentDocuments.emptyDescription') }}</p>
+      <RouterLink :to="{ name: 'timestamp' }">
+        {{ t('dashboard.recentDocuments.createFirst') }}
+      </RouterLink>
     </div>
   </section>
 </template>
@@ -366,7 +407,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
   }
 
   .recent-documents-table__column-headings > th:nth-child(4),
-  .recent-documents-table__row > [data-label='Boyut'] {
+  .recent-documents-table__size-cell {
     display: none;
   }
 }
@@ -392,22 +433,22 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
     grid-column: 1 / -1;
   }
 
-  .recent-documents-table__row > [data-label='Tarih'],
-  .recent-documents-table__row > [data-label='Boyut'] {
+  .recent-documents-table__date-cell,
+  .recent-documents-table__size-cell {
     display: block;
     grid-column: 1;
     font-size: var(--font-size-small);
   }
 
-  .recent-documents-table__row > [data-label='Tarih']::before,
-  .recent-documents-table__row > [data-label='Boyut']::before {
+  .recent-documents-table__date-cell::before,
+  .recent-documents-table__size-cell::before {
     margin-right: 0.35rem;
     color: var(--color-brand-950);
     content: attr(data-label) ':';
     font-weight: 800;
   }
 
-  .recent-documents-table__row > [data-label='İşlem'] {
+  .recent-documents-table__operation-cell {
     grid-column: 1;
   }
 

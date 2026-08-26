@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 import AppIcon from '@/components/common/AppIcon.vue'
 import type {
   TimestampJob,
@@ -16,10 +18,11 @@ const emit = defineEmits<{
   retry: []
 }>()
 
-const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
-  completed: 'Tamamlandı',
-  failed: 'Başarısız',
-  processing: 'İşleniyor',
+const { t } = useI18n({ useScope: 'global' })
+const timestampJobStatusTranslationKeys: Record<TimestampJobStatus, string> = {
+  completed: 'timestamp.history.completed',
+  failed: 'timestamp.history.failed',
+  processing: 'timestamp.history.processing',
 }
 </script>
 
@@ -31,14 +34,20 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
   >
     <header class="timestamp-history-table__header">
       <div>
-        <span>İşlem geçmişi</span>
-        <h2 id="timestamp-history-table-title">Son zaman damgaları</h2>
-        <p>Tamamlanan ve devam eden işlemlerinizi tek yerde izleyin.</p>
+        <span>{{ t('timestamp.history.eyebrow') }}</span>
+        <h2 id="timestamp-history-table-title">
+          {{ t('timestamp.history.title') }}
+        </h2>
+        <p>{{ t('timestamp.history.description') }}</p>
       </div>
 
       <button type="button" :disabled="isLoading" @click="emit('retry')">
         <AppIcon name="refresh" :size="17" />
-        {{ isLoading ? 'Yenileniyor…' : 'Geçmişi yenile' }}
+        {{
+          isLoading
+            ? t('timestamp.history.refreshing')
+            : t('timestamp.history.refresh')
+        }}
       </button>
     </header>
 
@@ -50,14 +59,14 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
       <span aria-hidden="true">!</span>
       <p>{{ errorMessage }}</p>
       <button type="button" :disabled="isLoading" @click="emit('retry')">
-        Tekrar dene
+        {{ t('common.retry') }}
       </button>
     </div>
 
     <div
       v-if="isLoading && timestampJobs.length === 0"
       class="timestamp-history-table__loading-state"
-      aria-label="Zaman damgası geçmişi yükleniyor"
+      :aria-label="t('timestamp.history.loadingAriaLabel')"
     >
       <span v-for="skeletonIndex in 3" :key="skeletonIndex"></span>
     </div>
@@ -67,14 +76,14 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
       class="timestamp-history-table__content"
     >
       <caption class="visually-hidden">
-        Son zaman damgası işlemleri
+        {{ t('timestamp.history.caption') }}
       </caption>
       <thead>
         <tr class="timestamp-history-table__column-headings">
-          <th scope="col">Dosya</th>
-          <th scope="col">Durum</th>
-          <th scope="col">İşlem tarihi</th>
-          <th scope="col">Maliyet</th>
+          <th scope="col">{{ t('timestamp.history.file') }}</th>
+          <th scope="col">{{ t('timestamp.history.status') }}</th>
+          <th scope="col">{{ t('timestamp.history.transactionDate') }}</th>
+          <th scope="col">{{ t('timestamp.history.cost') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -83,7 +92,10 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
           :key="timestampJob.id"
           class="timestamp-history-table__row"
         >
-          <td class="timestamp-history-table__file" data-label="Dosya">
+          <td
+            class="timestamp-history-table__file"
+            :data-label="t('timestamp.history.file')"
+          >
             <span aria-hidden="true">
               <AppIcon name="document" :size="20" />
             </span>
@@ -96,7 +108,7 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
             </div>
           </td>
 
-          <td data-label="Durum">
+          <td :data-label="t('timestamp.history.status')">
             <span
               :class="[
                 'timestamp-history-table__status',
@@ -104,18 +116,24 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
               ]"
             >
               <i aria-hidden="true"></i>
-              {{ timestampJobStatusLabels[timestampJob.status] }}
+              {{ t(timestampJobStatusTranslationKeys[timestampJob.status]) }}
             </span>
           </td>
 
-          <td data-label="İşlem tarihi">
+          <td
+            class="timestamp-history-table__date-cell"
+            :data-label="t('timestamp.history.transactionDate')"
+          >
             <time :datetime="timestampJob.createdAt">
               {{ formatDateTime(timestampJob.createdAt) }}
             </time>
           </td>
 
-          <td class="timestamp-history-table__credit" data-label="Maliyet">
-            {{ timestampJob.creditCost }} kontör
+          <td
+            class="timestamp-history-table__credit"
+            :data-label="t('timestamp.history.cost')"
+          >
+            {{ t('timestamp.history.creditCost', timestampJob.creditCost) }}
           </td>
         </tr>
       </tbody>
@@ -125,8 +143,8 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
       <span aria-hidden="true">
         <AppIcon name="timestamp" :size="27" />
       </span>
-      <h3>Henüz zaman damgası kaydınız yok</h3>
-      <p>İlk işleminiz tamamlandığında doğrulama kaydı burada görünecek.</p>
+      <h3>{{ t('timestamp.history.emptyTitle') }}</h3>
+      <p>{{ t('timestamp.history.emptyDescription') }}</p>
     </div>
   </section>
 </template>
@@ -502,7 +520,7 @@ const timestampJobStatusLabels: Record<TimestampJobStatus, string> = {
     padding: 1rem;
   }
 
-  .timestamp-history-table__row > [data-label='İşlem tarihi'] {
+  .timestamp-history-table__date-cell {
     grid-column: 1 / -1;
   }
 }

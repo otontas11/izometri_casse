@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 
@@ -16,6 +17,7 @@ const emit = defineEmits<{
   edit: []
 }>()
 
+const { t } = useI18n({ useScope: 'global' })
 const hasAvatarImageError = ref(false)
 const shouldDisplayAvatarImage = computed(
   () => Boolean(props.avatarUrl) && !hasAvatarImageError.value,
@@ -42,7 +44,7 @@ watch(
     </div>
 
     <div class="profile-identity-card__details">
-      <small>İzİmza hesabı</small>
+      <small>{{ t('profile.identity.account') }}</small>
       <h2 id="profile-identity-title">{{ displayName }}</h2>
       <p>{{ emailAddress }}</p>
 
@@ -56,7 +58,11 @@ watch(
         ]"
       >
         <span aria-hidden="true">{{ isEmailVerified ? '✓' : '!' }}</span>
-        {{ isEmailVerified ? 'E-posta doğrulandı' : 'Doğrulama bekleniyor' }}
+        {{
+          isEmailVerified
+            ? t('profile.identity.emailVerified')
+            : t('profile.identity.verificationPending')
+        }}
       </span>
     </div>
 
@@ -67,7 +73,9 @@ watch(
       @click="emit('edit')"
     >
       <AppIcon name="profile" :size="18" />
-      {{ isEditing ? 'Düzenleniyor' : 'Bilgileri düzenle' }}
+      {{
+        isEditing ? t('profile.identity.editing') : t('profile.identity.edit')
+      }}
     </button>
   </section>
 </template>

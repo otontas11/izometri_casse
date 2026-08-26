@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import type { NavigationItem } from '@/types/navigation'
@@ -16,12 +17,25 @@ const emit = defineEmits<{
 
 const sidebarElement = ref<HTMLElement | null>(null)
 const sidebarCloseButtonElement = ref<HTMLButtonElement | null>(null)
+const { t } = useI18n({ useScope: 'global' })
 
-const navigationItems: NavigationItem[] = [
-  { label: 'Anasayfa', icon: 'dashboard', routeName: 'dashboard' },
-  { label: 'Zaman Damgala', icon: 'timestamp', routeName: 'timestamp' },
-  { label: 'Profil', icon: 'profile', routeName: 'profile' },
-]
+const navigationItems = computed<NavigationItem[]>(() => [
+  {
+    label: t('layout.sidebar.dashboard'),
+    icon: 'dashboard',
+    routeName: 'dashboard',
+  },
+  {
+    label: t('layout.sidebar.timestamp'),
+    icon: 'timestamp',
+    routeName: 'timestamp',
+  },
+  {
+    label: t('layout.sidebar.profile'),
+    icon: 'profile',
+    routeName: 'profile',
+  },
+])
 
 const getFocusableSidebarElements = () =>
   Array.from(
@@ -90,14 +104,14 @@ watch(
     id="application-navigation"
     ref="sidebarElement"
     :class="['app-sidebar', { 'app-sidebar--open': isOpen }]"
-    aria-label="İzİmza ana navigasyonu"
+    :aria-label="t('layout.sidebar.ariaLabel')"
     @keydown="handleSidebarKeydown"
   >
     <div class="app-sidebar__brand-row">
       <RouterLink
         class="app-sidebar__brand"
         :to="{ name: 'dashboard' }"
-        aria-label="İzİmza anasayfa"
+        :aria-label="t('layout.sidebar.homeAriaLabel')"
         @click="emit('navigate')"
       >
         iz<span>imza</span>
@@ -107,7 +121,7 @@ watch(
         ref="sidebarCloseButtonElement"
         class="app-sidebar__close"
         type="button"
-        aria-label="Navigasyonu kapat"
+        :aria-label="t('layout.sidebar.closeAriaLabel')"
         @click="emit('close')"
       >
         <AppIcon name="close" :size="22" />
@@ -116,10 +130,13 @@ watch(
 
     <div class="app-sidebar__context">
       <span aria-hidden="true"></span>
-      Güvenli işlem merkezi
+      {{ t('layout.sidebar.context') }}
     </div>
 
-    <nav class="app-sidebar__navigation" aria-label="Ana navigasyon">
+    <nav
+      class="app-sidebar__navigation"
+      :aria-label="t('layout.sidebar.navigationAriaLabel')"
+    >
       <RouterLink
         v-for="item in navigationItems"
         :key="item.routeName"
@@ -135,8 +152,8 @@ watch(
     <footer class="app-sidebar__footer">
       <span class="app-sidebar__footer-mark" aria-hidden="true">✓</span>
       <span>
-        <strong>Güvenli oturum</strong>
-        <small>Bağlantınız korunuyor</small>
+        <strong>{{ t('layout.sidebar.secureSession') }}</strong>
+        <small>{{ t('layout.sidebar.protectedConnection') }}</small>
       </span>
     </footer>
   </aside>

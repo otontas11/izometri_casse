@@ -2,6 +2,7 @@ import { watch } from 'vue'
 import type { NavigationGuard, Router } from 'vue-router'
 
 import { auth0Plugin } from '@/features/auth/auth.plugin'
+import { i18n, translate } from '@/locales'
 
 const waitForAuth0Initialization = async () => {
   const configuredAuth0Plugin = auth0Plugin
@@ -60,7 +61,15 @@ const requireAuthenticatedRoute: NavigationGuard = async (targetRoute) => {
 export const registerRouterGuards = (applicationRouter: Router) => {
   applicationRouter.beforeEach(requireAuthenticatedRoute)
 
-  applicationRouter.afterEach((targetRoute) => {
-    document.title = `${targetRoute.meta.title} · İzİmza`
-  })
+  const updateDocumentTitle = (titleTranslationKey: string) => {
+    document.title = `${translate(titleTranslationKey)} · ${translate('common.appName')}`
+  }
+
+  applicationRouter.afterEach((targetRoute) =>
+    updateDocumentTitle(targetRoute.meta.titleKey),
+  )
+
+  watch(i18n.global.locale, () =>
+    updateDocumentTitle(applicationRouter.currentRoute.value.meta.titleKey),
+  )
 }

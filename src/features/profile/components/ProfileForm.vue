@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import BaseInput from '@/components/ui/BaseInput.vue'
 
@@ -34,6 +35,7 @@ const emit = defineEmits<{
   submit: [profileUpdates: UpdateProfilePayload]
 }>()
 
+const { locale, t } = useI18n({ useScope: 'global' })
 const profileFormValues = reactive<UpdateProfilePayload>({
   firstName: '',
   lastName: '',
@@ -65,7 +67,7 @@ const validateProfileField = (fieldName: ProfileEditableFieldName) => {
   if (fieldName === 'firstName') {
     profileFormErrors.firstName = validateProfileName(
       profileFormValues.firstName,
-      'Ad',
+      t('profile.form.firstName'),
     )
     return
   }
@@ -73,7 +75,7 @@ const validateProfileField = (fieldName: ProfileEditableFieldName) => {
   if (fieldName === 'lastName') {
     profileFormErrors.lastName = validateProfileName(
       profileFormValues.lastName,
-      'Soyad',
+      t('profile.form.lastName'),
     )
     return
   }
@@ -142,6 +144,20 @@ watch(
     }
   },
 )
+
+watch(locale, () => {
+  if (profileFormErrors.firstName) {
+    validateProfileField('firstName')
+  }
+
+  if (profileFormErrors.lastName) {
+    validateProfileField('lastName')
+  }
+
+  if (profileFormErrors.phone) {
+    validateProfileField('phone')
+  }
+})
 </script>
 
 <template>
@@ -153,17 +169,20 @@ watch(
   >
     <header class="profile-form__header">
       <div>
-        <small>Kişisel alan</small>
-        <h2 id="profile-form-title">Kişisel bilgiler</h2>
+        <small>{{ t('profile.form.eyebrow') }}</small>
+        <h2 id="profile-form-title">{{ t('profile.form.title') }}</h2>
       </div>
       <span :class="{ 'profile-form__mode--editing': isEditing }">
-        {{ isEditing ? 'Düzenleme modu' : 'Görüntüleme modu' }}
+        {{
+          isEditing
+            ? t('profile.form.editingMode')
+            : t('profile.form.viewingMode')
+        }}
       </span>
     </header>
 
     <p class="profile-form__description">
-      İşlem kayıtlarınızda ve hesap iletişiminde kullanılacak bilgilerinizi
-      yönetin.
+      {{ t('profile.form.description') }}
     </p>
 
     <div class="profile-form__fields">
@@ -171,7 +190,7 @@ watch(
         id="profile-first-name"
         v-model="profileFormValues.firstName"
         name="firstName"
-        label="Ad"
+        :label="t('profile.form.firstName')"
         autocomplete="given-name"
         :maximum-length="50"
         :readonly="!isEditing"
@@ -185,7 +204,7 @@ watch(
         id="profile-last-name"
         v-model="profileFormValues.lastName"
         name="lastName"
-        label="Soyad"
+        :label="t('profile.form.lastName')"
         autocomplete="family-name"
         :maximum-length="50"
         :readonly="!isEditing"
@@ -201,7 +220,7 @@ watch(
         name="phone"
         type="tel"
         input-mode="tel"
-        label="Telefon numarası"
+        :label="t('profile.form.phone')"
         autocomplete="tel"
         placeholder="+90 555 123 45 67"
         :maximum-length="24"
@@ -218,10 +237,10 @@ watch(
         name="email"
         type="email"
         input-mode="email"
-        label="E-posta adresi"
+        :label="t('profile.form.email')"
         autocomplete="email"
         readonly
-        hint="Bu alan Auth0 kimliğiniz üzerinden yönetilir."
+        :hint="t('profile.form.emailHint')"
       />
     </div>
 
@@ -235,14 +254,14 @@ watch(
     </p>
 
     <footer v-if="isEditing" class="profile-form__actions">
-      <p>Değişiklikler yalnızca “Kaydet” seçildiğinde uygulanır.</p>
+      <p>{{ t('profile.form.saveNote') }}</p>
       <div>
         <button
           type="button"
           :disabled="isSaving"
           @click="handleProfileFormCancel"
         >
-          Vazgeç
+          {{ t('common.cancel') }}
         </button>
         <button type="submit" :disabled="isSaving || !isProfileFormDirty">
           <span
@@ -250,7 +269,7 @@ watch(
             class="profile-form__spinner"
             aria-hidden="true"
           ></span>
-          {{ isSaving ? 'Kaydediliyor…' : 'Değişiklikleri kaydet' }}
+          {{ isSaving ? t('profile.form.saving') : t('profile.form.save') }}
         </button>
       </div>
     </footer>

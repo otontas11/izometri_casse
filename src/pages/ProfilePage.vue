@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import { useToast } from '@/composables/useToast'
@@ -10,6 +11,7 @@ import ProfileIdentityCard from '@/features/profile/components/ProfileIdentityCa
 import ProfileSecurityPanel from '@/features/profile/components/ProfileSecurityPanel.vue'
 import { useProfileStore } from '@/features/profile/stores/profile.store'
 import type { UpdateProfilePayload } from '@/features/profile/types/profile.types'
+import { getApplicationLocaleCode } from '@/locales'
 
 const profileStore = useProfileStore()
 const {
@@ -24,6 +26,7 @@ const {
 } = storeToRefs(profileStore)
 const { isAuthenticated, user: authenticatedUser } = useAuth0()
 const { showErrorToast, showSuccessToast } = useToast()
+const { t } = useI18n({ useScope: 'global' })
 
 const isProfileEditing = ref(false)
 
@@ -32,14 +35,16 @@ const profileDisplayName = computed(() => {
     return profileFullName.value
   }
 
-  return authenticatedUser.value?.name?.trim() || 'İzİmza kullanıcısı'
+  return (
+    authenticatedUser.value?.name?.trim() || t('profile.page.userFallback')
+  )
 })
 
 const profileEmailAddress = computed(
   () =>
     authenticatedUser.value?.email ||
     userProfile.value?.email ||
-    'E-posta bilgisi bulunamadı',
+    t('profile.page.emailUnavailable'),
 )
 
 const profileAvatarUrl = computed(
@@ -55,7 +60,7 @@ const profileInitials = computed(() => {
   const initials = displayNameParts
     .map((displayNamePart) => Array.from(displayNamePart)[0] ?? '')
     .join('')
-    .toLocaleUpperCase('tr-TR')
+    .toLocaleUpperCase(getApplicationLocaleCode())
 
   return initials || 'İZ'
 })
@@ -84,7 +89,7 @@ const handleProfileUpdate = async (profileUpdates: UpdateProfilePayload) => {
   }
 
   showErrorToast(
-    profileSaveErrorMessage.value || 'Profil bilgileri güncellenemedi.',
+    profileSaveErrorMessage.value || t('profile.page.updateError'),
   )
 }
 
@@ -103,12 +108,9 @@ onMounted(() => {
   <section class="profile-page" aria-labelledby="profile-page-title">
     <header class="profile-page__header">
       <div>
-        <span class="profile-page__eyebrow">Hesap merkezi</span>
-        <h1 id="profile-page-title">Profilim</h1>
-        <p>
-          Kişisel bilgilerinizi yönetin ve hesabınızın güvenlik durumunu tek
-          bakışta takip edin.
-        </p>
+        <span class="profile-page__eyebrow">{{ t('profile.page.eyebrow') }}</span>
+        <h1 id="profile-page-title">{{ t('profile.page.title') }}</h1>
+        <p>{{ t('profile.page.description') }}</p>
       </div>
 
       <div class="profile-page__security-summary">
@@ -116,8 +118,8 @@ onMounted(() => {
           <AppIcon name="signature" :size="21" />
         </span>
         <div>
-          <small>Kimlik güvenliği</small>
-          <strong>Auth0 ile korunuyor</strong>
+          <small>{{ t('profile.page.identitySecurity') }}</small>
+          <strong>{{ t('profile.page.protectedByAuth0') }}</strong>
         </div>
       </div>
     </header>
@@ -130,8 +132,8 @@ onMounted(() => {
     >
       <span class="profile-page__loading-spinner" aria-hidden="true"></span>
       <div>
-        <strong>Profiliniz hazırlanıyor</strong>
-        <p>Hesap bilgileriniz güvenli şekilde yükleniyor.</p>
+        <strong>{{ t('profile.page.preparing') }}</strong>
+        <p>{{ t('profile.page.loadingDescription') }}</p>
       </div>
     </div>
 
@@ -142,12 +144,16 @@ onMounted(() => {
     >
       <span aria-hidden="true">!</span>
       <div>
-        <strong>Profil bilgileri yüklenemedi</strong>
+        <strong>{{ t('profile.page.loadErrorTitle') }}</strong>
         <p>{{ profileLoadErrorMessage }}</p>
       </div>
       <button type="button" :disabled="isProfileLoading" @click="handleProfileRetry">
         <AppIcon name="refresh" :size="17" />
-        {{ isProfileLoading ? 'Yükleniyor…' : 'Tekrar dene' }}
+        {{
+          isProfileLoading
+            ? t('profile.page.loading')
+            : t('profile.page.retry')
+        }}
       </button>
     </div>
 
@@ -178,7 +184,9 @@ onMounted(() => {
       >
         <span aria-hidden="true">!</span>
         {{ profileLoadErrorMessage }}
-        <button type="button" @click="handleProfileRetry">Yenile</button>
+        <button type="button" @click="handleProfileRetry">
+          {{ t('profile.page.refresh') }}
+        </button>
       </p>
 
       <div class="profile-page__content-grid">

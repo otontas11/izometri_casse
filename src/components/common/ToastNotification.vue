@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 
 import { useNotificationStore } from '@/stores/notification.store'
 
 const notificationStore = useNotificationStore()
 const { activeNotifications } = storeToRefs(notificationStore)
+const { t } = useI18n({ useScope: 'global' })
 
 const notificationSymbols = {
   error: '!',
@@ -20,7 +22,7 @@ const notificationSymbols = {
     tag="div"
     class="toast-notification"
     aria-live="polite"
-    aria-label="Uygulama bildirimleri"
+    :aria-label="t('notifications.ariaLabel')"
   >
     <article
       v-for="notification in activeNotifications"
@@ -37,7 +39,7 @@ const notificationSymbols = {
       <p>{{ notification.message }}</p>
       <button
         type="button"
-        aria-label="Bildirimi kapat"
+        :aria-label="t('notifications.dismissAriaLabel')"
         @click="notificationStore.dismissNotification(notification.id)"
       >
         ×

@@ -1,0 +1,316 @@
+{
+  "language": {
+    "selectorLabel": "Application language",
+    "turkish": "Turkish",
+    "english": "English",
+    "switchTo": "Switch language to {language}"
+  },
+  "common": {
+    "appName": "İzİmza",
+    "retry": "Try again",
+    "refresh": "Refresh",
+    "cancel": "Cancel",
+    "loading": "Loading…",
+    "credit": "credit"
+  },
+  "routes": {
+    "login": "Sign In",
+    "authCallback": "Verifying Session",
+    "application": "İzİmza",
+    "dashboard": "Dashboard",
+    "timestamp": "Timestamp",
+    "profile": "Profile and Security"
+  },
+  "layout": {
+    "sidebar": {
+      "ariaLabel": "İzİmza primary navigation",
+      "homeAriaLabel": "İzİmza dashboard",
+      "closeAriaLabel": "Close navigation",
+      "context": "Secure transaction center",
+      "navigationAriaLabel": "Primary navigation",
+      "dashboard": "Dashboard",
+      "timestamp": "Timestamp",
+      "profile": "Profile",
+      "secureSession": "Secure session",
+      "protectedConnection": "Your connection is protected"
+    },
+    "topbar": {
+      "openNavigation": "Open navigation",
+      "closeNavigation": "Close navigation",
+      "context": "Secure digital transactions",
+      "remainingCredits": "Remaining credits"
+    }
+  },
+  "notifications": {
+    "ariaLabel": "Application notifications",
+    "dismissAriaLabel": "Dismiss notification"
+  },
+  "auth": {
+    "userMenu": {
+      "fallbackName": "İzİmza User",
+      "openAriaLabel": "Open user menu",
+      "closeAriaLabel": "Close user menu",
+      "profile": "Profile and security",
+      "logout": "Secure logout"
+    },
+    "login": {
+      "homeAriaLabel": "İzİmza dashboard",
+      "eyebrow": "Your digital footprint is secure",
+      "title": "Give your documents a trustworthy timestamp.",
+      "description": "Manage electronic signatures, timestamps, and archived documents from one secure center.",
+      "oauthFeature": "OAuth 2.0 and OpenID Connect",
+      "sessionFeature": "Centralized and secure session management",
+      "historyFeature": "Transparent transaction history",
+      "featureListAriaLabel": "İzİmza security features",
+      "footer": "İzİmza Frontend Case · Secure transaction center",
+      "eyebrowPanel": "Secure sign in",
+      "panelTitle": "Access your İzİmza account",
+      "panelDescription": "You will be redirected to the secure Auth0 sign-in screen to continue.",
+      "configurationTitle": "Auth0 configuration required",
+      "configurationBeforeKeys": "Add",
+      "configurationBetweenKeys": "and",
+      "configurationAfterKeys": "to your .env file.",
+      "callbackUrl": "Callback URL",
+      "authenticationErrorTitle": "Session could not be verified",
+      "authenticationErrorDescription": "The sign-in flow could not be completed. Please try again.",
+      "startError": "Sign-in could not be started. Please try again.",
+      "signIn": "Sign in",
+      "checkingSession": "Checking session…",
+      "signUp": "Create an account",
+      "privacy": "Your password is never viewed or stored by the İzİmza interface."
+    },
+    "callback": {
+      "failedTitle": "Session could not be verified",
+      "configurationError": "Sign-in could not be completed because the Auth0 environment variables are not configured.",
+      "authenticationError": "The sign-in flow could not be completed. Please try again.",
+      "backToLogin": "Return to sign in",
+      "preparingTitle": "Preparing your secure session",
+      "preparingDescription": "Your identity is being verified and you will be redirected to your requested page."
+    }
+  },
+  "dashboard": {
+    "page": {
+      "userFallback": "İzİmza user",
+      "greeting": "Hello, {name}",
+      "introduction": "Your digital transaction summary and secure tools are all here.",
+      "refreshing": "Refreshing…",
+      "refreshData": "Refresh data",
+      "loadingAriaLabel": "Loading dashboard data",
+      "loadErrorTitle": "Transaction center could not be loaded",
+      "retry": "Try again",
+      "accountSummaryAriaLabel": "Account summary"
+    },
+    "metrics": {
+      "signedDocuments": "Signed documents",
+      "signedDocumentsDetail": "All-time transactions",
+      "archivedDocuments": "Archived records",
+      "archivedDocumentsDetail": "Documents stored securely",
+      "availableCredits": "Available credits",
+      "availableCreditsDetail": "Each timestamp costs 1 credit",
+      "archiveCapacity": "Archive capacity",
+      "totalStorage": "{size} total storage",
+      "archiveUsageAriaLabel": "Archive storage usage"
+    },
+    "quickActions": {
+      "ariaLabel": "Quick actions",
+      "fastestAction": "Fastest action",
+      "title": "Prove when your document existed.",
+      "description": "Upload your file and complete its integrity check, timestamp, and archive record in one secure flow.",
+      "startSelectingFile": "Start selecting a file",
+      "goToTimestamp": "Continue to the Timestamp page",
+      "assurance": "İzİmza assurance",
+      "trustChain": "Chain of trust",
+      "fileIntegrity": "File integrity",
+      "fileIntegrityDescription": "A digital digest of the document is prepared.",
+      "timeProof": "Proof of time",
+      "timeProofDescription": "The transaction time is recorded securely.",
+      "secureArchive": "Secure archive",
+      "secureArchiveDescription": "Your resulting document is stored in your account."
+    },
+    "recentDocuments": {
+      "previewPreparing": "A secure preview is being prepared for {fileName}.",
+      "downloadRequested": "A download request was created for {fileName}.",
+      "eyebrow": "Recent activity",
+      "title": "Recently archived documents",
+      "recordCount": "Showing {count} records",
+      "document": "Document",
+      "operation": "Operation",
+      "date": "Date",
+      "size": "Size",
+      "actions": "Actions",
+      "electronicSignature": "E-signature",
+      "timestamp": "Timestamp",
+      "previewAriaLabel": "Preview {fileName}",
+      "downloadAriaLabel": "Download {fileName}",
+      "previewTitle": "Preview document",
+      "previewUnavailableTitle": "This file type cannot be previewed",
+      "downloadTitle": "Download document",
+      "emptyTitle": "Your archive is empty",
+      "emptyDescription": "Your document will appear here after your first timestamp transaction is completed.",
+      "createFirst": "Create first transaction"
+    }
+  },
+  "timestamp": {
+    "page": {
+      "eyebrow": "Secure verification center",
+      "title": "Timestamp",
+      "description": "Create a trusted record that proves your file existed at a specific time in just a few steps.",
+      "transactionCost": "Transaction cost",
+      "costPerFile": "1 credit / file",
+      "balanceLoading": "Loading balance…",
+      "availableCredits": "Available credits: {count}",
+      "noAvailableCredits": "No credits available",
+      "guideEyebrow": "Complete in three steps",
+      "guideTitle": "From your file to a verification record",
+      "selectFile": "Select your file",
+      "selectFileDescription": "Add one file up to {maximumSize}.",
+      "confirmInformation": "Confirm the information",
+      "confirmInformationDescription": "Review the file name, size, and credit cost.",
+      "followRecord": "Track the record",
+      "followRecordDescription": "View the completed transaction in your history.",
+      "guideNote": "The result is saved together with the file information and creation date."
+    },
+    "upload": {
+      "fileFallback": "File",
+      "fileExtension": "{extension} file",
+      "multipleFilesError": "You can select only one file at a time.",
+      "inputAriaLabel": "Select a file to timestamp",
+      "eyebrow": "File selection",
+      "title": "Drop your file into the secure area",
+      "description": "Drag and drop your file or select it from your device. You can review the file information before continuing.",
+      "selectAnother": "Select another file",
+      "selectFromDevice": "Select from device",
+      "requirements": "All file types are supported · Maximum {maximumSize}",
+      "selectedFileAriaLabel": "Selected file",
+      "ready": "Ready to process",
+      "removeAriaLabel": "Remove {fileName}",
+      "transactionCost": "Transaction cost",
+      "oneCredit": "1 credit",
+      "continue": "Continue to timestamp"
+    },
+    "modal": {
+      "eyebrow": "Final review",
+      "title": "Confirm the timestamp",
+      "closeAriaLabel": "Close confirmation dialog",
+      "description": "A verifiable transaction record will be created for the file below. The record will be added to your transaction history after confirmation.",
+      "operation": "Operation",
+      "operationValue": "Timestamping",
+      "creditCost": "Credit cost",
+      "oneCredit": "1 credit",
+      "creating": "Creating transaction…",
+      "confirm": "Confirm and timestamp"
+    },
+    "history": {
+      "eyebrow": "Transaction history",
+      "title": "Recent timestamps",
+      "description": "Track completed and in-progress transactions in one place.",
+      "refreshing": "Refreshing…",
+      "refresh": "Refresh history",
+      "loadingAriaLabel": "Loading timestamp history",
+      "caption": "Recent timestamp transactions",
+      "file": "File",
+      "status": "Status",
+      "transactionDate": "Transaction date",
+      "cost": "Cost",
+      "completed": "Completed",
+      "failed": "Failed",
+      "processing": "Processing",
+      "creditCost": "{count} credit | {count} credits",
+      "emptyTitle": "No timestamp records yet",
+      "emptyDescription": "Your verification record will appear here after your first transaction is completed."
+    },
+    "validation": {
+      "emptyFile": "Empty files cannot be timestamped.",
+      "fileTooLarge": "The file size cannot exceed {maximumSize}."
+    },
+    "feedback": {
+      "endpointMissing": "The timestamp service was not found. Stop the fake API and restart it with npm run api.",
+      "insufficientCredits": "You do not have enough credits for timestamping.",
+      "selectFile": "Select a file to continue with timestamping.",
+      "success": "{fileName} was timestamped successfully. 1 credit was used."
+    }
+  },
+  "profile": {
+    "page": {
+      "userFallback": "İzİmza user",
+      "emailUnavailable": "Email information is unavailable",
+      "updateError": "Profile information could not be updated.",
+      "eyebrow": "Account center",
+      "title": "My Profile",
+      "description": "Manage your personal information and review your account security status at a glance.",
+      "identitySecurity": "Identity security",
+      "protectedByAuth0": "Protected by Auth0",
+      "preparing": "Preparing your profile",
+      "loadingDescription": "Your account information is being loaded securely.",
+      "loadErrorTitle": "Profile information could not be loaded",
+      "loading": "Loading…",
+      "retry": "Try again",
+      "refresh": "Refresh"
+    },
+    "identity": {
+      "account": "İzİmza account",
+      "emailVerified": "Email verified",
+      "verificationPending": "Verification pending",
+      "editing": "Editing",
+      "edit": "Edit information"
+    },
+    "form": {
+      "eyebrow": "Personal details",
+      "title": "Personal information",
+      "editingMode": "Editing mode",
+      "viewingMode": "Viewing mode",
+      "description": "Manage the information used in your transaction records and account communications.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone number",
+      "email": "Email address",
+      "emailHint": "This field is managed through your Auth0 identity.",
+      "saveNote": "Changes are applied only after you select Save.",
+      "saving": "Saving…",
+      "save": "Save changes"
+    },
+    "validation": {
+      "required": "{fieldLabel} is required.",
+      "nameLength": "{fieldLabel} must be between {minimumLength} and {maximumLength} characters.",
+      "nameCharacters": "{fieldLabel} may contain only letters, spaces, hyphens, and apostrophes.",
+      "phoneRequired": "Phone number is required.",
+      "phoneInvalid": "Enter a valid phone number. Example: +90 555 123 45 67."
+    },
+    "security": {
+      "eyebrow": "Security",
+      "title": "Identity provider",
+      "description": "Your session and identity information are protected by Auth0 through OAuth 2.0 and OpenID Connect.",
+      "session": "Session",
+      "active": "Active",
+      "checking": "Checking",
+      "email": "Email",
+      "verified": "Verified",
+      "verificationPending": "Verification pending",
+      "identitySystem": "Identity system",
+      "note": "Password and email changes are managed directly through your identity provider for security."
+    },
+    "feedback": {
+      "updated": "Your profile information was updated."
+    }
+  },
+  "errors": {
+    "badRequest": "The submitted information is invalid. Check the fields and try again.",
+    "unauthorized": "Your session could not be verified. Please sign in again.",
+    "forbidden": "You are not authorized to perform this action.",
+    "notFound": "The requested record was not found.",
+    "conflict": "This action conflicts with the existing data.",
+    "unprocessable": "The submitted information could not be processed.",
+    "serviceUnavailable": "The service is temporarily unavailable. Please try again.",
+    "fallback": "The operation could not be completed. Please try again.",
+    "unexpected": "An unexpected error occurred.",
+    "timeout": "The request timed out. Please try again.",
+    "apiUnavailable": "The fake API server could not be reached. Make sure `npm run api` is running.",
+    "invalidTimestampTransaction": "The file information submitted for timestamping is invalid.",
+    "timestampTransactionFailed": "The timestamp transaction could not be completed."
+  },
+  "placeholder": {
+    "ready": "Skeleton ready",
+    "title": "Page components will be added in the next step.",
+    "description": "The routes, responsive application shell, and core design tokens are ready."
+  }
+}

@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 
 import { getApiErrorMessage, toApiRequestError } from '@/api/apiError'
 import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
+import { translate } from '@/locales'
 import type { ApiRequestStatus } from '@/types/api.types'
 
 import { timestampApi } from '../api/timestamp.api'
@@ -12,7 +13,7 @@ const getTimestampSubmissionErrorMessage = (requestError: unknown) => {
   const normalizedApiError = toApiRequestError(requestError)
 
   if (normalizedApiError.statusCode === 404) {
-    return 'Zaman damgalama servisi bulunamadı. Fake API’yi durdurup npm run api komutuyla yeniden başlatın.'
+    return translate('timestamp.feedback.endpointMissing')
   }
 
   return getApiErrorMessage(normalizedApiError)
@@ -65,8 +66,9 @@ export const useTimestampStore = defineStore('timestamp', () => {
     }
 
     timestampSubmissionStatus.value = 'error'
-    timestampSubmissionErrorMessage.value =
-      'Zaman damgalama işlemi için yeterli kontörünüz bulunmuyor.'
+    timestampSubmissionErrorMessage.value = translate(
+      'timestamp.feedback.insufficientCredits',
+    )
     timestampSubmissionSuccessMessage.value = ''
   }
 
@@ -77,8 +79,9 @@ export const useTimestampStore = defineStore('timestamp', () => {
 
     if (!selectedTimestampFile.value) {
       timestampSubmissionStatus.value = 'error'
-      timestampSubmissionErrorMessage.value =
-        'Zaman damgalama işlemine devam etmek için bir dosya seçin.'
+      timestampSubmissionErrorMessage.value = translate(
+        'timestamp.feedback.selectFile',
+      )
 
       return false
     }
@@ -115,8 +118,10 @@ export const useTimestampStore = defineStore('timestamp', () => {
       timestampJobsLoadStatus.value = 'success'
       selectedTimestampFile.value = null
       timestampSubmissionStatus.value = 'success'
-      timestampSubmissionSuccessMessage.value =
-        `${timestampTransaction.timestampJob.fileName} başarıyla zaman damgalandı. 1 kontör kullanıldı.`
+      timestampSubmissionSuccessMessage.value = translate(
+        'timestamp.feedback.success',
+        { fileName: timestampTransaction.timestampJob.fileName },
+      )
 
       return true
     } catch (requestError) {

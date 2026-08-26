@@ -1,0 +1,316 @@
+{
+  "language": {
+    "selectorLabel": "Uygulama dili",
+    "turkish": "Türkçe",
+    "english": "İngilizce",
+    "switchTo": "Dili {language} olarak değiştir"
+  },
+  "common": {
+    "appName": "İzİmza",
+    "retry": "Tekrar dene",
+    "refresh": "Yenile",
+    "cancel": "Vazgeç",
+    "loading": "Yükleniyor…",
+    "credit": "kontör"
+  },
+  "routes": {
+    "login": "Giriş",
+    "authCallback": "Oturum doğrulanıyor",
+    "application": "İzİmza",
+    "dashboard": "Anasayfa",
+    "timestamp": "Zaman Damgala",
+    "profile": "Profil ve Güvenlik"
+  },
+  "layout": {
+    "sidebar": {
+      "ariaLabel": "İzİmza ana navigasyonu",
+      "homeAriaLabel": "İzİmza anasayfa",
+      "closeAriaLabel": "Navigasyonu kapat",
+      "context": "Güvenli işlem merkezi",
+      "navigationAriaLabel": "Ana navigasyon",
+      "dashboard": "Anasayfa",
+      "timestamp": "Zaman Damgala",
+      "profile": "Profil",
+      "secureSession": "Güvenli oturum",
+      "protectedConnection": "Bağlantınız korunuyor"
+    },
+    "topbar": {
+      "openNavigation": "Navigasyonu aç",
+      "closeNavigation": "Navigasyonu kapat",
+      "context": "Güvenli dijital işlemler",
+      "remainingCredits": "Kalan kontör"
+    }
+  },
+  "notifications": {
+    "ariaLabel": "Uygulama bildirimleri",
+    "dismissAriaLabel": "Bildirimi kapat"
+  },
+  "auth": {
+    "userMenu": {
+      "fallbackName": "İzİmza Kullanıcısı",
+      "openAriaLabel": "Kullanıcı menüsünü aç",
+      "closeAriaLabel": "Kullanıcı menüsünü kapat",
+      "profile": "Profil ve güvenlik",
+      "logout": "Güvenli çıkış"
+    },
+    "login": {
+      "homeAriaLabel": "İzİmza anasayfa",
+      "eyebrow": "Dijital iziniz güvende",
+      "title": "Belgelerinize güvenilir bir zaman kazandırın.",
+      "description": "Elektronik imzalama, zaman damgalama ve arşivleme işlemlerinizi tek bir güvenli merkezden yönetin.",
+      "oauthFeature": "OAuth 2.0 ve OpenID Connect",
+      "sessionFeature": "Merkezi ve güvenli oturum yönetimi",
+      "historyFeature": "Şeffaf işlem geçmişi",
+      "featureListAriaLabel": "İzİmza güvenlik özellikleri",
+      "footer": "İzİmza Frontend Case · Güvenli işlem merkezi",
+      "eyebrowPanel": "Güvenli giriş",
+      "panelTitle": "İzİmza hesabınıza erişin",
+      "panelDescription": "Devam ettiğinizde güvenli Auth0 giriş ekranına yönlendirilirsiniz.",
+      "configurationTitle": "Auth0 yapılandırması bekleniyor",
+      "configurationBeforeKeys": ".env dosyasına",
+      "configurationBetweenKeys": "ve",
+      "configurationAfterKeys": "değerlerini ekleyin.",
+      "callbackUrl": "Callback URL",
+      "authenticationErrorTitle": "Oturum doğrulanamadı",
+      "authenticationErrorDescription": "Giriş akışı tamamlanamadı. Lütfen tekrar deneyin.",
+      "startError": "Giriş işlemi başlatılamadı. Lütfen tekrar deneyin.",
+      "signIn": "Giriş yap",
+      "checkingSession": "Oturum kontrol ediliyor…",
+      "signUp": "Yeni hesap oluştur",
+      "privacy": "Parolanız İzİmza arayüzü tarafından görülmez veya saklanmaz."
+    },
+    "callback": {
+      "failedTitle": "Oturum doğrulanamadı",
+      "configurationError": "Auth0 ortam değişkenleri yapılandırılmadığı için giriş tamamlanamadı.",
+      "authenticationError": "Giriş akışı tamamlanamadı. Lütfen tekrar deneyin.",
+      "backToLogin": "Giriş ekranına dön",
+      "preparingTitle": "Güvenli oturum hazırlanıyor",
+      "preparingDescription": "Kimliğiniz doğrulanıyor ve istediğiniz sayfaya yönlendiriliyorsunuz."
+    }
+  },
+  "dashboard": {
+    "page": {
+      "userFallback": "İzİmza kullanıcısı",
+      "greeting": "Merhaba, {name}",
+      "introduction": "Dijital işlemlerinizin özeti ve güvenli işlem araçlarınız burada.",
+      "refreshing": "Yenileniyor…",
+      "refreshData": "Verileri yenile",
+      "loadingAriaLabel": "Dashboard verileri yükleniyor",
+      "loadErrorTitle": "İşlem merkezi yüklenemedi",
+      "retry": "Yeniden dene",
+      "accountSummaryAriaLabel": "Hesap özeti"
+    },
+    "metrics": {
+      "signedDocuments": "İmzalanan belge",
+      "signedDocumentsDetail": "Tüm zamanlardaki işlemler",
+      "archivedDocuments": "Arşivdeki kayıt",
+      "archivedDocumentsDetail": "Güvenle saklanan doküman",
+      "availableCredits": "Kullanılabilir kontör",
+      "availableCreditsDetail": "Her zaman damgası 1 kontör",
+      "archiveCapacity": "Arşiv kapasitesi",
+      "totalStorage": "{size} toplam alan",
+      "archiveUsageAriaLabel": "Arşiv kullanım oranı"
+    },
+    "quickActions": {
+      "ariaLabel": "Hızlı işlemler",
+      "fastestAction": "En hızlı işlem",
+      "title": "Belgenizin zamanını şimdi kanıtlayın.",
+      "description": "Dosyanızı yükleyin; bütünlük kontrolü, zaman damgası ve arşiv kaydını tek bir güvenli akışta tamamlayın.",
+      "startSelectingFile": "Dosya seçmeye başla",
+      "goToTimestamp": "Zaman Damgala ekranına ilerle",
+      "assurance": "İzİmza güvencesi",
+      "trustChain": "Güven zinciri",
+      "fileIntegrity": "Dosya bütünlüğü",
+      "fileIntegrityDescription": "Belgenin dijital özeti hazırlanır.",
+      "timeProof": "Zaman kanıtı",
+      "timeProofDescription": "İşlem zamanı güvenle kayıt altına alınır.",
+      "secureArchive": "Güvenli arşiv",
+      "secureArchiveDescription": "Sonuç belgeniz hesabınızda saklanır."
+    },
+    "recentDocuments": {
+      "previewPreparing": "{fileName} için güvenli önizleme hazırlanıyor.",
+      "downloadRequested": "{fileName} için indirme isteği oluşturuldu.",
+      "eyebrow": "Yakın geçmiş",
+      "title": "Son arşivlenen belgeler",
+      "recordCount": "{count} kayıt gösteriliyor",
+      "document": "Belge",
+      "operation": "İşlem",
+      "date": "Tarih",
+      "size": "Boyut",
+      "actions": "İşlemler",
+      "electronicSignature": "E-imza",
+      "timestamp": "Zaman damgası",
+      "previewAriaLabel": "{fileName} belgesini önizle",
+      "downloadAriaLabel": "{fileName} belgesini indir",
+      "previewTitle": "Belgeyi önizle",
+      "previewUnavailableTitle": "Bu dosya türü önizlenemiyor",
+      "downloadTitle": "Belgeyi indir",
+      "emptyTitle": "Arşiviniz henüz boş",
+      "emptyDescription": "İlk zaman damgası işleminiz tamamlandığında belgeniz burada görünür.",
+      "createFirst": "İlk işlemi oluştur"
+    }
+  },
+  "timestamp": {
+    "page": {
+      "eyebrow": "Güvenli doğrulama merkezi",
+      "title": "Zaman Damgala",
+      "description": "Dosyanızın belirli bir tarihte var olduğunu doğrulayan güvenilir işlem kaydını birkaç adımda oluşturun.",
+      "transactionCost": "İşlem maliyeti",
+      "costPerFile": "1 kontör / dosya",
+      "balanceLoading": "Bakiye yükleniyor…",
+      "availableCredits": "Kullanılabilir kontör: {count}",
+      "noAvailableCredits": "Kullanılabilir kontör yok",
+      "guideEyebrow": "Üç adımda tamamlayın",
+      "guideTitle": "Dosyanızdan doğrulama kaydına",
+      "selectFile": "Dosyanızı seçin",
+      "selectFileDescription": "En fazla {maximumSize} boyutunda tek dosya ekleyin.",
+      "confirmInformation": "Bilgileri onaylayın",
+      "confirmInformationDescription": "Dosya adı, boyutu ve kontör maliyetini kontrol edin.",
+      "followRecord": "Kaydı takip edin",
+      "followRecordDescription": "Tamamlanan işlemi geçmiş listenizde görüntüleyin.",
+      "guideNote": "İşlem sonucu, dosya bilgileri ve oluşturulma tarihiyle birlikte kaydedilir."
+    },
+    "upload": {
+      "fileFallback": "Dosya",
+      "fileExtension": "{extension} dosyası",
+      "multipleFilesError": "Tek seferde yalnızca bir dosya seçebilirsiniz.",
+      "inputAriaLabel": "Zaman damgalanacak dosyayı seçin",
+      "eyebrow": "Dosya seçimi",
+      "title": "Dosyanızı güvenli alana bırakın",
+      "description": "Sürükleyip bırakabilir veya cihazınızdan seçebilirsiniz. İşlem öncesinde dosya bilgilerini tekrar kontrol edebilirsiniz.",
+      "selectAnother": "Başka dosya seç",
+      "selectFromDevice": "Cihazdan dosya seç",
+      "requirements": "Tüm dosya türleri desteklenir · En fazla {maximumSize}",
+      "selectedFileAriaLabel": "Seçilen dosya",
+      "ready": "İşleme hazır",
+      "removeAriaLabel": "{fileName} dosyasını kaldır",
+      "transactionCost": "İşlem maliyeti",
+      "oneCredit": "1 kontör",
+      "continue": "Zaman damgalamaya devam et"
+    },
+    "modal": {
+      "eyebrow": "Son kontrol",
+      "title": "Zaman damgasını onaylayın",
+      "closeAriaLabel": "Onay penceresini kapat",
+      "description": "Aşağıdaki dosya için doğrulanabilir bir işlem kaydı oluşturulacak. Onaydan sonra kayıt işlem geçmişinize eklenir.",
+      "operation": "İşlem",
+      "operationValue": "Zaman damgalama",
+      "creditCost": "Kontör maliyeti",
+      "oneCredit": "1 kontör",
+      "creating": "İşlem oluşturuluyor…",
+      "confirm": "Onayla ve zaman damgala"
+    },
+    "history": {
+      "eyebrow": "İşlem geçmişi",
+      "title": "Son zaman damgaları",
+      "description": "Tamamlanan ve devam eden işlemlerinizi tek yerde izleyin.",
+      "refreshing": "Yenileniyor…",
+      "refresh": "Geçmişi yenile",
+      "loadingAriaLabel": "Zaman damgası geçmişi yükleniyor",
+      "caption": "Son zaman damgası işlemleri",
+      "file": "Dosya",
+      "status": "Durum",
+      "transactionDate": "İşlem tarihi",
+      "cost": "Maliyet",
+      "completed": "Tamamlandı",
+      "failed": "Başarısız",
+      "processing": "İşleniyor",
+      "creditCost": "{count} kontör | {count} kontör",
+      "emptyTitle": "Henüz zaman damgası kaydınız yok",
+      "emptyDescription": "İlk işleminiz tamamlandığında doğrulama kaydı burada görünecek."
+    },
+    "validation": {
+      "emptyFile": "Boş dosyalar zaman damgalama işlemine alınamaz.",
+      "fileTooLarge": "Dosya boyutu {maximumSize} sınırını aşamaz."
+    },
+    "feedback": {
+      "endpointMissing": "Zaman damgalama servisi bulunamadı. Fake API’yi durdurup npm run api komutuyla yeniden başlatın.",
+      "insufficientCredits": "Zaman damgalama işlemi için yeterli kontörünüz bulunmuyor.",
+      "selectFile": "Zaman damgalama işlemine devam etmek için bir dosya seçin.",
+      "success": "{fileName} başarıyla zaman damgalandı. 1 kontör kullanıldı."
+    }
+  },
+  "profile": {
+    "page": {
+      "userFallback": "İzİmza kullanıcısı",
+      "emailUnavailable": "E-posta bilgisi bulunamadı",
+      "updateError": "Profil bilgileri güncellenemedi.",
+      "eyebrow": "Hesap merkezi",
+      "title": "Profilim",
+      "description": "Kişisel bilgilerinizi yönetin ve hesabınızın güvenlik durumunu tek bakışta takip edin.",
+      "identitySecurity": "Kimlik güvenliği",
+      "protectedByAuth0": "Auth0 ile korunuyor",
+      "preparing": "Profiliniz hazırlanıyor",
+      "loadingDescription": "Hesap bilgileriniz güvenli şekilde yükleniyor.",
+      "loadErrorTitle": "Profil bilgileri yüklenemedi",
+      "loading": "Yükleniyor…",
+      "retry": "Tekrar dene",
+      "refresh": "Yenile"
+    },
+    "identity": {
+      "account": "İzİmza hesabı",
+      "emailVerified": "E-posta doğrulandı",
+      "verificationPending": "Doğrulama bekleniyor",
+      "editing": "Düzenleniyor",
+      "edit": "Bilgileri düzenle"
+    },
+    "form": {
+      "eyebrow": "Kişisel alan",
+      "title": "Kişisel bilgiler",
+      "editingMode": "Düzenleme modu",
+      "viewingMode": "Görüntüleme modu",
+      "description": "İşlem kayıtlarınızda ve hesap iletişiminde kullanılacak bilgilerinizi yönetin.",
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "phone": "Telefon numarası",
+      "email": "E-posta adresi",
+      "emailHint": "Bu alan Auth0 kimliğiniz üzerinden yönetilir.",
+      "saveNote": "Değişiklikler yalnızca “Kaydet” seçildiğinde uygulanır.",
+      "saving": "Kaydediliyor…",
+      "save": "Değişiklikleri kaydet"
+    },
+    "validation": {
+      "required": "{fieldLabel} alanı zorunludur.",
+      "nameLength": "{fieldLabel} {minimumLength}-{maximumLength} karakter arasında olmalıdır.",
+      "nameCharacters": "{fieldLabel} yalnızca harf, boşluk, tire ve kesme işareti içerebilir.",
+      "phoneRequired": "Telefon numarası alanı zorunludur.",
+      "phoneInvalid": "Geçerli bir telefon numarası girin. Örnek: +90 555 123 45 67."
+    },
+    "security": {
+      "eyebrow": "Güvenlik",
+      "title": "Kimlik sağlayıcısı",
+      "description": "Oturumunuz ve kimlik bilgileriniz OAuth 2.0 / OpenID Connect akışıyla Auth0 tarafından korunur.",
+      "session": "Oturum",
+      "active": "Aktif",
+      "checking": "Kontrol ediliyor",
+      "email": "E-posta",
+      "verified": "Doğrulandı",
+      "verificationPending": "Doğrulama bekleniyor",
+      "identitySystem": "Kimlik sistemi",
+      "note": "Şifre ve e-posta değişiklikleri güvenlik nedeniyle doğrudan kimlik sağlayıcınız üzerinden yönetilir."
+    },
+    "feedback": {
+      "updated": "Profil bilgileriniz güncellendi."
+    }
+  },
+  "errors": {
+    "badRequest": "Gönderilen bilgiler geçersiz. Lütfen alanları kontrol edin.",
+    "unauthorized": "Oturumunuz doğrulanamadı. Lütfen yeniden giriş yapın.",
+    "forbidden": "Bu işlem için yetkiniz bulunmuyor.",
+    "notFound": "İstenen kayıt bulunamadı.",
+    "conflict": "Bu işlem mevcut verilerle çakışıyor.",
+    "unprocessable": "Gönderilen bilgiler işlenemedi.",
+    "serviceUnavailable": "Servis geçici olarak kullanılamıyor. Lütfen tekrar deneyin.",
+    "fallback": "İşlem tamamlanamadı. Lütfen tekrar deneyin.",
+    "unexpected": "Beklenmeyen bir hata oluştu.",
+    "timeout": "İstek zaman aşımına uğradı. Lütfen tekrar deneyin.",
+    "apiUnavailable": "Fake API sunucusuna ulaşılamadı. `npm run api` komutunun çalıştığını kontrol edin.",
+    "invalidTimestampTransaction": "Zaman damgalama için gönderilen dosya bilgileri geçersiz.",
+    "timestampTransactionFailed": "Zaman damgalama işlemi tamamlanamadı."
+  },
+  "placeholder": {
+    "ready": "İskelet hazır",
+    "title": "Sayfa bileşenleri bir sonraki aşamada eklenecek.",
+    "description": "Route, responsive uygulama kabuğu ve temel tasarım token’ları kullanıma hazır."
+  }
+}

@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 import AppIcon from '@/components/common/AppIcon.vue'
 
 defineProps<{
   isAuthenticated: boolean
   isEmailVerified: boolean
 }>()
+
+const { t } = useI18n({ useScope: 'global' })
 </script>
 
 <template>
@@ -17,47 +21,53 @@ defineProps<{
         <AppIcon name="signature" :size="22" />
       </span>
       <div>
-        <small>Güvenlik</small>
-        <h2 id="profile-security-panel-title">Kimlik sağlayıcısı</h2>
+        <small>{{ t('profile.security.eyebrow') }}</small>
+        <h2 id="profile-security-panel-title">
+          {{ t('profile.security.title') }}
+        </h2>
       </div>
     </header>
 
     <p class="profile-security-panel__description">
-      Oturumunuz ve kimlik bilgileriniz OAuth 2.0 / OpenID Connect akışıyla
-      Auth0 tarafından korunur.
+      {{ t('profile.security.description') }}
     </p>
 
     <dl class="profile-security-panel__status-list">
       <div>
-        <dt>Oturum</dt>
+        <dt>{{ t('profile.security.session') }}</dt>
         <dd :class="{ 'profile-security-panel__status--success': isAuthenticated }">
           <span aria-hidden="true"></span>
-          {{ isAuthenticated ? 'Aktif' : 'Kontrol ediliyor' }}
+          {{
+            isAuthenticated
+              ? t('profile.security.active')
+              : t('profile.security.checking')
+          }}
         </dd>
       </div>
       <div>
-        <dt>E-posta</dt>
+        <dt>{{ t('profile.security.email') }}</dt>
         <dd
           :class="{
             'profile-security-panel__status--success': isEmailVerified,
           }"
         >
           <span aria-hidden="true"></span>
-          {{ isEmailVerified ? 'Doğrulandı' : 'Doğrulama bekleniyor' }}
+          {{
+            isEmailVerified
+              ? t('profile.security.verified')
+              : t('profile.security.verificationPending')
+          }}
         </dd>
       </div>
       <div>
-        <dt>Kimlik sistemi</dt>
+        <dt>{{ t('profile.security.identitySystem') }}</dt>
         <dd>Auth0</dd>
       </div>
     </dl>
 
     <div class="profile-security-panel__note">
       <span aria-hidden="true">i</span>
-      <p>
-        Şifre ve e-posta değişiklikleri güvenlik nedeniyle doğrudan kimlik
-        sağlayıcınız üzerinden yönetilir.
-      </p>
+      <p>{{ t('profile.security.note') }}</p>
     </div>
   </section>
 </template>

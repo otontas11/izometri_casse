@@ -2,8 +2,10 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 import { auth0Config } from '@/config/auth0.config'
+import { getApplicationLocaleCode } from '@/locales'
 
 const { logout: logoutFromAuth0, user: authenticatedUser } = useAuth0()
 const isUserMenuOpen = ref(false)
@@ -11,13 +13,14 @@ const userMenuElement = ref<HTMLElement | null>(null)
 const userMenuTriggerElement = ref<HTMLButtonElement | null>(null)
 const userMenuPopoverElement = ref<HTMLElement | null>(null)
 const hasAuthenticatedUserPictureError = ref(false)
+const { t } = useI18n({ useScope: 'global' })
 
 const authenticatedUserDisplayName = computed(
   () =>
     authenticatedUser.value?.name ||
     authenticatedUser.value?.nickname ||
     authenticatedUser.value?.email ||
-    'İzİmza Kullanıcısı',
+    t('auth.userMenu.fallbackName'),
 )
 const authenticatedUserEmail = computed(
   () => authenticatedUser.value?.email ?? '',
@@ -42,7 +45,7 @@ const authenticatedUserInitials = computed(() => {
 
   return displayNameWords
     .slice(0, 2)
-    .map((word) => word.charAt(0).toLocaleUpperCase('tr-TR'))
+    .map((word) => word.charAt(0).toLocaleUpperCase(getApplicationLocaleCode()))
     .join('')
 })
 
@@ -130,7 +133,9 @@ onBeforeUnmount(() =>
       :aria-expanded="isUserMenuOpen"
       aria-controls="authenticated-user-popover"
       :aria-label="
-        isUserMenuOpen ? 'Kullanıcı menüsünü kapat' : 'Kullanıcı menüsünü aç'
+        isUserMenuOpen
+          ? t('auth.userMenu.closeAriaLabel')
+          : t('auth.userMenu.openAriaLabel')
       "
       @click="isUserMenuOpen = !isUserMenuOpen"
       @keydown="handleUserMenuTriggerKeydown"
@@ -160,10 +165,10 @@ onBeforeUnmount(() =>
         :to="{ name: 'profile' }"
         @click="closeUserMenu"
       >
-        Profil ve güvenlik
+        {{ t('auth.userMenu.profile') }}
       </RouterLink>
       <button type="button" @click="handleLogout">
-        Güvenli çıkış
+        {{ t('auth.userMenu.logout') }}
       </button>
     </div>
   </div>

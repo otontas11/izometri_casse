@@ -1,14 +1,4 @@
-const fileSizeNumberFormatter = new Intl.NumberFormat('tr-TR', {
-  maximumFractionDigits: 1,
-})
-
-const dateTimeFormatter = new Intl.DateTimeFormat('tr-TR', {
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  month: 'short',
-  year: 'numeric',
-})
+import { getApplicationLocaleCode } from '@/locales'
 
 const FILE_SIZE_UNIT_BASE = 1024
 const fileSizeUnits = ['B', 'KB', 'MB', 'GB'] as const
@@ -25,7 +15,11 @@ export const formatFileSize = (fileSizeInBytes: number) => {
   const normalizedFileSize =
     fileSizeInBytes / FILE_SIZE_UNIT_BASE ** fileSizeUnitIndex
 
-  return `${fileSizeNumberFormatter.format(normalizedFileSize)} ${fileSizeUnits[fileSizeUnitIndex]}`
+  const localizedFileSize = new Intl.NumberFormat(getApplicationLocaleCode(), {
+    maximumFractionDigits: 1,
+  }).format(normalizedFileSize)
+
+  return `${localizedFileSize} ${fileSizeUnits[fileSizeUnitIndex]}`
 }
 
 export const formatDateTime = (dateValue: Date | string) => {
@@ -35,5 +29,11 @@ export const formatDateTime = (dateValue: Date | string) => {
     return '—'
   }
 
-  return dateTimeFormatter.format(parsedDate)
+  return new Intl.DateTimeFormat(getApplicationLocaleCode(), {
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(parsedDate)
 }

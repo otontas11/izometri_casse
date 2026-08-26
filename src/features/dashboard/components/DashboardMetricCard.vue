@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 import AppIcon from '@/components/common/AppIcon.vue'
 import type { AppIconName } from '@/types/icon'
 
@@ -15,6 +17,8 @@ withDefaults(
     progress: undefined,
   },
 )
+
+const { t } = useI18n({ useScope: 'global' })
 </script>
 
 <template>
@@ -34,7 +38,7 @@ withDefaults(
         v-if="progress !== undefined"
         class="dashboard-metric-card__progress"
         role="progressbar"
-        aria-label="Arşiv kullanım oranı"
+        :aria-label="t('dashboard.metrics.archiveUsageAriaLabel')"
         aria-valuemin="0"
         aria-valuemax="100"
         :aria-valuenow="Math.round(progress)"

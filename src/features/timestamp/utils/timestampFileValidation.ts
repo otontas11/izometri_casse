@@ -1,3 +1,4 @@
+import { translate } from '@/locales'
 import { formatFileSize } from '@/utils/formatters'
 
 export const MAX_TIMESTAMP_FILE_SIZE_BYTES = 25 * 1024 * 1024
@@ -11,14 +12,16 @@ export const validateTimestampFile = (
 ): TimestampFileValidationResult => {
   if (timestampFile.size === 0) {
     return {
-      errorMessage: 'Boş dosyalar zaman damgalama işlemine alınamaz.',
+      errorMessage: translate('timestamp.validation.emptyFile'),
       isValid: false,
     }
   }
 
   if (timestampFile.size > MAX_TIMESTAMP_FILE_SIZE_BYTES) {
     return {
-      errorMessage: `Dosya boyutu ${formatFileSize(MAX_TIMESTAMP_FILE_SIZE_BYTES)} sınırını aşamaz.`,
+      errorMessage: translate('timestamp.validation.fileTooLarge', {
+        maximumSize: formatFileSize(MAX_TIMESTAMP_FILE_SIZE_BYTES),
+      }),
       isValid: false,
     }
   }

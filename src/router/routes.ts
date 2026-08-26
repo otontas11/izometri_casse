@@ -4,7 +4,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 
 declare module 'vue-router' {
   interface RouteMeta {
-    title: string
+    titleKey: string
     requiresAuth?: boolean
   }
 }
@@ -14,36 +14,36 @@ export const applicationRoutes: RouteRecordRaw[] = [
     path: '/login',
     name: 'login',
     component: () => import('@/pages/auth/LoginPage.vue'),
-    meta: { title: 'Giriş' },
+    meta: { titleKey: 'routes.login' },
   },
   {
     path: '/auth/callback',
     name: 'auth-callback',
     component: () => import('@/pages/auth/AuthCallbackPage.vue'),
-    meta: { title: 'Oturum doğrulanıyor' },
+    meta: { titleKey: 'routes.authCallback' },
   },
   {
     path: '/',
     component: AppLayout,
-    meta: { title: 'İzİmza', requiresAuth: true },
+    meta: { titleKey: 'routes.application', requiresAuth: true },
     children: [
       {
         path: '',
         name: 'dashboard',
         component: () => import('@/pages/DashboardPage.vue'),
-        meta: { title: 'Anasayfa' },
+        meta: { titleKey: 'routes.dashboard' },
       },
       {
         path: 'timestamp',
         name: 'timestamp',
         component: () => import('@/pages/TimestampPage.vue'),
-        meta: { title: 'Zaman Damgala' },
+        meta: { titleKey: 'routes.timestamp' },
       },
       {
         path: 'settings/profile',
         name: 'profile',
         component: () => import('@/pages/ProfilePage.vue'),
-        meta: { title: 'Profil ve Güvenlik' },
+        meta: { titleKey: 'routes.profile' },
       },
     ],
   },

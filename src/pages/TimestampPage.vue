@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import { useToast } from '@/composables/useToast'
@@ -26,10 +27,11 @@ const {
   timestampSubmissionSuccessMessage,
 } = storeToRefs(timestampStore)
 const { showErrorToast, showSuccessToast, showWarningToast } = useToast()
+const { t } = useI18n({ useScope: 'global' })
 
 const isConfirmationModalOpen = ref(false)
-const maximumTimestampFileSizeLabel = formatFileSize(
-  MAX_TIMESTAMP_FILE_SIZE_BYTES,
+const maximumTimestampFileSizeLabel = computed(() =>
+  formatFileSize(MAX_TIMESTAMP_FILE_SIZE_BYTES),
 )
 const availableTimestampCredits = computed(
   () => dashboardSummary.value?.remainingCredits ?? null,
@@ -93,12 +95,9 @@ onMounted(() => {
   <section class="timestamp-page" aria-labelledby="timestamp-page-title">
     <header class="timestamp-page__header">
       <div>
-        <span class="timestamp-page__eyebrow">Güvenli doğrulama merkezi</span>
-        <h1 id="timestamp-page-title">Zaman Damgala</h1>
-        <p>
-          Dosyanızın belirli bir tarihte var olduğunu doğrulayan güvenilir işlem
-          kaydını birkaç adımda oluşturun.
-        </p>
+        <span class="timestamp-page__eyebrow">{{ t('timestamp.page.eyebrow') }}</span>
+        <h1 id="timestamp-page-title">{{ t('timestamp.page.title') }}</h1>
+        <p>{{ t('timestamp.page.description') }}</p>
       </div>
 
       <div
@@ -114,15 +113,17 @@ onMounted(() => {
           <AppIcon name="wallet" :size="21" />
         </span>
         <div>
-          <small>İşlem maliyeti</small>
-          <strong>1 kontör / dosya</strong>
+          <small>{{ t('timestamp.page.transactionCost') }}</small>
+          <strong>{{ t('timestamp.page.costPerFile') }}</strong>
           <small class="timestamp-page__available-credits">
             {{
               availableTimestampCredits === null
-                ? 'Bakiye yükleniyor…'
+                ? t('timestamp.page.balanceLoading')
                 : availableTimestampCredits > 0
-                  ? `${availableTimestampCredits} kontör kullanılabilir`
-                  : 'Kullanılabilir kontör yok'
+                  ? t('timestamp.page.availableCredits', {
+                      count: availableTimestampCredits,
+                    })
+                  : t('timestamp.page.noAvailableCredits')
             }}
           </small>
         </div>
@@ -163,42 +164,44 @@ onMounted(() => {
         <span class="timestamp-page__guide-icon" aria-hidden="true">
           <AppIcon name="timestamp" :size="24" />
         </span>
-        <p>Üç adımda tamamlayın</p>
-        <h2 id="timestamp-guide-title">Dosyanızdan doğrulama kaydına</h2>
+        <p>{{ t('timestamp.page.guideEyebrow') }}</p>
+        <h2 id="timestamp-guide-title">{{ t('timestamp.page.guideTitle') }}</h2>
 
         <ol>
           <li>
             <span>01</span>
             <div>
-              <strong>Dosyanızı seçin</strong>
+              <strong>{{ t('timestamp.page.selectFile') }}</strong>
               <small>
-                En fazla {{ maximumTimestampFileSizeLabel }} boyutunda tek dosya
-                ekleyin.
+                {{
+                  t('timestamp.page.selectFileDescription', {
+                    maximumSize: maximumTimestampFileSizeLabel,
+                  })
+                }}
               </small>
             </div>
           </li>
           <li>
             <span>02</span>
             <div>
-              <strong>Bilgileri onaylayın</strong>
-              <small>Dosya adı, boyutu ve kontör maliyetini kontrol edin.</small>
+              <strong>{{ t('timestamp.page.confirmInformation') }}</strong>
+              <small>
+                {{ t('timestamp.page.confirmInformationDescription') }}
+              </small>
             </div>
           </li>
           <li>
             <span>03</span>
             <div>
-              <strong>Kaydı takip edin</strong>
-              <small>Tamamlanan işlemi geçmiş listenizde görüntüleyin.</small>
+              <strong>{{ t('timestamp.page.followRecord') }}</strong>
+              <small>{{ t('timestamp.page.followRecordDescription') }}</small>
             </div>
           </li>
         </ol>
 
         <div class="timestamp-page__guide-note">
           <span aria-hidden="true">✓</span>
-          <p>
-            İşlem sonucu, dosya bilgileri ve oluşturulma tarihiyle birlikte
-            kaydedilir.
-          </p>
+          <p>{{ t('timestamp.page.guideNote') }}</p>
         </div>
       </aside>
     </div>

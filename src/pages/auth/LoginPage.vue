@@ -2,7 +2,9 @@
 import { computed, ref, watch } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
+import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
 import {
   auth0Config,
   isAuth0Configured,
@@ -13,6 +15,7 @@ type AuthMode = 'login' | 'signup'
 const currentRoute = useRoute()
 const applicationRouter = useRouter()
 const auth0Client = isAuth0Configured ? useAuth0() : null
+const { locale, t } = useI18n({ useScope: 'global' })
 const isAuthenticationSubmitting = ref(false)
 const localAuthenticationError = ref('')
 
@@ -35,20 +38,15 @@ const authenticationRedirectTarget = computed(() => {
 const isAuth0Loading = computed(() => auth0Client?.isLoading.value ?? false)
 const authenticationErrorMessage = computed(
   () =>
-    localAuthenticationError.value || auth0Client?.error.value?.message || '',
+    localAuthenticationError.value ||
+    (auth0Client?.error.value
+      ? t('auth.login.authenticationErrorDescription')
+      : ''),
 )
 const hasAuth0ConfigurationError = computed(
   () =>
     !isAuth0Configured || currentRoute.query.reason === 'configuration',
 )
-
-const getAuthenticationErrorMessage = (authenticationError: unknown) => {
-  if (authenticationError instanceof Error) {
-    return authenticationError.message
-  }
-
-  return 'Giriş işlemi başlatılamadı. Lütfen tekrar deneyin.'
-}
 
 const handleAuthenticationStart = async (authenticationMode: AuthMode) => {
   if (!auth0Client) {
@@ -61,13 +59,13 @@ const handleAuthenticationStart = async (authenticationMode: AuthMode) => {
   try {
     await auth0Client.loginWithRedirect({
       appState: { target: authenticationRedirectTarget.value },
-      ...(authenticationMode === 'signup'
-        ? { authorizationParams: { screen_hint: 'signup' } }
-        : {}),
+      authorizationParams: {
+        ui_locales: locale.value,
+        ...(authenticationMode === 'signup' ? { screen_hint: 'signup' } : {}),
+      },
     })
-  } catch (authenticationError) {
-    localAuthenticationError.value =
-      getAuthenticationErrorMessage(authenticationError)
+  } catch {
+    localAuthenticationError.value = t('auth.login.startError')
     isAuthenticationSubmitting.value = false
   }
 }
@@ -86,38 +84,50 @@ watch(
 <template>
   <main class="login-page">
     <section class="login-page__story" aria-labelledby="login-story-title">
-      <a class="login-page__brand" href="/" aria-label="İzİmza anasayfa">
+      <a
+        class="login-page__brand"
+        href="/"
+        :aria-label="t('auth.login.homeAriaLabel')"
+      >
         iz<span>imza</span>
       </a>
 
       <div class="login-page__story-content">
-        <span class="login-page__eyebrow">Dijital iziniz güvende</span>
-        <h1 id="login-story-title">Belgelerinize güvenilir bir zaman kazandırın.</h1>
-        <p>
-          Elektronik imzalama, zaman damgalama ve arşivleme işlemlerinizi tek bir
-          güvenli merkezden yönetin.
-        </p>
+        <span class="login-page__eyebrow">{{ t('auth.login.eyebrow') }}</span>
+        <h1 id="login-story-title">{{ t('auth.login.title') }}</h1>
+        <p>{{ t('auth.login.description') }}</p>
 
-        <ul aria-label="İzİmza güvenlik özellikleri">
-          <li><span aria-hidden="true">✓</span> OAuth 2.0 ve OpenID Connect</li>
-          <li><span aria-hidden="true">✓</span> Merkezi ve güvenli oturum yönetimi</li>
-          <li><span aria-hidden="true">✓</span> Şeffaf işlem geçmişi</li>
+        <ul :aria-label="t('auth.login.featureListAriaLabel')">
+          <li>
+            <span aria-hidden="true">✓</span>
+            {{ t('auth.login.oauthFeature') }}
+          </li>
+          <li>
+            <span aria-hidden="true">✓</span>
+            {{ t('auth.login.sessionFeature') }}
+          </li>
+          <li>
+            <span aria-hidden="true">✓</span>
+            {{ t('auth.login.historyFeature') }}
+          </li>
         </ul>
       </div>
 
-      <small>İzİmza Frontend Case · Güvenli işlem merkezi</small>
+      <small>{{ t('auth.login.footer') }}</small>
     </section>
 
     <section class="login-page__panel" aria-labelledby="login-title">
+      <LanguageSwitcher class="login-page__language-switcher" />
+
       <div class="login-page__card">
         <div class="login-page__card-seal" aria-hidden="true">
           <span>✓</span>
         </div>
 
         <div class="login-page__card-heading">
-          <span>Güvenli giriş</span>
-          <h2 id="login-title">İzİmza hesabınıza erişin</h2>
-          <p>Devam ettiğinizde güvenli Auth0 giriş ekranına yönlendirilirsiniz.</p>
+          <span>{{ t('auth.login.eyebrowPanel') }}</span>
+          <h2 id="login-title">{{ t('auth.login.panelTitle') }}</h2>
+          <p>{{ t('auth.login.panelDescription') }}</p>
         </div>
 
         <div
@@ -125,13 +135,17 @@ watch(
           class="login-page__card-notice login-page__card-notice--warning"
           role="alert"
         >
-          <strong>Auth0 yapılandırması bekleniyor</strong>
+          <strong>{{ t('auth.login.configurationTitle') }}</strong>
           <p>
-            <code>.env</code> dosyasına <code>VITE_AUTH0_DOMAIN</code> ve
-            <code>VITE_AUTH0_CLIENT_ID</code> değerlerini ekleyin.
+            {{ t('auth.login.configurationBeforeKeys') }}
+            <code>VITE_AUTH0_DOMAIN</code>
+            {{ t('auth.login.configurationBetweenKeys') }}
+            <code>VITE_AUTH0_CLIENT_ID</code>
+            {{ t('auth.login.configurationAfterKeys') }}
           </p>
           <small>
-            Callback URL: <code>{{ auth0Config.callbackUri }}</code>
+            {{ t('auth.login.callbackUrl') }}:
+            <code>{{ auth0Config.callbackUri }}</code>
           </small>
         </div>
 
@@ -143,11 +157,11 @@ watch(
           class="login-page__card-notice login-page__card-notice--error"
           role="alert"
         >
-          <strong>Oturum doğrulanamadı</strong>
+          <strong>{{ t('auth.login.authenticationErrorTitle') }}</strong>
           <p>
             {{
               authenticationErrorMessage ||
-              'Giriş akışı tamamlanamadı. Lütfen tekrar deneyin.'
+              t('auth.login.authenticationErrorDescription')
             }}
           </p>
         </div>
@@ -169,8 +183,8 @@ watch(
             ></span>
             {{
               isAuth0Loading || isAuthenticationSubmitting
-                ? 'Oturum kontrol ediliyor…'
-                : 'Giriş yap'
+                ? t('auth.login.checkingSession')
+                : t('auth.login.signIn')
             }}
           </button>
 
@@ -184,12 +198,12 @@ watch(
             "
             @click="handleAuthenticationStart('signup')"
           >
-            Yeni hesap oluştur
+            {{ t('auth.login.signUp') }}
           </button>
         </div>
 
         <p class="login-page__card-privacy">
-          Parolanız İzİmza arayüzü tarafından görülmez veya saklanmaz.
+          {{ t('auth.login.privacy') }}
         </p>
       </div>
     </section>
@@ -333,10 +347,17 @@ watch(
 }
 
 .login-page__panel {
+  position: relative;
   display: grid;
   min-height: 100vh;
   place-items: center;
   padding: clamp(1.5rem, 5vw, 5rem);
+}
+
+.login-page__language-switcher {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
 }
 
 .login-page__card {

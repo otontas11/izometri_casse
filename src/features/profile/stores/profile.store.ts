@@ -2,6 +2,7 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import { getApiErrorMessage } from '@/api/apiError'
+import { translate } from '@/locales'
 import type { ApiRequestStatus } from '@/types/api.types'
 
 import { profileApi } from '../api/profile.api'
@@ -57,7 +58,7 @@ export const useProfileStore = defineStore('profile', () => {
     try {
       userProfile.value = await profileApi.updateUserProfile(profileUpdates)
       profileSaveStatus.value = 'success'
-      profileSaveSuccessMessage.value = 'Profil bilgileriniz güncellendi.'
+      profileSaveSuccessMessage.value = translate('profile.feedback.updated')
 
       return true
     } catch (requestError) {
