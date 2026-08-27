@@ -1,6 +1,6 @@
 export interface DashboardSummary {
   totalSignedDocuments: number
-  archivedDocumentCount: number
+  totalTimestampedDocuments: number
   remainingCredits: number
   storageUsedMb: number
   storageLimitMb: number

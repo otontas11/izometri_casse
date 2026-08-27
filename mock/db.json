@@ -1,7 +1,7 @@
 {
   "dashboard": {
     "totalSignedDocuments": 1,
-    "archivedDocumentCount": 3,
+    "totalTimestampedDocuments": 2,
     "remainingCredits": 17,
     "storageUsedMb": 2.69,
     "storageLimitMb": 1024

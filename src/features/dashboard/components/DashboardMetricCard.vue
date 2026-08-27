@@ -24,20 +24,17 @@ const { t } = useI18n({ useScope: 'global' })
 
 <template>
   <article :class="['dashboard-metric-card', `dashboard-metric-card--${tone}`]">
-    <div class="dashboard-metric-card__topline">
-      <span class="dashboard-metric-card__icon" aria-hidden="true">
-        <AppIcon :name="icon" :size="21" />
-      </span>
+    <span class="dashboard-metric-card__icon" aria-hidden="true">
+      <AppIcon :name="icon" :size="21" />
+    </span>
+
+    <div class="dashboard-metric-card__content">
       <span class="dashboard-metric-card__label">{{ label }}</span>
-    </div>
+      <strong class="dashboard-metric-card__value">{{ metricValue }}</strong>
 
-    <strong class="dashboard-metric-card__value">{{ metricValue }}</strong>
-
-    <div
-      v-if="detail || progress !== undefined"
-      class="dashboard-metric-card__footer"
-    >
-      <span v-if="detail">{{ detail }}</span>
+      <span v-if="detail" class="dashboard-metric-card__detail">
+        {{ detail }}
+      </span>
       <div
         v-if="progress !== undefined"
         class="dashboard-metric-card__progress"
@@ -59,8 +56,11 @@ const { t } = useI18n({ useScope: 'global' })
   --metric-soft: var(--color-brand-100);
 
   display: grid;
-  min-height: 8.5rem;
-  padding: 1rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.875rem;
+  align-items: center;
+  min-height: 5.25rem;
+  padding: 0.75rem 0.875rem;
   overflow: hidden;
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
@@ -83,20 +83,19 @@ const { t } = useI18n({ useScope: 'global' })
   --metric-soft: #f0ebff;
 }
 
-.dashboard-metric-card__topline {
-  display: flex;
-  gap: 0.625rem;
-  align-items: center;
-}
-
 .dashboard-metric-card__icon {
   display: grid;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
   place-items: center;
   color: var(--metric-color);
   background: var(--metric-soft);
   border-radius: 0.75rem;
+}
+
+.dashboard-metric-card__content {
+  display: grid;
+  min-width: 0;
 }
 
 .dashboard-metric-card__label {
@@ -107,18 +106,18 @@ const { t } = useI18n({ useScope: 'global' })
 }
 
 .dashboard-metric-card__value {
-  align-self: end;
-  margin-top: 0.75rem;
+  margin-top: 0.3rem;
+  overflow: hidden;
   color: var(--color-brand-950);
-  font-size: clamp(1.5rem, 2vw, 2rem);
-  line-height: 1;
-  letter-spacing: -0.05em;
+  font-size: clamp(1.15rem, 1.5vw, 1.45rem);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.dashboard-metric-card__footer {
-  display: grid;
-  gap: 0.4rem;
-  margin-top: 0.5rem;
+.dashboard-metric-card__detail {
+  margin-top: 0.25rem;
   color: var(--color-text-secondary);
   font-size: var(--font-size-small);
   font-weight: 600;
@@ -126,6 +125,7 @@ const { t } = useI18n({ useScope: 'global' })
 
 .dashboard-metric-card__progress {
   height: 0.3rem;
+  margin-top: 0.45rem;
   overflow: hidden;
   background: var(--color-surface-subtle);
   border-radius: 999px;

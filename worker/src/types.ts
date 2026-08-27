@@ -21,11 +21,11 @@ export interface UpdateProfilePayload {
 }
 
 export interface DashboardSummary {
-  archivedDocumentCount: number
   remainingCredits: number
   storageLimitMb: number
   storageUsedMb: number
   totalSignedDocuments: number
+  totalTimestampedDocuments: number
 }
 
 export type DocumentOperation = 'signature' | 'timestamp'
@@ -113,9 +113,9 @@ export interface DraftFileDatabaseRecord {
 }
 
 export interface DashboardDatabaseRecord {
-  archived_document_count: number
   remaining_credits: number
   signed_document_count: number
   storage_limit_bytes: number
   storage_used_bytes: number
+  timestamped_document_count: number
 }

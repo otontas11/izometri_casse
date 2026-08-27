@@ -166,12 +166,15 @@ export const fetchDashboardSummary = async (
           SELECT COUNT(*)
           FROM documents
           WHERE documents.auth0_user_id = profiles.auth0_user_id
-        ) AS archived_document_count,
+            AND documents.operation = 'timestamp'
+            AND documents.status = 'completed'
+        ) AS timestamped_document_count,
         (
           SELECT COUNT(*)
           FROM documents
           WHERE documents.auth0_user_id = profiles.auth0_user_id
             AND documents.operation = 'signature'
+            AND documents.status = 'completed'
         ) AS signed_document_count,
         (
           SELECT COALESCE(SUM(draft_files.file_size), 0)
@@ -199,7 +202,6 @@ export const fetchDashboardSummary = async (
   }
 
   return {
-    archivedDocumentCount: dashboardRecord.archived_document_count,
     remainingCredits: dashboardRecord.remaining_credits,
     storageLimitMb: Number(
       (dashboardRecord.storage_limit_bytes / BYTES_PER_MEGABYTE).toFixed(2),
@@ -208,6 +210,8 @@ export const fetchDashboardSummary = async (
       (dashboardRecord.storage_used_bytes / BYTES_PER_MEGABYTE).toFixed(2),
     ),
     totalSignedDocuments: dashboardRecord.signed_document_count,
+    totalTimestampedDocuments:
+      dashboardRecord.timestamped_document_count,
   }
 }
 

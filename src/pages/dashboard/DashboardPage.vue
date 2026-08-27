@@ -73,7 +73,7 @@
         />
         <DashboardMetricCard :label="t('dashboard.metrics.archivedDocuments')"
                              :metric-value="
-            formatDashboardNumber(dashboardSummary.archivedDocumentCount)
+            formatDashboardNumber(dashboardSummary.totalTimestampedDocuments)
           "
                              icon="archive"
                              tone="violet"

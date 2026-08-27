@@ -200,12 +200,14 @@ const createDocumentTransaction = (draftFileId, intendedOperation) => {
   ]
   const updatedDashboardSummary = {
     ...dashboardSummary,
-    archivedDocumentCount: dashboardSummary.archivedDocumentCount + 1,
     remainingCredits:
       dashboardSummary.remainingCredits - DOCUMENT_TRANSACTION_CREDIT_COST,
     totalSignedDocuments:
       dashboardSummary.totalSignedDocuments +
       (intendedOperation === 'signature' ? 1 : 0),
+    totalTimestampedDocuments:
+      dashboardSummary.totalTimestampedDocuments +
+      (intendedOperation === 'timestamp' ? 1 : 0),
   }
   const uploadedDraftFileContent = uploadedDraftFileContents.get(draftFileId)
 
