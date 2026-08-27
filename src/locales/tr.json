@@ -3,6 +3,8 @@
     "selectorLabel": "Uygulama dili",
     "turkish": "Türkçe",
     "english": "İngilizce",
+    "openMenu": "Dil menüsünü aç",
+    "closeMenu": "Dil menüsünü kapat",
     "switchTo": "Dili {language} olarak değiştir"
   },
   "common": {
@@ -109,18 +111,8 @@
     "quickActions": {
       "ariaLabel": "Hızlı işlemler",
       "fastestAction": "En hızlı işlem",
-      "title": "Belgenizi güvenli imza akışına hazırlayın.",
-      "description": "Dosyanızı seçin; kimliğinizle ilişkilendirilen imza kaydını ve güvenli arşiv işlemini tek akışta tamamlayın.",
-      "startSelectingFile": "Dosya seçmeye başla",
-      "goToSignature": "İmzala ekranına ilerle",
-      "assurance": "İzİmza güvencesi",
-      "trustChain": "İmza güven zinciri",
-      "fileIntegrity": "Dosya bütünlüğü",
-      "fileIntegrityDescription": "Belgenin dijital özeti hazırlanır.",
-      "identityAssociation": "Kimlik eşleşmesi",
-      "identityAssociationDescription": "İşlem, doğrulanmış kullanıcı hesabınızla ilişkilendirilir.",
-      "secureArchive": "Güvenli arşiv",
-      "secureArchiveDescription": "Sonuç belgeniz hesabınızda saklanır."
+      "title": "Hemen İmzala",
+      "description": "Dosyalarınızı seçtikten sonra imzalama adımlarına devam edin. Dosya seçimi sizi otomatik olarak İmzala ekranına götürür."
     },
     "recentDocuments": {
       "downloadRequested": "{fileName} için indirme isteği oluşturuldu.",

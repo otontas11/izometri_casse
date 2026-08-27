@@ -103,7 +103,7 @@ export const useSignatureStore = defineStore('signature', () => {
 
   const addSignatureFiles = (newSignatureFiles: File[]) => {
     if (isSignatureActionInProgress.value) {
-      return
+      return false
     }
 
     const validSignatureFiles: File[] = []
@@ -135,6 +135,8 @@ export const useSignatureStore = defineStore('signature', () => {
 
     signatureFileValidationErrorMessage.value =
       validationErrorMessages.join(' ')
+
+    return validSignatureFiles.length > 0
   }
 
   const removeSignatureFile = async (signatureFileId: string) => {

@@ -3,6 +3,8 @@
     "selectorLabel": "Application language",
     "turkish": "Turkish",
     "english": "English",
+    "openMenu": "Open language menu",
+    "closeMenu": "Close language menu",
     "switchTo": "Switch language to {language}"
   },
   "common": {
@@ -109,18 +111,8 @@
     "quickActions": {
       "ariaLabel": "Quick actions",
       "fastestAction": "Fastest action",
-      "title": "Prepare your document for a secure signature flow.",
-      "description": "Select your file and create a signature record associated with your identity together with a secure archive entry.",
-      "startSelectingFile": "Start selecting a file",
-      "goToSignature": "Continue to the Sign page",
-      "assurance": "İzİmza assurance",
-      "trustChain": "Signature trust chain",
-      "fileIntegrity": "File integrity",
-      "fileIntegrityDescription": "A digital digest of the document is prepared.",
-      "identityAssociation": "Identity association",
-      "identityAssociationDescription": "The transaction is associated with your verified user account.",
-      "secureArchive": "Secure archive",
-      "secureArchiveDescription": "Your resulting document is stored in your account."
+      "title": "Sign Now",
+      "description": "Select your files and continue with the signing steps. File selection automatically takes you to the Sign page."
     },
     "recentDocuments": {
       "downloadRequested": "A download request was created for {fileName}.",
