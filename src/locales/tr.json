@@ -195,11 +195,38 @@
         "uploading": "Yükleniyor",
         "uploaded": "Taslak yüklendi",
         "processing": "İmzalanıyor",
-        "completed": "İmzalandı",
         "upload-error": "Yükleme hatası",
         "process-error": "İmzalama hatası",
         "deleting": "Siliniyor"
       }
+    },
+    "recentSignatures": {
+      "eyebrow": "İmza geçmişi",
+      "title": "Son imzalananlar",
+      "recordCount": "{count} kayıt",
+      "loading": "Son imzalanan belgeler yükleniyor…",
+      "errorTitle": "İmza geçmişi yüklenemedi",
+      "emptyTitle": "Henüz imzalanan belge yok",
+      "emptyDescription": "İmza işlemi tamamlanan belgeler burada listelenecek.",
+      "signedAt": "İmzalanma tarihi",
+      "fileSize": "Dosya boyutu",
+      "signedStatus": "İmzalandı"
+    },
+    "verification": {
+      "eyebrow": "Güvenli imzalama",
+      "title": "Tek Kullanımlık Şifre Doğrulama",
+      "phoneMessage": "Kodunuz {phoneNumber} numaralı telefona gönderildi.",
+      "codePrompt": "6 haneli kodu girin",
+      "codeInputAriaLabel": "Tek kullanımlık doğrulama kodu",
+      "codeDigitAriaLabel": "Doğrulama kodunun {position}. hanesi",
+      "closeAriaLabel": "İmza doğrulamasını kapat",
+      "demoCode": "Case doğrulama kodu: {code}",
+      "invalidCode": "Doğrulama kodu hatalı. Lütfen tekrar deneyin.",
+      "confirm": "Doğrula ve imzala",
+      "verifying": "İmzalanıyor…",
+      "resendCountdown": "Tekrar gönder ({seconds} sn)",
+      "resend": "Tekrar gönder",
+      "codeResent": "Demo doğrulama kodu yeniden gönderildi."
     },
     "validation": {
       "fileError": "{fileName}: {message}"

@@ -14,7 +14,6 @@ export type SignatureFileStatus =
   | 'uploading'
   | 'uploaded'
   | 'processing'
-  | 'completed'
   | 'upload-error'
   | 'process-error'
   | 'deleting'

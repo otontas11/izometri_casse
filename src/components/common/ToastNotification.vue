@@ -52,7 +52,7 @@ const notificationSymbols = {
   position: fixed;
   top: 1.5rem;
   right: 1.5rem;
-  z-index: 100;
+  z-index: 200;
   display: grid;
   width: min(25rem, calc(100vw - 2rem));
   gap: 0.75rem;

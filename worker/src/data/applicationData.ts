@@ -219,17 +219,29 @@ export const fetchRecentDocuments = async (
   database: D1Database,
   authenticatedUserId: string,
   documentLimit: number,
+  documentOperation?: DocumentOperation,
 ) => {
-  const { results: documentRecords } = await database
-    .prepare(
-      `SELECT *
-      FROM documents
-      WHERE auth0_user_id = ?
-      ORDER BY created_at DESC
-      LIMIT ?`,
-    )
-    .bind(authenticatedUserId, documentLimit)
-    .all<DocumentDatabaseRecord>()
+  const recentDocumentsStatement = documentOperation
+    ? database
+        .prepare(
+          `SELECT *
+          FROM documents
+          WHERE auth0_user_id = ? AND operation = ?
+          ORDER BY created_at DESC
+          LIMIT ?`,
+        )
+        .bind(authenticatedUserId, documentOperation, documentLimit)
+    : database
+        .prepare(
+          `SELECT *
+          FROM documents
+          WHERE auth0_user_id = ?
+          ORDER BY created_at DESC
+          LIMIT ?`,
+        )
+        .bind(authenticatedUserId, documentLimit)
+  const { results: documentRecords } =
+    await recentDocumentsStatement.all<DocumentDatabaseRecord>()
 
   return documentRecords.map(mapArchivedDocument)
 }

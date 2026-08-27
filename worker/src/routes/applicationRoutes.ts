@@ -105,6 +105,24 @@ const getDocumentLimit = (requestUrl: URL) => {
     : RECENT_DOCUMENT_LIMIT
 }
 
+const getOptionalDocumentOperation = (requestUrl: URL) => {
+  const requestedDocumentOperation = requestUrl.searchParams.get('operation')
+
+  if (requestedDocumentOperation === null) {
+    return undefined
+  }
+
+  if (!isDocumentOperation(requestedDocumentOperation)) {
+    throw new WorkerApiError(
+      422,
+      'INVALID_DOCUMENT_OPERATION',
+      'Belgeler için geçerli bir işlem seçin.',
+    )
+  }
+
+  return requestedDocumentOperation
+}
+
 const readProfileUpdatePayload = async (
   request: Request,
 ): Promise<UpdateProfilePayload> => {
@@ -625,6 +643,7 @@ export const routeAuthenticatedRequest = async (
       environment.DATABASE,
       authenticatedUser.userId,
       getDocumentLimit(requestUrl),
+      getOptionalDocumentOperation(requestUrl),
     )
     return createJsonResponse(recentDocuments, 200, corsHeaders)
   }

@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 
 import { getApiErrorMessage } from '@/api/apiError'
 import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
+import type { ArchivedDocument } from '@/features/dashboard/types/dashboard.types'
 import { useDraftFilesStore } from '@/features/draft-files/stores/draftFiles.store'
 import type { DraftFile } from '@/features/draft-files/types/draftFile.types'
 import { validateDraftFile } from '@/features/draft-files/utils/draftFileValidation'
@@ -11,6 +12,8 @@ import type { ApiRequestStatus } from '@/types/api.types'
 
 import { signatureApi } from '../api/signature.api'
 import type { SignatureFileItem } from '../types/signature.types'
+
+const RECENT_SIGNED_DOCUMENT_LIMIT = 5
 
 const createSelectedSignatureFileItem = (
   selectedFile: File,
@@ -42,13 +45,19 @@ export const useSignatureStore = defineStore('signature', () => {
   const dashboardStore = useDashboardStore()
   const draftFilesStore = useDraftFilesStore()
   const signatureFiles = shallowRef<SignatureFileItem[]>([])
+  const recentSignedDocuments = shallowRef<ArchivedDocument[]>([])
   const signatureFileValidationErrorMessage = ref('')
   const signatureActionStatus = ref<ApiRequestStatus>('idle')
   const signatureActionErrorMessage = ref('')
   const signatureActionSuccessMessage = ref('')
+  const recentSignaturesRequestStatus = ref<ApiRequestStatus>('idle')
+  const recentSignaturesErrorMessage = ref('')
 
   const isSignatureActionInProgress = computed(
     () => signatureActionStatus.value === 'loading',
+  )
+  const isRecentSignaturesLoading = computed(
+    () => recentSignaturesRequestStatus.value === 'loading',
   )
   const canUploadSignatureFiles = computed(() =>
     signatureFiles.value.some(
@@ -76,6 +85,37 @@ export const useSignatureStore = defineStore('signature', () => {
         ? { ...signatureFileItem, ...updatedFields }
         : signatureFileItem,
     )
+  }
+
+  const addRecentSignedDocument = (signedDocument: ArchivedDocument) => {
+    recentSignedDocuments.value = [
+      signedDocument,
+      ...recentSignedDocuments.value.filter(
+        ({ id }) => id !== signedDocument.id,
+      ),
+    ].slice(0, RECENT_SIGNED_DOCUMENT_LIMIT)
+    recentSignaturesRequestStatus.value = 'success'
+    recentSignaturesErrorMessage.value = ''
+  }
+
+  const loadRecentSignedDocuments = async () => {
+    if (isRecentSignaturesLoading.value) {
+      return
+    }
+
+    recentSignaturesRequestStatus.value = 'loading'
+    recentSignaturesErrorMessage.value = ''
+
+    try {
+      recentSignedDocuments.value =
+        await signatureApi.fetchRecentSignedDocuments(
+          RECENT_SIGNED_DOCUMENT_LIMIT,
+        )
+      recentSignaturesRequestStatus.value = 'success'
+    } catch (requestError) {
+      recentSignaturesRequestStatus.value = 'error'
+      recentSignaturesErrorMessage.value = getApiErrorMessage(requestError)
+    }
   }
 
   const loadUploadedSignatureFiles = async () => {
@@ -152,10 +192,7 @@ export const useSignatureStore = defineStore('signature', () => {
       return false
     }
 
-    if (
-      signatureFileItem.draftFileId === null ||
-      signatureFileItem.status === 'completed'
-    ) {
+    if (signatureFileItem.draftFileId === null) {
       signatureFiles.value = signatureFiles.value.filter(
         ({ id }) => id !== signatureFileId,
       )
@@ -202,8 +239,7 @@ export const useSignatureStore = defineStore('signature', () => {
     }
 
     const uploadedSignatureFiles = signatureFiles.value.filter(
-      ({ draftFileId, status }) =>
-        draftFileId !== null && status !== 'completed',
+      ({ draftFileId }) => draftFileId !== null,
     )
 
     if (uploadedSignatureFiles.length === 0) {
@@ -432,11 +468,10 @@ export const useSignatureStore = defineStore('signature', () => {
           signatureFileItem.draftFileId,
           'signature',
         )
-        updateSignatureFileItem(signatureFileItem.id, {
-          errorMessage: '',
-          progressPercentage: 100,
-          status: 'completed',
-        })
+        addRecentSignedDocument(signatureTransaction.signedDocument)
+        signatureFiles.value = signatureFiles.value.filter(
+          ({ id }) => id !== signatureFileItem.id,
+        )
         completedFileCount += 1
       } catch (requestError) {
         updateSignatureFileItem(signatureFileItem.id, {
@@ -475,8 +510,13 @@ export const useSignatureStore = defineStore('signature', () => {
     canUploadSignatureFiles,
     clearSignaturePage,
     isSignatureActionInProgress,
+    isRecentSignaturesLoading,
+    loadRecentSignedDocuments,
     loadUploadedSignatureFiles,
     processSignatureFiles,
+    recentSignedDocuments,
+    recentSignaturesErrorMessage,
+    recentSignaturesRequestStatus,
     removeSignatureFile,
     reportInsufficientSignatureCredits,
     signatureActionErrorMessage,

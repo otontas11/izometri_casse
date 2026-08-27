@@ -195,11 +195,38 @@
         "uploading": "Uploading",
         "uploaded": "Draft uploaded",
         "processing": "Signing",
-        "completed": "Signed",
         "upload-error": "Upload error",
         "process-error": "Signing error",
         "deleting": "Deleting"
       }
+    },
+    "recentSignatures": {
+      "eyebrow": "Signature history",
+      "title": "Recently signed documents",
+      "recordCount": "{count} records",
+      "loading": "Loading recently signed documents…",
+      "errorTitle": "Signature history could not be loaded",
+      "emptyTitle": "No signed documents yet",
+      "emptyDescription": "Documents will appear here after the signature process is completed.",
+      "signedAt": "Signed at",
+      "fileSize": "File size",
+      "signedStatus": "Signed"
+    },
+    "verification": {
+      "eyebrow": "Secure signing",
+      "title": "One-Time Password Verification",
+      "phoneMessage": "Your code was sent to the phone number {phoneNumber}.",
+      "codePrompt": "Enter the 6-digit code",
+      "codeInputAriaLabel": "One-time verification code",
+      "codeDigitAriaLabel": "Verification code digit {position}",
+      "closeAriaLabel": "Close signature verification",
+      "demoCode": "Case verification code: {code}",
+      "invalidCode": "The verification code is incorrect. Please try again.",
+      "confirm": "Verify and sign",
+      "verifying": "Signing…",
+      "resendCountdown": "Resend ({seconds}s)",
+      "resend": "Resend",
+      "codeResent": "The demo verification code was resent."
     },
     "validation": {
       "fileError": "{fileName}: {message}"

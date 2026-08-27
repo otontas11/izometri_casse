@@ -55,18 +55,33 @@
                             @request-signature="handleSignatureRequest"
                             @request-upload="handleSignatureUploadRequest"
     />
+
+    <RecentSignaturesList :error-message="recentSignaturesErrorMessage"
+                          :is-loading="isRecentSignaturesLoading"
+                          :signed-documents="recentSignedDocuments"
+                          @retry="handleRecentSignaturesRetry"
+    />
+
+    <SignatureVerificationModal :is-open="isSignatureVerificationModalOpen"
+                                :is-submitting="isSignatureActionInProgress"
+                                @close="handleSignatureVerificationModalClose"
+                                @confirm="handleSignatureVerificationConfirm"
+                                @resend="handleSignatureVerificationCodeResend"
+    />
   </section>
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {storeToRefs} from 'pinia'
 import {useI18n} from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import {useToast} from '@/composables/useToast'
 import {useDashboardStore} from '@/features/dashboard/stores/dashboard.store'
+import RecentSignaturesList from '@/features/signature/components/RecentSignaturesList.vue'
 import SignatureFileWorkspace from '@/features/signature/components/SignatureFileWorkspace.vue'
+import SignatureVerificationModal from '@/features/signature/components/SignatureVerificationModal.vue'
 import {useSignatureStore} from '@/features/signature/stores/signature.store'
 
 const dashboardStore = useDashboardStore()
@@ -76,7 +91,10 @@ const {dashboardRequestStatus, dashboardSummary} =
 const {
   canProcessSignatureFiles,
   canUploadSignatureFiles,
+  isRecentSignaturesLoading,
   isSignatureActionInProgress,
+  recentSignedDocuments,
+  recentSignaturesErrorMessage,
   signatureActionErrorMessage,
   signatureActionSuccessMessage,
   signatureFiles,
@@ -84,6 +102,7 @@ const {
 } = storeToRefs(signatureStore)
 const {showErrorToast, showSuccessToast, showWarningToast} = useToast()
 const {t} = useI18n({useScope: 'global'})
+const isSignatureVerificationModalOpen = ref(false)
 
 const availableSignatureCredits = computed(
     () => dashboardSummary.value?.remainingCredits ?? null,
@@ -124,14 +143,29 @@ const handleSignatureUploadRequest = async () => {
   )
 }
 
-const handleSignatureRequest = async () => {
+const handleSignatureRequest = () => {
   if (!hasAvailableSignatureCredits.value) {
     signatureStore.reportInsufficientSignatureCredits()
     showWarningToast(signatureActionErrorMessage.value)
     return
   }
 
+  isSignatureVerificationModalOpen.value = true
+}
+
+const handleSignatureVerificationModalClose = () => {
+  if (!isSignatureActionInProgress.value) {
+    isSignatureVerificationModalOpen.value = false
+  }
+}
+
+const handleSignatureVerificationConfirm = async () => {
+  if (isSignatureActionInProgress.value) {
+    return
+  }
+
   const areSignaturesCreated = await signatureStore.processSignatureFiles()
+  isSignatureVerificationModalOpen.value = false
 
   if (areSignaturesCreated) {
     showSuccessToast(signatureActionSuccessMessage.value)
@@ -144,12 +178,21 @@ const handleSignatureRequest = async () => {
   )
 }
 
+const handleSignatureVerificationCodeResend = () => {
+  showSuccessToast(t('signature.verification.codeResent'))
+}
+
+const handleRecentSignaturesRetry = () => {
+  void signatureStore.loadRecentSignedDocuments()
+}
+
 onMounted(() => {
   if (dashboardRequestStatus.value === 'idle') {
     void dashboardStore.fetchDashboardData()
   }
 
   void signatureStore.loadUploadedSignatureFiles()
+  void signatureStore.loadRecentSignedDocuments()
 })
 </script>
 
