@@ -30,23 +30,56 @@ const PROFILE_NAME_MINIMUM_LENGTH = 2
 const PROFILE_NAME_MAXIMUM_LENGTH = 50
 const profileNamePattern = /^[\p{L}\p{M}]+(?:[ '\-’][\p{L}\p{M}]+)*$/u
 const normalizedPhonePattern = /^\+?[1-9]\d{9,14}$/
+const supportedSignatureFileExtensions = new Set([
+  '.avif',
+  '.bmp',
+  '.gif',
+  '.heic',
+  '.heif',
+  '.ico',
+  '.jpeg',
+  '.jpg',
+  '.mp3',
+  '.pdf',
+  '.png',
+  '.svg',
+  '.tif',
+  '.tiff',
+  '.udf',
+  '.webp',
+])
+
+const getFileExtension = (fileName: string) => {
+  const extensionSeparatorIndex = fileName.lastIndexOf('.')
+
+  return extensionSeparatorIndex >= 0
+    ? fileName.slice(extensionSeparatorIndex).toLowerCase()
+    : ''
+}
+
+const isSupportedSignatureFileName = (fileName: string) =>
+  supportedSignatureFileExtensions.has(getFileExtension(fileName))
 
 interface DocumentTransactionConfiguration {
   actionName: string
   creditCost: number
   fileTooLargeErrorCode: string
+  isFileNameAllowed?: (fileName: string) => boolean
   invalidTransactionErrorCode: string
   operation: DocumentOperation
   transactionFailedErrorCode: string
+  unsupportedFileTypeErrorCode?: string
 }
 
 const signatureTransactionConfiguration = {
   actionName: 'İmzalama',
   creditCost: 0,
   fileTooLargeErrorCode: 'SIGNATURE_FILE_TOO_LARGE',
+  isFileNameAllowed: isSupportedSignatureFileName,
   invalidTransactionErrorCode: 'INVALID_SIGNATURE_TRANSACTION',
   operation: 'signature',
   transactionFailedErrorCode: 'SIGNATURE_TRANSACTION_FAILED',
+  unsupportedFileTypeErrorCode: 'UNSUPPORTED_SIGNATURE_FILE_TYPE',
 } satisfies DocumentTransactionConfiguration
 
 const timestampTransactionConfiguration = {
@@ -177,6 +210,18 @@ const readDocumentTransactionFile = async (
       400,
       transactionConfiguration.invalidTransactionErrorCode,
       'Dosya adı geçersiz.',
+    )
+  }
+
+  if (
+    transactionConfiguration.isFileNameAllowed &&
+    !transactionConfiguration.isFileNameAllowed(safeFileName)
+  ) {
+    throw new WorkerApiError(
+      415,
+      transactionConfiguration.unsupportedFileTypeErrorCode ??
+        'UNSUPPORTED_FILE_TYPE',
+      'Yalnızca görsel, MP3, UDF ve PDF dosyalarına izin verilir.',
     )
   }
 

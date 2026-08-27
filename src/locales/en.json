@@ -150,39 +150,43 @@
     "page": {
       "eyebrow": "Secure signature center",
       "title": "Sign",
-      "description": "Select and preview your file, then create a signature record associated with your account in the secure archive.",
+      "description": "Select your files and create signature records associated with your account in the secure archive.",
       "clear": "Clear page",
       "simulationTitle": "Case simulation",
       "simulationDescription": "This flow does not produce a qualified electronic signature. It stores the file in R2 and creates a user-owned signature transaction record in D1."
     },
     "workspace": {
-      "inputAriaLabel": "Select a file to sign",
-      "multipleFilesError": "You can select only one file at a time.",
+      "inputAriaLabel": "Select files to sign",
       "uploadEyebrow": "File selection",
-      "uploadTitle": "Drop your file here",
-      "uploadDescription": "Drag and drop your file or select it from your device. Review the file information and preview before starting.",
-      "selectAnother": "Select another file",
-      "selectFromDevice": "Select from device",
-      "requirements": "All file types are supported · Maximum {maximumSize}",
-      "previewAriaLabel": "Selected file preview",
-      "previewEyebrow": "File review",
-      "previewTitle": "Preview",
-      "ready": "Ready to process",
-      "previewEmpty": "Select a file to preview",
-      "previewEmptyDescription": "Images and PDF documents are displayed here.",
-      "previewUnavailable": "Preview is unavailable for this file type",
-      "pdfPreviewAriaLabel": "PDF preview for {fileName}",
+      "uploadTitle": "Drop your files here",
+      "uploadDescription": "Drag and drop one or more files or select them from your device. Each file is displayed as a separate card.",
+      "selectFromDevice": "Select files from device",
+      "requirements": "Images, MP3, UDF, and PDF · Maximum {maximumSize} per file",
+      "listEyebrow": "Upload queue",
+      "listTitle": "Selected files",
+      "selectedFileCount": "{count} files",
+      "progressAriaLabel": "Upload progress for {fileName}",
       "removeAriaLabel": "Remove {fileName}",
-      "sign": "Sign",
-      "signing": "Signing…"
+      "signFiles": "Sign files",
+      "signingFiles": "Signing files…",
+      "status": {
+        "pending": "Pending",
+        "uploading": "Uploading",
+        "completed": "Completed",
+        "error": "Error"
+      }
     },
     "validation": {
       "emptyFile": "Empty files cannot be submitted for signing.",
-      "fileTooLarge": "The file size cannot exceed {maximumSize}."
+      "fileTooLarge": "The file size cannot exceed {maximumSize}.",
+      "unsupportedFileType": "Only image, MP3, UDF, and PDF files are allowed.",
+      "fileError": "{fileName}: {message}"
     },
     "feedback": {
-      "selectFile": "Select a file to continue with signing.",
-      "success": "A signature record was created for {fileName} and the document was saved to the secure archive.",
+      "selectFiles": "Select at least one file to continue with signing.",
+      "batchSuccess": "Signature records were created for {count} files and the files were saved to the secure archive.",
+      "partialFailure": "{completedCount} files completed and {failedCount} files failed. You can retry the failed files.",
+      "batchFailure": "{count} files could not be uploaded. Review the errors on the file cards and try again.",
       "transactionFailed": "The signature transaction could not be completed. Please try again."
     }
   },
@@ -343,6 +347,7 @@
     "apiUnavailable": "The fake API server could not be reached. Make sure `npm run api` is running.",
     "invalidSignatureTransaction": "The file information submitted for signing is invalid.",
     "signatureTransactionFailed": "The signature transaction could not be completed.",
+    "unsupportedSignatureFileType": "Only image, MP3, UDF, and PDF files are allowed.",
     "invalidTimestampTransaction": "The file information submitted for timestamping is invalid.",
     "timestampTransactionFailed": "The timestamp transaction could not be completed."
   }

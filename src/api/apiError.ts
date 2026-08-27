@@ -13,6 +13,8 @@ const apiErrorTranslationKeys: Record<string, string> = {
   INVALID_TIMESTAMP_TRANSACTION: 'errors.invalidTimestampTransaction',
   SIGNATURE_TRANSACTION_FAILED: 'errors.signatureTransactionFailed',
   TIMESTAMP_TRANSACTION_FAILED: 'errors.timestampTransactionFailed',
+  UNSUPPORTED_SIGNATURE_FILE_TYPE:
+    'errors.unsupportedSignatureFileType',
 }
 
 class ApiRequestError extends Error {

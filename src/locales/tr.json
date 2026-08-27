@@ -150,39 +150,43 @@
     "page": {
       "eyebrow": "Güvenli imza merkezi",
       "title": "İmzala",
-      "description": "Dosyanızı seçin, önizleyin ve kullanıcı hesabınızla ilişkilendirilmiş imza kaydını güvenli arşivde oluşturun.",
+      "description": "Dosyalarınızı seçin ve kullanıcı hesabınızla ilişkilendirilmiş imza kayıtlarını güvenli arşivde oluşturun.",
       "clear": "Sayfayı temizle",
       "simulationTitle": "Case simülasyonu",
       "simulationDescription": "Bu akış gerçek bir nitelikli elektronik imza üretmez; dosyayı R2 arşivine kaydeder ve D1 üzerinde kullanıcıya ait bir imza işlem kaydı oluşturur."
     },
     "workspace": {
-      "inputAriaLabel": "İmzalanacak dosyayı seçin",
-      "multipleFilesError": "Tek seferde yalnızca bir dosya seçebilirsiniz.",
+      "inputAriaLabel": "İmzalanacak dosyaları seçin",
       "uploadEyebrow": "Dosya seçimi",
-      "uploadTitle": "Dosyanızı buraya bırakın",
-      "uploadDescription": "Dosyanızı sürükleyip bırakın veya cihazınızdan seçin. İşleme başlamadan önce dosya bilgilerini ve önizlemeyi kontrol edebilirsiniz.",
-      "selectAnother": "Başka dosya seç",
+      "uploadTitle": "Dosyalarınızı buraya bırakın",
+      "uploadDescription": "Bir veya daha fazla dosyayı sürükleyip bırakın ya da cihazınızdan seçin. Dosyalar ayrı kartlar halinde gösterilir.",
       "selectFromDevice": "Cihazdan dosya seç",
-      "requirements": "Tüm dosya türleri desteklenir · En fazla {maximumSize}",
-      "previewAriaLabel": "Seçilen dosya önizlemesi",
-      "previewEyebrow": "Dosya kontrolü",
-      "previewTitle": "Önizleme",
-      "ready": "İşleme hazır",
-      "previewEmpty": "Önizleme için dosya seçin",
-      "previewEmptyDescription": "Görseller ve PDF belgeleri burada görüntülenir.",
-      "previewUnavailable": "Bu dosya türü için önizleme desteklenmiyor",
-      "pdfPreviewAriaLabel": "{fileName} PDF önizlemesi",
+      "requirements": "Görsel, MP3, UDF ve PDF · Dosya başına en fazla {maximumSize}",
+      "listEyebrow": "Yükleme sırası",
+      "listTitle": "Seçilen dosyalar",
+      "selectedFileCount": "{count} dosya",
+      "progressAriaLabel": "{fileName} yükleme ilerlemesi",
       "removeAriaLabel": "{fileName} dosyasını kaldır",
-      "sign": "İmzala",
-      "signing": "İmzalanıyor…"
+      "signFiles": "Dosyaları imzala",
+      "signingFiles": "Dosyalar imzalanıyor…",
+      "status": {
+        "pending": "Bekliyor",
+        "uploading": "Yükleniyor",
+        "completed": "Tamamlandı",
+        "error": "Hata"
+      }
     },
     "validation": {
       "emptyFile": "Boş dosyalar imzalama işlemine alınamaz.",
-      "fileTooLarge": "Dosya boyutu {maximumSize} sınırını aşamaz."
+      "fileTooLarge": "Dosya boyutu {maximumSize} sınırını aşamaz.",
+      "unsupportedFileType": "Yalnızca görsel, MP3, UDF ve PDF dosyalarına izin verilir.",
+      "fileError": "{fileName}: {message}"
     },
     "feedback": {
-      "selectFile": "İmzalama işlemine devam etmek için bir dosya seçin.",
-      "success": "{fileName} için imza kaydı oluşturuldu ve belge güvenli arşive kaydedildi.",
+      "selectFiles": "İmzalama işlemine devam etmek için en az bir dosya seçin.",
+      "batchSuccess": "{count} dosyanın imza kaydı oluşturuldu ve dosyalar güvenli arşive kaydedildi.",
+      "partialFailure": "{completedCount} dosya tamamlandı, {failedCount} dosya yüklenemedi. Hatalı dosyaları tekrar deneyebilirsiniz.",
+      "batchFailure": "{count} dosya yüklenemedi. Dosya kartlarındaki hataları kontrol edip tekrar deneyin.",
       "transactionFailed": "İmzalama işlemi tamamlanamadı. Lütfen tekrar deneyin."
     }
   },
@@ -343,6 +347,7 @@
     "apiUnavailable": "Fake API sunucusuna ulaşılamadı. `npm run api` komutunun çalıştığını kontrol edin.",
     "invalidSignatureTransaction": "İmzalama için gönderilen dosya bilgileri geçersiz.",
     "signatureTransactionFailed": "İmzalama işlemi tamamlanamadı.",
+    "unsupportedSignatureFileType": "Yalnızca görsel, MP3, UDF ve PDF dosyalarına izin verilir.",
     "invalidTimestampTransaction": "Zaman damgalama için gönderilen dosya bilgileri geçersiz.",
     "timestampTransactionFailed": "Zaman damgalama işlemi tamamlanamadı."
   }

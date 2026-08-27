@@ -8,6 +8,24 @@ const TIMESTAMP_CREDIT_COST = 1
 const BYTES_PER_MEGABYTE = 1024 * 1024
 const RECENT_DOCUMENT_LIMIT = 5
 const MAX_DOCUMENT_FILE_SIZE_BYTES = 25 * BYTES_PER_MEGABYTE
+const supportedSignatureFileExtensions = new Set([
+  '.avif',
+  '.bmp',
+  '.gif',
+  '.heic',
+  '.heif',
+  '.ico',
+  '.jpeg',
+  '.jpg',
+  '.mp3',
+  '.pdf',
+  '.png',
+  '.svg',
+  '.tif',
+  '.tiff',
+  '.udf',
+  '.webp',
+])
 
 const jsonServerApplication = jsonServer.create()
 const defaultDatabasePath = path.join(__dirname, 'db.json')
@@ -41,6 +59,17 @@ const getNextNumericRecordId = (records) =>
 
 const isNonEmptyString = (stringCandidate) =>
   typeof stringCandidate === 'string' && stringCandidate.trim().length > 0
+
+const getFileExtension = (fileName) => {
+  const extensionSeparatorIndex = fileName.lastIndexOf('.')
+
+  return extensionSeparatorIndex >= 0
+    ? fileName.slice(extensionSeparatorIndex).toLowerCase()
+    : ''
+}
+
+const isSupportedSignatureFileName = (fileName) =>
+  supportedSignatureFileExtensions.has(getFileExtension(fileName))
 
 const isValidDocumentTransactionPayload = (requestPayload) =>
   requestPayload &&
@@ -223,6 +252,17 @@ jsonServerApplication.post('/signature-transactions', (request, response) => {
       response.status(400).json({
         error: 'INVALID_SIGNATURE_TRANSACTION',
         message: 'İmzalama için gönderilen dosya bilgileri geçersiz.',
+      })
+      return
+    }
+
+    if (
+      !isSupportedSignatureFileName(signatureTransactionPayload.fileName)
+    ) {
+      response.status(415).json({
+        error: 'UNSUPPORTED_SIGNATURE_FILE_TYPE',
+        message:
+          'Yalnızca görsel, MP3, UDF ve PDF dosyalarına izin verilir.',
       })
       return
     }
