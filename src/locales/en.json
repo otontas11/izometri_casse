@@ -170,14 +170,11 @@
       "eyebrow": "Secure signature center",
       "title": "Sign",
       "description": "Upload your files to the secure area for free, then select the files you want to sign.",
-      "clear": "Clear page",
       "transactionCost": "Transaction cost",
       "costPerFile": "1 credit / file",
       "balanceLoading": "Loading balance…",
       "availableCredits": "Available credits: {count}",
-      "noAvailableCredits": "No credits available",
-      "simulationTitle": "Case simulation",
-      "simulationDescription": "Uploading is free and stores the file in R2. Signing creates a D1 transaction record and uses 1 credit per file."
+      "noAvailableCredits": "No credits available"
     },
     "workspace": {
       "inputAriaLabel": "Select files to sign",

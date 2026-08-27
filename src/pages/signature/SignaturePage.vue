@@ -47,10 +47,6 @@ const handleSignatureFileRemoval = (signatureFileId: string) => {
   void signatureStore.removeSignatureFile(signatureFileId)
 }
 
-const handleSignaturePageClear = () => {
-  void signatureStore.clearSignaturePage()
-}
-
 const handleSignatureUploadRequest = async () => {
   const areFilesUploaded = await signatureStore.uploadSignatureFiles()
 
@@ -101,9 +97,6 @@ onMounted(() => {
   <section class="signature-page" aria-labelledby="signature-page-title">
     <header class="signature-page__header">
       <div>
-        <span class="signature-page__eyebrow">
-          {{ t('signature.page.eyebrow') }}
-        </span>
         <h1 id="signature-page-title">{{ t('signature.page.title') }}</h1>
         <p>{{ t('signature.page.description') }}</p>
       </div>
@@ -137,37 +130,8 @@ onMounted(() => {
             </small>
           </div>
         </div>
-
-        <button
-          class="signature-page__clear-button"
-          type="button"
-          :disabled="isSignatureActionInProgress"
-          @click="handleSignaturePageClear"
-        >
-          <AppIcon name="refresh" :size="18" />
-          {{ t('signature.page.clear') }}
-        </button>
       </div>
     </header>
-
-    <aside class="signature-page__simulation-notice">
-      <span aria-hidden="true">
-        <AppIcon name="signature" :size="21" />
-      </span>
-      <div>
-        <strong>{{ t('signature.page.simulationTitle') }}</strong>
-        <p>{{ t('signature.page.simulationDescription') }}</p>
-      </div>
-    </aside>
-
-    <p
-      v-if="signatureActionSuccessMessage"
-      class="signature-page__feedback signature-page__feedback--success"
-      role="status"
-    >
-      <span aria-hidden="true">✓</span>
-      {{ signatureActionSuccessMessage }}
-    </p>
 
     <p
       v-if="signatureActionErrorMessage"

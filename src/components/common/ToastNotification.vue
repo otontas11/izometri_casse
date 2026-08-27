@@ -50,8 +50,8 @@ const notificationSymbols = {
 <style scoped>
 .toast-notification {
   position: fixed;
+  top: 1.5rem;
   right: 1.5rem;
-  bottom: 1.5rem;
   z-index: 100;
   display: grid;
   width: min(25rem, calc(100vw - 2rem));
@@ -138,13 +138,13 @@ const notificationSymbols = {
 .toast-notification-enter-from,
 .toast-notification-leave-to {
   opacity: 0;
-  transform: translateY(0.75rem);
+  transform: translateX(calc(100% + 2rem));
 }
 
 @media (max-width: 47.99rem) {
   .toast-notification {
+    top: 1rem;
     right: 1rem;
-    bottom: 1rem;
   }
 }
 </style>

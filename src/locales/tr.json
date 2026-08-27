@@ -170,14 +170,11 @@
       "eyebrow": "Güvenli imza merkezi",
       "title": "İmzala",
       "description": "Dosyalarınızı önce ücretsiz olarak güvenli alana yükleyin, ardından imzalamak istediklerinizi seçin.",
-      "clear": "Sayfayı temizle",
       "transactionCost": "İşlem maliyeti",
       "costPerFile": "1 kontör / dosya",
       "balanceLoading": "Bakiye yükleniyor…",
       "availableCredits": "Kullanılabilir kontör: {count}",
-      "noAvailableCredits": "Kullanılabilir kontör yok",
-      "simulationTitle": "Case simülasyonu",
-      "simulationDescription": "Yükleme ücretsizdir ve dosyayı R2 arşivine kaydeder. İmzalama işlemi D1 üzerinde kayıt oluşturur ve dosya başına 1 kontör kullanır."
+      "noAvailableCredits": "Kullanılabilir kontör yok"
     },
     "workspace": {
       "inputAriaLabel": "İmzalanacak dosyaları seçin",
