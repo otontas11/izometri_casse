@@ -99,8 +99,13 @@
       <DashboardQuickActionsPanel/>
 
       <RecentDocumentsTable :archived-documents="recentDocuments"
+                            :deleting-document-id="deletingDocumentId"
                             :downloading-document-id="downloadingDocumentId"
+                            :previewing-document-id="previewingDocumentId"
+                            @delete="handleDocumentDelete"
                             @download="handleDocumentDownload"
+                            @preview="handleDocumentPreview"
+                            @send-email="handleDocumentEmailSend"
       />
     </template>
   </section>
@@ -126,14 +131,19 @@ const {
   dashboardErrorMessage,
   dashboardRequestStatus,
   dashboardSummary,
+  deletingDocumentId,
+  documentDeleteErrorMessage,
   documentDownloadErrorMessage,
+  documentPreviewErrorMessage,
   downloadingDocumentId,
   isDashboardLoading,
+  previewingDocumentId,
   recentDocuments,
 } = storeToRefs(dashboardStore)
 const {user: authenticatedUser} = useAuth0()
 const {showErrorToast, showSuccessToast} = useToast()
 const {t} = useI18n({useScope: 'global'})
+const DOCUMENT_PREVIEW_URL_LIFETIME_MILLISECONDS = 60_000
 
 const formatDashboardNumber = (dashboardNumber: number) =>
     new Intl.NumberFormat(getApplicationLocaleCode(), {
@@ -155,6 +165,13 @@ const authenticatedUserFirstName = computed(() => {
       authenticatedUserDisplayName?.trim().split(/\s+/)[0] ??
       t('dashboard.page.userFallback')
   )
+})
+const authenticatedUserEmailAddress = computed(() => {
+  const auth0EmailAddress = authenticatedUser.value?.email
+
+  return typeof auth0EmailAddress === 'string' && auth0EmailAddress.trim()
+      ? auth0EmailAddress.trim()
+      : t('dashboard.recentDocuments.registeredEmailAddress')
 })
 const isInitialDashboardLoading = computed(
     () =>
@@ -221,6 +238,92 @@ const handleDocumentDownload = async (archivedDocument: ArchivedDocument) => {
   saveDocumentContent(documentContent, archivedDocument.name)
   showSuccessToast(
       t('dashboard.recentDocuments.downloadRequested', {
+        fileName: archivedDocument.name,
+      }),
+  )
+}
+
+const openDocumentPreviewWindow = () => {
+  const documentPreviewWindow = window.open('', '_blank')
+
+  if (!documentPreviewWindow) {
+    return null
+  }
+
+  documentPreviewWindow.opener = null
+  documentPreviewWindow.document.title = t(
+      'dashboard.recentDocuments.previewWindowTitle',
+  )
+  documentPreviewWindow.document.body.textContent = t(
+      'dashboard.recentDocuments.previewLoading',
+  )
+
+  return documentPreviewWindow
+}
+
+const handleDocumentPreview = async (archivedDocument: ArchivedDocument) => {
+  const documentPreviewWindow = openDocumentPreviewWindow()
+
+  if (!documentPreviewWindow) {
+    showErrorToast(t('dashboard.recentDocuments.previewPopupBlocked'))
+    return
+  }
+
+  const documentContent = await dashboardStore.previewArchivedDocument(
+      archivedDocument.id,
+  )
+
+  if (!documentContent) {
+    documentPreviewWindow.close()
+    showErrorToast(
+        documentPreviewErrorMessage.value ||
+        t('dashboard.recentDocuments.previewFailed'),
+    )
+    return
+  }
+
+  const documentPreviewUrl = URL.createObjectURL(documentContent)
+  documentPreviewWindow.location.replace(documentPreviewUrl)
+  window.setTimeout(
+      () => URL.revokeObjectURL(documentPreviewUrl),
+      DOCUMENT_PREVIEW_URL_LIFETIME_MILLISECONDS,
+  )
+}
+
+const handleDocumentEmailSend = (archivedDocument: ArchivedDocument) => {
+  showSuccessToast(
+      t('dashboard.recentDocuments.emailSentSimulation', {
+        emailAddress: authenticatedUserEmailAddress.value,
+        fileName: archivedDocument.name,
+      }),
+  )
+}
+
+const handleDocumentDelete = async (archivedDocument: ArchivedDocument) => {
+  const shouldDeleteDocument = window.confirm(
+      t('dashboard.recentDocuments.deleteConfirmation', {
+        fileName: archivedDocument.name,
+      }),
+  )
+
+  if (!shouldDeleteDocument) {
+    return
+  }
+
+  const isDocumentDeleted = await dashboardStore.deleteArchivedDocument(
+      archivedDocument.id,
+  )
+
+  if (!isDocumentDeleted) {
+    showErrorToast(
+        documentDeleteErrorMessage.value ||
+        t('dashboard.recentDocuments.deleteFailed'),
+    )
+    return
+  }
+
+  showSuccessToast(
+      t('dashboard.recentDocuments.deleteSucceeded', {
         fileName: archivedDocument.name,
       }),
   )

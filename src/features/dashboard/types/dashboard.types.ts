@@ -15,3 +15,8 @@ export interface ArchivedDocument {
   operation: DocumentOperation
   sizeBytes: number
 }
+
+export interface ArchivedDocumentDeletionResponse {
+  dashboardSummary: DashboardSummary
+  recentDocuments: ArchivedDocument[]
+}

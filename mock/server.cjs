@@ -181,6 +181,7 @@ const createDocumentTransaction = (draftFileId, intendedOperation) => {
   const archivedDocument = {
     id: getNextNumericRecordId(archivedDocuments),
     createdAt: transactionDate,
+    draftFileId: draftFile.id,
     name: draftFile.fileName,
     operation: intendedOperation,
     sizeBytes: draftFile.fileSize,
@@ -227,6 +228,7 @@ const createDocumentTransaction = (draftFileId, intendedOperation) => {
   if (intendedOperation === 'timestamp') {
     const timestampJob = {
       id: getNextNumericRecordId(timestampJobs),
+      documentId: archivedDocument.id,
       completedAt: transactionDate,
       createdAt: transactionDate,
       creditCost: DOCUMENT_TRANSACTION_CREDIT_COST,
@@ -287,6 +289,83 @@ const deleteDraftFile = (draftFileId) => {
     .write()
   uploadedDraftFileContents.delete(draftFileId)
   return true
+}
+
+const deleteArchivedDocument = (documentId) => {
+  const {
+    archivedDocuments,
+    dashboardSummary,
+    draftFiles,
+    timestampJobs,
+  } = getRequiredDatabaseCollections()
+  const archivedDocument = archivedDocuments.find(({ id }) => id === documentId)
+
+  if (!archivedDocument) {
+    return null
+  }
+
+  const linkedDraftFileId = Number.isSafeInteger(archivedDocument.draftFileId)
+    ? archivedDocument.draftFileId
+    : null
+  const updatedArchivedDocuments = archivedDocuments.filter(
+    ({ id }) => id !== documentId,
+  )
+  const updatedDraftFiles =
+    linkedDraftFileId === null
+      ? draftFiles
+      : draftFiles.filter(({ id }) => id !== linkedDraftFileId)
+  const updatedTimestampJobs = timestampJobs.filter((timestampJob) => {
+    if (archivedDocument.operation !== 'timestamp') {
+      return true
+    }
+
+    const timestampDocumentId = Number.isSafeInteger(timestampJob.documentId)
+      ? timestampJob.documentId
+      : timestampJob.id
+
+    return timestampDocumentId !== documentId
+  })
+  const updatedDashboardSummary = {
+    ...dashboardSummary,
+    storageUsedMb: Math.max(
+      0,
+      Number(
+        (
+          dashboardSummary.storageUsedMb -
+          archivedDocument.sizeBytes / BYTES_PER_MEGABYTE
+        ).toFixed(2),
+      ),
+    ),
+    totalSignedDocuments: Math.max(
+      0,
+      dashboardSummary.totalSignedDocuments -
+        (archivedDocument.operation === 'signature' ? 1 : 0),
+    ),
+    totalTimestampedDocuments: Math.max(
+      0,
+      dashboardSummary.totalTimestampedDocuments -
+        (archivedDocument.operation === 'timestamp' ? 1 : 0),
+    ),
+  }
+
+  database
+    .assign({
+      dashboard: updatedDashboardSummary,
+      documents: updatedArchivedDocuments,
+      draftFiles: updatedDraftFiles,
+      timestampJobs: updatedTimestampJobs,
+    })
+    .write()
+  archivedDocumentContents.delete(documentId)
+
+  if (linkedDraftFileId !== null) {
+    uploadedDraftFileContents.delete(linkedDraftFileId)
+  }
+
+  return {
+    dashboardSummary: updatedDashboardSummary,
+    recentDocuments: getRecentDocuments(updatedArchivedDocuments),
+  }
 }
 
 jsonServerApplication.use(jsonServer.defaults())
@@ -478,9 +557,26 @@ jsonServerApplication.get('/documents/:documentId/download', (request, response)
     'Cache-Control': 'private, no-store',
     'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(archivedDocument.name)}`,
     'Content-Type':
-      archivedDocumentContent?.mimeType || 'application/octet-stream',
+      archivedDocumentContent?.mimeType || 'text/plain; charset=utf-8',
   })
   response.send(documentContent)
+})
+
+jsonServerApplication.delete('/documents/:documentId', (request, response) => {
+  const documentId = Number.parseInt(request.params.documentId, 10)
+  const archivedDocumentDeletionResponse = Number.isSafeInteger(documentId)
+    ? deleteArchivedDocument(documentId)
+    : null
+
+  if (!archivedDocumentDeletionResponse) {
+    response.status(404).json({
+      error: 'DOCUMENT_NOT_FOUND',
+      message: 'Silinecek belge bulunamadı.',
+    })
+    return
+  }
+
+  response.json(archivedDocumentDeletionResponse)
 })
 
 jsonServerApplication.use(jsonServerRouter)

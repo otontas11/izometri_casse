@@ -1,5 +1,6 @@
 import {
   createCompletedDocumentFromDraft,
+  deleteOwnedDocumentRecord,
   deleteUploadedDraftFileRecord,
   fetchDashboardSummary,
   fetchOwnedDocument,
@@ -19,6 +20,7 @@ import {
   WorkerApiError,
 } from '../http/apiResponse'
 import type {
+  ArchivedDocumentDeletionResponse,
   AuthenticatedUser,
   DocumentDatabaseRecord,
   DocumentOperation,
@@ -558,6 +560,49 @@ const downloadOwnedDocument = async (
   return new Response(storedDocument.body, { headers: responseHeaders })
 }
 
+const deleteArchivedDocument = async (
+  environment: Env,
+  authenticatedUserId: string,
+  documentId: number,
+) => {
+  const deletedDocument = await deleteOwnedDocumentRecord(
+    environment.DATABASE,
+    authenticatedUserId,
+    documentId,
+  )
+
+  try {
+    await environment.DOCUMENT_STORAGE.delete(deletedDocument.object_key)
+  } catch (fileDeleteError) {
+    console.error(
+      JSON.stringify({
+        documentId,
+        error:
+          fileDeleteError instanceof Error
+            ? fileDeleteError.message
+            : String(fileDeleteError),
+        message: 'Silinen D1 belgesinin R2 içeriği temizlenemedi.',
+        objectKey: deletedDocument.object_key,
+      }),
+    )
+  }
+
+  const [dashboardSummary, recentDocuments] = await Promise.all([
+    fetchDashboardSummary(environment.DATABASE, authenticatedUserId),
+    fetchRecentDocuments(
+      environment.DATABASE,
+      authenticatedUserId,
+      RECENT_DOCUMENT_LIMIT,
+    ),
+  ])
+  const archivedDocumentDeletionResponse: ArchivedDocumentDeletionResponse = {
+    dashboardSummary,
+    recentDocuments,
+  }
+
+  return archivedDocumentDeletionResponse
+}
+
 export const routeAuthenticatedRequest = async (
   request: Request,
   environment: Env,
@@ -682,6 +727,21 @@ export const routeAuthenticatedRequest = async (
       environment,
       authenticatedUser.userId,
       Number.parseInt(documentDownloadPathMatch[1], 10),
+      corsHeaders,
+    )
+  }
+
+  const documentPathMatch = requestPathname.match(/^\/documents\/(\d+)$/)
+
+  if (request.method === 'DELETE' && documentPathMatch?.[1]) {
+    const archivedDocumentDeletionResponse = await deleteArchivedDocument(
+      environment,
+      authenticatedUser.userId,
+      Number.parseInt(documentPathMatch[1], 10),
+    )
+    return createJsonResponse(
+      archivedDocumentDeletionResponse,
+      200,
       corsHeaders,
     )
   }

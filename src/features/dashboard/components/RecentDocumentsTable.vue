@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -11,14 +12,20 @@ import { formatDateTime, formatFileSize } from '@/utils/formatters'
 
 defineProps<{
   archivedDocuments: ArchivedDocument[]
+  deletingDocumentId: number | null
   downloadingDocumentId: number | null
+  previewingDocumentId: number | null
 }>()
 
 const emit = defineEmits<{
+  delete: [archivedDocument: ArchivedDocument]
   download: [archivedDocument: ArchivedDocument]
+  preview: [archivedDocument: ArchivedDocument]
+  'send-email': [archivedDocument: ArchivedDocument]
 }>()
 
 const { t } = useI18n({ useScope: 'global' })
+const openDocumentMenuId = ref<number | null>(null)
 
 const documentOperationTranslationKeys: Record<DocumentOperation, string> = {
   signature: 'dashboard.recentDocuments.electronicSignature',
@@ -28,6 +35,58 @@ const documentOperationTranslationKeys: Record<DocumentOperation, string> = {
 const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
   emit('download', archivedDocument)
 }
+
+const getDocumentMenuElementId = (documentId: number) =>
+  `archived-document-menu-${documentId}`
+
+const handleDocumentMenuToggle = (documentId: number) => {
+  openDocumentMenuId.value =
+    openDocumentMenuId.value === documentId ? null : documentId
+}
+
+const handleDocumentPreview = (archivedDocument: ArchivedDocument) => {
+  emit('preview', archivedDocument)
+}
+
+const handleDocumentEmailSend = (archivedDocument: ArchivedDocument) => {
+  openDocumentMenuId.value = null
+  emit('send-email', archivedDocument)
+}
+
+const handleDocumentDelete = (archivedDocument: ArchivedDocument) => {
+  openDocumentMenuId.value = null
+  emit('delete', archivedDocument)
+}
+
+const handleDocumentMenuOutsidePointerDown = (pointerEvent: PointerEvent) => {
+  const pointerTarget = pointerEvent.target
+
+  if (
+    pointerTarget instanceof Element &&
+    !pointerTarget.closest('[data-document-menu]')
+  ) {
+    openDocumentMenuId.value = null
+  }
+}
+
+const handleDocumentMenuKeydown = (keyboardEvent: KeyboardEvent) => {
+  if (keyboardEvent.key === 'Escape') {
+    openDocumentMenuId.value = null
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('pointerdown', handleDocumentMenuOutsidePointerDown)
+  document.addEventListener('keydown', handleDocumentMenuKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener(
+    'pointerdown',
+    handleDocumentMenuOutsidePointerDown,
+  )
+  document.removeEventListener('keydown', handleDocumentMenuKeydown)
+})
 </script>
 
 <template>
@@ -60,6 +119,11 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
       </caption>
       <thead>
         <tr class="recent-documents-table__column-headings">
+          <th scope="col">
+            <span class="visually-hidden">
+              {{ t('dashboard.recentDocuments.menuColumn') }}
+            </span>
+          </th>
           <th scope="col">{{ t('dashboard.recentDocuments.document') }}</th>
           <th scope="col">{{ t('dashboard.recentDocuments.operation') }}</th>
           <th scope="col">{{ t('dashboard.recentDocuments.date') }}</th>
@@ -73,6 +137,53 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
           :key="archivedDocument.id"
           class="recent-documents-table__row"
         >
+          <td
+            class="recent-documents-table__menu-cell"
+            data-document-menu
+          >
+            <button
+              type="button"
+              class="recent-documents-table__menu-button"
+              :disabled="deletingDocumentId !== null"
+              aria-haspopup="menu"
+              :aria-expanded="openDocumentMenuId === archivedDocument.id"
+              :aria-controls="getDocumentMenuElementId(archivedDocument.id)"
+              :aria-label="
+                t('dashboard.recentDocuments.menuAriaLabel', {
+                  fileName: archivedDocument.name,
+                })
+              "
+              @click="handleDocumentMenuToggle(archivedDocument.id)"
+            >
+              <AppIcon name="more-horizontal" :size="19" />
+            </button>
+
+            <div
+              v-if="openDocumentMenuId === archivedDocument.id"
+              :id="getDocumentMenuElementId(archivedDocument.id)"
+              class="recent-documents-table__menu"
+              role="menu"
+            >
+              <button
+                type="button"
+                role="menuitem"
+                @click="handleDocumentEmailSend(archivedDocument)"
+              >
+                <AppIcon name="mail" :size="17" />
+                <span>{{ t('dashboard.recentDocuments.sendByEmail') }}</span>
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                class="recent-documents-table__delete-menu-button"
+                :disabled="deletingDocumentId !== null"
+                @click="handleDocumentDelete(archivedDocument)"
+              >
+                <AppIcon name="trash" :size="17" />
+                <span>{{ t('dashboard.recentDocuments.deleteDocument') }}</span>
+              </button>
+            </div>
+          </td>
           <td
             class="recent-documents-table__file"
             :data-label="t('dashboard.recentDocuments.document')"
@@ -120,7 +231,27 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
           >
             <button
               type="button"
-              :disabled="downloadingDocumentId !== null"
+              class="recent-documents-table__preview-button"
+              :disabled="
+                previewingDocumentId !== null || deletingDocumentId !== null
+              "
+              :aria-busy="previewingDocumentId === archivedDocument.id"
+              :aria-label="
+                t('dashboard.recentDocuments.previewAriaLabel', {
+                  fileName: archivedDocument.name,
+                })
+              "
+              @click="handleDocumentPreview(archivedDocument)"
+            >
+              <AppIcon name="eye" :size="17" />
+              <span>{{ t('dashboard.recentDocuments.preview') }}</span>
+            </button>
+            <button
+              type="button"
+              class="recent-documents-table__download-button"
+              :disabled="
+                downloadingDocumentId !== null || deletingDocumentId !== null
+              "
               :aria-busy="downloadingDocumentId === archivedDocument.id"
               :aria-label="
                 t('dashboard.recentDocuments.downloadAriaLabel', {
@@ -152,7 +283,8 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
 
 <style scoped>
 .recent-documents-table {
-  overflow: hidden;
+  position: relative;
+  overflow: visible;
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -209,7 +341,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
 .recent-documents-table__column-headings,
 .recent-documents-table__row {
   display: grid;
-  grid-template-columns: minmax(15rem, 2fr) minmax(8rem, 0.8fr) minmax(10rem, 1fr) minmax(5rem, 0.55fr) 5rem;
+  grid-template-columns: 2.5rem minmax(15rem, 2fr) minmax(8rem, 0.8fr) minmax(10rem, 1fr) minmax(5rem, 0.55fr) 8.5rem;
   gap: 1rem;
   align-items: center;
   padding-inline: 1.5rem;
@@ -244,6 +376,78 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
 
 .recent-documents-table__row + .recent-documents-table__row {
   border-top: 1px solid var(--color-border);
+}
+
+.recent-documents-table__menu-cell {
+  position: relative;
+}
+
+.recent-documents-table__menu-button {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  place-items: center;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 0.5rem;
+}
+
+.recent-documents-table__menu-button:hover:not(:disabled),
+.recent-documents-table__menu-button[aria-expanded='true'] {
+  color: var(--color-brand-950);
+  background: var(--color-surface-subtle);
+}
+
+.recent-documents-table__menu-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.recent-documents-table__menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 20;
+  display: grid;
+  width: 12rem;
+  padding: 0.4rem;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-md);
+}
+
+.recent-documents-table__menu > button {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  width: 100%;
+  min-height: 2.35rem;
+  padding: 0.55rem 0.65rem;
+  color: var(--color-brand-950);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 0.5rem;
+}
+
+.recent-documents-table__menu > button:hover:not(:disabled) {
+  background: var(--color-surface-subtle);
+}
+
+.recent-documents-table__menu > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.recent-documents-table__menu > .recent-documents-table__delete-menu-button {
+  color: var(--color-danger);
 }
 
 .recent-documents-table__file {
@@ -309,23 +513,36 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
   justify-content: flex-end;
 }
 
-.recent-documents-table__actions button {
-  display: grid;
-  width: 2rem;
+.recent-documents-table__actions > button {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  justify-content: center;
   height: 2rem;
-  place-items: center;
+  padding: 0;
   color: var(--color-text-secondary);
+  font: inherit;
+  font-weight: 800;
   cursor: pointer;
   background: transparent;
+  border: 0;
   border-radius: 0.5rem;
 }
 
-.recent-documents-table__actions button:hover:not(:disabled) {
+.recent-documents-table__actions > .recent-documents-table__preview-button {
+  padding-inline: 0.55rem;
+}
+
+.recent-documents-table__download-button {
+  width: 2rem;
+}
+
+.recent-documents-table__actions > button:hover:not(:disabled) {
   color: var(--color-brand-950);
   background: var(--color-surface-subtle);
 }
 
-.recent-documents-table__actions button:disabled {
+.recent-documents-table__actions > button:disabled {
   cursor: not-allowed;
   opacity: 0.35;
 }
@@ -375,10 +592,10 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
 @media (max-width: 79.99rem) {
   .recent-documents-table__column-headings,
   .recent-documents-table__row {
-    grid-template-columns: minmax(13rem, 1.7fr) minmax(7rem, 0.8fr) minmax(9rem, 1fr) 5rem;
+    grid-template-columns: 2.5rem minmax(13rem, 1.7fr) minmax(7rem, 0.8fr) minmax(9rem, 1fr) 8.5rem;
   }
 
-  .recent-documents-table__column-headings > th:nth-child(4),
+  .recent-documents-table__column-headings > th:nth-child(5),
   .recent-documents-table__size-cell {
     display: none;
   }
@@ -396,19 +613,26 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
 
   .recent-documents-table__row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 0.85rem 1rem;
     padding-block: 1.1rem;
   }
 
+  .recent-documents-table__menu-cell {
+    grid-row: 1;
+    grid-column: 1;
+    align-self: center;
+  }
+
   .recent-documents-table__file {
-    grid-column: 1 / -1;
+    grid-row: 1;
+    grid-column: 2 / -1;
   }
 
   .recent-documents-table__date-cell,
   .recent-documents-table__size-cell {
     display: block;
-    grid-column: 1;
+    grid-column: 2;
     font-size: var(--font-size-small);
   }
 
@@ -421,13 +645,22 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
   }
 
   .recent-documents-table__operation-cell {
-    grid-column: 1;
+    grid-column: 2;
   }
 
   .recent-documents-table__actions {
     grid-row: 2 / span 3;
-    grid-column: 2;
+    grid-column: 3;
     align-self: center;
+  }
+
+  .recent-documents-table__preview-button > span {
+    display: none;
+  }
+
+  .recent-documents-table__actions > .recent-documents-table__preview-button {
+    width: 2rem;
+    padding: 0;
   }
 }
 </style>

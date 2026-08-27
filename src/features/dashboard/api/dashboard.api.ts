@@ -2,6 +2,7 @@ import { axiosInstance } from '@/api/axiosInstance'
 
 import type {
   ArchivedDocument,
+  ArchivedDocumentDeletionResponse,
   DashboardSummary,
 } from '../types/dashboard.types'
 
@@ -27,7 +28,7 @@ const fetchRecentDocuments = async (documentLimit = 5) => {
   return recentDocuments
 }
 
-const downloadArchivedDocument = async (documentId: number) => {
+const fetchArchivedDocumentContent = async (documentId: number) => {
   const { data: documentContent } = await axiosInstance.get<Blob>(
     `/documents/${documentId}/download`,
     {
@@ -39,8 +40,18 @@ const downloadArchivedDocument = async (documentId: number) => {
   return documentContent
 }
 
+const deleteArchivedDocument = async (documentId: number) => {
+  const { data: archivedDocumentDeletionResponse } =
+    await axiosInstance.delete<ArchivedDocumentDeletionResponse>(
+      `/documents/${documentId}`,
+    )
+
+  return archivedDocumentDeletionResponse
+}
+
 export const dashboardApi = {
-  downloadArchivedDocument,
+  deleteArchivedDocument,
+  fetchArchivedDocumentContent,
   fetchDashboardSummary,
   fetchRecentDocuments,
 }

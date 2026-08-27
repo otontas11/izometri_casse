@@ -490,3 +490,59 @@ export const fetchOwnedDocument = async (
 
   return ownedDocument
 }
+
+export const deleteOwnedDocumentRecord = async (
+  database: D1Database,
+  authenticatedUserId: string,
+  documentId: number,
+) => {
+  const ownedDocument = await fetchOwnedDocument(
+    database,
+    authenticatedUserId,
+    documentId,
+  )
+  const documentDeletionStatements = [
+    database
+      .prepare('DELETE FROM documents WHERE id = ? AND auth0_user_id = ?')
+      .bind(documentId, authenticatedUserId),
+  ]
+
+  if (ownedDocument.draft_file_id !== null) {
+    documentDeletionStatements.push(
+      database
+        .prepare(
+          `DELETE FROM draft_files
+          WHERE id = ?
+            AND auth0_user_id = ?
+            AND status = 'processed'`,
+        )
+        .bind(ownedDocument.draft_file_id, authenticatedUserId),
+    )
+  }
+
+  const [documentDeleteResult, linkedDraftFileDeleteResult] =
+    await database.batch(documentDeletionStatements)
+
+  if (documentDeleteResult.meta.changes !== 1) {
+    throw new WorkerApiError(
+      409,
+      'DOCUMENT_DELETE_CONFLICT',
+      'Belge durumu değiştiği için silinemedi.',
+    )
+  }
+
+  if (
+    ownedDocument.draft_file_id !== null &&
+    linkedDraftFileDeleteResult?.meta.changes !== 1
+  ) {
+    console.error(
+      JSON.stringify({
+        documentId,
+        draftFileId: ownedDocument.draft_file_id,
+        message: 'Silinen belgeye bağlı işlenmiş taslak bulunamadı.',
+      }),
+    )
+  }
+
+  return ownedDocument
+}

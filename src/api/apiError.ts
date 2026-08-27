@@ -8,6 +8,9 @@ interface ApiErrorPayload {
 }
 
 const apiErrorTranslationKeys: Record<string, string> = {
+  DOCUMENT_DELETE_CONFLICT: 'dashboard.recentDocuments.deleteFailed',
+  DOCUMENT_FILE_NOT_FOUND: 'errors.notFound',
+  DOCUMENT_NOT_FOUND: 'errors.notFound',
   DRAFT_FILE_ALREADY_PROCESSED: 'errors.draftFileAlreadyProcessed',
   DRAFT_FILE_CONTENT_NOT_FOUND: 'errors.draftFileContentNotFound',
   DRAFT_FILE_DELETE_CONFLICT: 'errors.draftFileDeleteFailed',
