@@ -2,7 +2,6 @@
   <section aria-labelledby="dashboard-page-title" class="dashboard-page">
     <header class="dashboard-page__header">
       <div>
-        <p class="dashboard-page__date">{{ formattedCurrentDate }}</p>
         <h1 id="dashboard-page-title">
           {{ t('dashboard.page.greeting', {name: authenticatedUserFirstName}) }}
         </h1>
@@ -65,37 +64,32 @@
       <section :aria-label="t('dashboard.page.accountSummaryAriaLabel')"
                class="dashboard-page__metrics"
       >
-        <DashboardMetricCard :detail="t('dashboard.metrics.signedDocumentsDetail')"
-                             :label="t('dashboard.metrics.signedDocuments')"
+        <DashboardMetricCard :label="t('dashboard.metrics.signedDocuments')"
                              :metric-value="
             formatDashboardNumber(dashboardSummary.totalSignedDocuments)
           "
                              icon="signature"
                              tone="navy"
         />
-        <DashboardMetricCard :detail="t('dashboard.metrics.archivedDocumentsDetail')"
-                             :label="t('dashboard.metrics.archivedDocuments')"
+        <DashboardMetricCard :label="t('dashboard.metrics.archivedDocuments')"
                              :metric-value="
             formatDashboardNumber(dashboardSummary.archivedDocumentCount)
           "
                              icon="archive"
                              tone="violet"
         />
-        <DashboardMetricCard :detail="t('dashboard.metrics.availableCreditsDetail')"
-                             :label="t('dashboard.metrics.availableCredits')"
+        <DashboardMetricCard :label="t('dashboard.metrics.availableCredits')"
                              :metric-value="
             formatDashboardNumber(dashboardSummary.remainingCredits)
           "
                              icon="wallet"
                              tone="green"
         />
-        <DashboardMetricCard :detail="
-            t('dashboard.metrics.totalStorage', {
-              size: formatStorageSize(dashboardSummary.storageLimitMb),
-            })
-          "
-                             :label="t('dashboard.metrics.archiveCapacity')"
-                             :metric-value="formatStorageSize(dashboardSummary.storageUsedMb)"
+        <DashboardMetricCard :label="t('dashboard.metrics.archiveCapacity')"
+                             :metric-value="formatArchiveStorageSummary(
+            dashboardSummary.storageUsedMb,
+            dashboardSummary.storageLimitMb,
+          )"
                              :progress="archiveStorageUsagePercentage"
                              icon="storage"
                              tone="blue"
@@ -141,13 +135,6 @@ const {user: authenticatedUser} = useAuth0()
 const {showErrorToast, showSuccessToast} = useToast()
 const {t} = useI18n({useScope: 'global'})
 
-const formattedCurrentDate = computed(() =>
-    new Intl.DateTimeFormat(getApplicationLocaleCode(), {
-      day: 'numeric',
-      month: 'long',
-      weekday: 'long',
-    }).format(new Date()),
-)
 const formatDashboardNumber = (dashboardNumber: number) =>
     new Intl.NumberFormat(getApplicationLocaleCode(), {
       maximumFractionDigits: 1,
@@ -194,13 +181,11 @@ const archiveStorageUsagePercentage = computed(() => {
   )
 })
 
-const formatStorageSize = (storageSizeInMegabytes: number) => {
-  if (storageSizeInMegabytes >= 1024) {
-    return `${formatDashboardNumber(storageSizeInMegabytes / 1024)} GB`
-  }
-
-  return `${formatDashboardNumber(storageSizeInMegabytes)} MB`
-}
+const formatArchiveStorageSummary = (
+    usedStorageInMegabytes: number,
+    storageLimitInMegabytes: number,
+) =>
+    `${usedStorageInMegabytes.toFixed(1)} Mb / ${storageLimitInMegabytes.toFixed(0)} Mb`
 
 const handleDashboardRefresh = () => {
   void dashboardStore.fetchDashboardData()

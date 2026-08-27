@@ -59,11 +59,11 @@ onMounted(() => {
     </div>
 
     <div class="app-topbar__actions">
-      <LanguageSwitcher class="app-topbar__language-switcher" />
       <span class="app-topbar__quota" aria-live="polite">
         <small>{{ t('layout.topbar.remainingCredits') }}</small>
         <strong>{{ dashboardSummary?.remainingCredits ?? '—' }}</strong>
       </span>
+      <LanguageSwitcher class="app-topbar__language-switcher" />
       <AuthUserMenu />
     </div>
   </header>
@@ -149,9 +149,16 @@ onMounted(() => {
 
 @media (max-width: 35.99rem) {
   .app-topbar__context,
-  .app-topbar__language-switcher,
   .app-topbar__quota small {
     display: none;
+  }
+
+  .app-topbar {
+    padding-inline: 0.75rem;
+  }
+
+  .app-topbar__actions {
+    gap: 0.5rem;
   }
 
   .app-topbar__quota {

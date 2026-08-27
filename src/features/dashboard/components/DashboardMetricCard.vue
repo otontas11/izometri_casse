@@ -6,7 +6,7 @@ import type { AppIconName } from '@/types/icon'
 
 withDefaults(
   defineProps<{
-    detail: string
+    detail?: string
     icon: AppIconName
     label: string
     metricValue: string
@@ -14,6 +14,7 @@ withDefaults(
     tone: 'blue' | 'green' | 'navy' | 'violet'
   }>(),
   {
+    detail: '',
     progress: undefined,
   },
 )
@@ -32,8 +33,11 @@ const { t } = useI18n({ useScope: 'global' })
 
     <strong class="dashboard-metric-card__value">{{ metricValue }}</strong>
 
-    <div class="dashboard-metric-card__footer">
-      <span>{{ detail }}</span>
+    <div
+      v-if="detail || progress !== undefined"
+      class="dashboard-metric-card__footer"
+    >
+      <span v-if="detail">{{ detail }}</span>
       <div
         v-if="progress !== undefined"
         class="dashboard-metric-card__progress"
@@ -55,8 +59,8 @@ const { t } = useI18n({ useScope: 'global' })
   --metric-soft: var(--color-brand-100);
 
   display: grid;
-  min-height: 10.75rem;
-  padding: 1.25rem;
+  min-height: 8.5rem;
+  padding: 1rem;
   overflow: hidden;
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
@@ -81,14 +85,14 @@ const { t } = useI18n({ useScope: 'global' })
 
 .dashboard-metric-card__topline {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.625rem;
   align-items: center;
 }
 
 .dashboard-metric-card__icon {
   display: grid;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   place-items: center;
   color: var(--metric-color);
   background: var(--metric-soft);
@@ -104,7 +108,7 @@ const { t } = useI18n({ useScope: 'global' })
 
 .dashboard-metric-card__value {
   align-self: end;
-  margin-top: 1.25rem;
+  margin-top: 0.75rem;
   color: var(--color-brand-950);
   font-size: clamp(1.5rem, 2vw, 2rem);
   line-height: 1;
@@ -113,8 +117,8 @@ const { t } = useI18n({ useScope: 'global' })
 
 .dashboard-metric-card__footer {
   display: grid;
-  gap: 0.55rem;
-  margin-top: 0.65rem;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
   color: var(--color-text-secondary);
   font-size: var(--font-size-small);
   font-weight: 600;

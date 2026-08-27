@@ -100,14 +100,10 @@
       "accountSummaryAriaLabel": "Hesap özeti"
     },
     "metrics": {
-      "signedDocuments": "İmzalanan belge",
-      "signedDocumentsDetail": "Tüm zamanlardaki işlemler",
-      "archivedDocuments": "Arşivdeki kayıt",
-      "archivedDocumentsDetail": "Güvenle saklanan doküman",
-      "availableCredits": "Kullanılabilir kontör",
-      "availableCreditsDetail": "Her imza ve zaman damgası 1 kontör",
-      "archiveCapacity": "Arşiv kapasitesi",
-      "totalStorage": "{size} toplam alan",
+      "signedDocuments": "Toplam İmzalama",
+      "archivedDocuments": "Arşivlenen Doküman",
+      "availableCredits": "Kalan Kontör",
+      "archiveCapacity": "Arşiv Alanı",
       "archiveUsageAriaLabel": "Arşiv kullanım oranı"
     },
     "quickActions": {

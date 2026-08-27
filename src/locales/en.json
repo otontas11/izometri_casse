@@ -100,14 +100,10 @@
       "accountSummaryAriaLabel": "Account summary"
     },
     "metrics": {
-      "signedDocuments": "Signed documents",
-      "signedDocumentsDetail": "All-time transactions",
-      "archivedDocuments": "Archived records",
-      "archivedDocumentsDetail": "Documents stored securely",
-      "availableCredits": "Available credits",
-      "availableCreditsDetail": "Each signature and timestamp costs 1 credit",
-      "archiveCapacity": "Archive capacity",
-      "totalStorage": "{size} total storage",
+      "signedDocuments": "Total Signatures",
+      "archivedDocuments": "Archived Documents",
+      "availableCredits": "Remaining Credits",
+      "archiveCapacity": "Archive Storage",
       "archiveUsageAriaLabel": "Archive storage usage"
     },
     "quickActions": {
