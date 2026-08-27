@@ -1,13 +1,18 @@
 <script setup lang="ts">
+import { computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import { useToast } from '@/composables/useToast'
+import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
 import SignatureFileWorkspace from '@/features/signature/components/SignatureFileWorkspace.vue'
 import { useSignatureStore } from '@/features/signature/stores/signature.store'
 
+const dashboardStore = useDashboardStore()
 const signatureStore = useSignatureStore()
+const { dashboardRequestStatus, dashboardSummary } =
+  storeToRefs(dashboardStore)
 const {
   canSubmitSignatureFiles,
   isSignatureSubmitting,
@@ -16,8 +21,22 @@ const {
   signatureSubmissionErrorMessage,
   signatureSubmissionSuccessMessage,
 } = storeToRefs(signatureStore)
-const { showErrorToast, showSuccessToast } = useToast()
+const { showErrorToast, showSuccessToast, showWarningToast } = useToast()
 const { t } = useI18n({ useScope: 'global' })
+
+const availableSignatureCredits = computed(
+  () => dashboardSummary.value?.remainingCredits ?? null,
+)
+const hasAvailableSignatureCredits = computed(
+  () =>
+    availableSignatureCredits.value === null ||
+    availableSignatureCredits.value > 0,
+)
+const canStartSignatureTransaction = computed(
+  () =>
+    canSubmitSignatureFiles.value &&
+    hasAvailableSignatureCredits.value,
+)
 
 const handleSignatureFilesAdded = (signatureFiles: File[]) => {
   signatureStore.addSignatureFiles(signatureFiles)
@@ -32,6 +51,12 @@ const handleSignaturePageClear = () => {
 }
 
 const handleSignatureRequest = async () => {
+  if (!hasAvailableSignatureCredits.value) {
+    signatureStore.reportInsufficientSignatureCredits()
+    showWarningToast(signatureSubmissionErrorMessage.value)
+    return
+  }
+
   const areSignaturesCreated = await signatureStore.submitSignatureFiles()
 
   if (areSignaturesCreated) {
@@ -44,6 +69,12 @@ const handleSignatureRequest = async () => {
       t('signature.feedback.transactionFailed'),
   )
 }
+
+onMounted(() => {
+  if (dashboardRequestStatus.value === 'idle') {
+    void dashboardStore.fetchDashboardData()
+  }
+})
 </script>
 
 <template>
@@ -57,15 +88,46 @@ const handleSignatureRequest = async () => {
         <p>{{ t('signature.page.description') }}</p>
       </div>
 
-      <button
-        class="signature-page__clear-button"
-        type="button"
-        :disabled="isSignatureSubmitting"
-        @click="handleSignaturePageClear"
-      >
-        <AppIcon name="refresh" :size="18" />
-        {{ t('signature.page.clear') }}
-      </button>
+      <div class="signature-page__header-actions">
+        <div
+          :class="[
+            'signature-page__transaction-summary',
+            {
+              'signature-page__transaction-summary--insufficient':
+                !hasAvailableSignatureCredits,
+            },
+          ]"
+        >
+          <span aria-hidden="true">
+            <AppIcon name="wallet" :size="21" />
+          </span>
+          <div>
+            <small>{{ t('signature.page.transactionCost') }}</small>
+            <strong>{{ t('signature.page.costPerFile') }}</strong>
+            <small class="signature-page__available-credits">
+              {{
+                availableSignatureCredits === null
+                  ? t('signature.page.balanceLoading')
+                  : availableSignatureCredits > 0
+                    ? t('signature.page.availableCredits', {
+                        count: availableSignatureCredits,
+                      })
+                    : t('signature.page.noAvailableCredits')
+              }}
+            </small>
+          </div>
+        </div>
+
+        <button
+          class="signature-page__clear-button"
+          type="button"
+          :disabled="isSignatureSubmitting"
+          @click="handleSignaturePageClear"
+        >
+          <AppIcon name="refresh" :size="18" />
+          {{ t('signature.page.clear') }}
+        </button>
+      </div>
     </header>
 
     <aside class="signature-page__simulation-notice">
@@ -97,7 +159,7 @@ const handleSignatureRequest = async () => {
     </p>
 
     <SignatureFileWorkspace
-      :can-submit="canSubmitSignatureFiles"
+      :can-submit="canStartSignatureTransaction"
       :file-validation-error-message="signatureFileValidationErrorMessage"
       :is-submitting="isSignatureSubmitting"
       :signature-files="signatureFiles"

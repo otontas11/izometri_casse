@@ -24,7 +24,7 @@ import type {
 } from '../types'
 
 const MAX_DOCUMENT_FILE_SIZE_BYTES = 25 * 1024 * 1024
-const TIMESTAMP_CREDIT_COST = 1
+const DOCUMENT_TRANSACTION_CREDIT_COST = 1
 const RECENT_DOCUMENT_LIMIT = 5
 const PROFILE_NAME_MINIMUM_LENGTH = 2
 const PROFILE_NAME_MAXIMUM_LENGTH = 50
@@ -73,7 +73,7 @@ interface DocumentTransactionConfiguration {
 
 const signatureTransactionConfiguration = {
   actionName: 'İmzalama',
-  creditCost: 0,
+  creditCost: DOCUMENT_TRANSACTION_CREDIT_COST,
   fileTooLargeErrorCode: 'SIGNATURE_FILE_TOO_LARGE',
   isFileNameAllowed: isSupportedSignatureFileName,
   invalidTransactionErrorCode: 'INVALID_SIGNATURE_TRANSACTION',
@@ -84,7 +84,7 @@ const signatureTransactionConfiguration = {
 
 const timestampTransactionConfiguration = {
   actionName: 'Zaman damgalama',
-  creditCost: TIMESTAMP_CREDIT_COST,
+  creditCost: DOCUMENT_TRANSACTION_CREDIT_COST,
   fileTooLargeErrorCode: 'TIMESTAMP_FILE_TOO_LARGE',
   invalidTransactionErrorCode: 'INVALID_TIMESTAMP_TRANSACTION',
   operation: 'timestamp',
@@ -280,6 +280,7 @@ const createDocumentTransaction = async (
   try {
     const completedDocumentDetails = {
       completedAt: transactionDate,
+      creditCost: transactionConfiguration.creditCost,
       createdAt: transactionDate,
       fileName: documentFileDetails.fileName,
       fileSize: documentFileDetails.file.size,
@@ -292,10 +293,7 @@ const createDocumentTransaction = async (
         ? await insertTimestampDocument(
             environment.DATABASE,
             authenticatedUser.userId,
-            {
-              ...completedDocumentDetails,
-              creditCost: transactionConfiguration.creditCost,
-            },
+            completedDocumentDetails,
           )
         : await insertSignatureDocument(
             environment.DATABASE,
@@ -319,14 +317,11 @@ const createDocumentTransaction = async (
       )
     }
 
-    if (
-      transactionConfiguration.operation === 'timestamp' &&
-      String(documentCreationError).includes('INSUFFICIENT_CREDITS')
-    ) {
+    if (String(documentCreationError).includes('INSUFFICIENT_CREDITS')) {
       throw new WorkerApiError(
         409,
         'INSUFFICIENT_CREDITS',
-        'Zaman damgalama işlemi için yeterli kontörünüz bulunmuyor.',
+        'Bu işlem için yeterli kontörünüz bulunmuyor.',
       )
     }
 

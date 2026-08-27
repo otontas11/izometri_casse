@@ -4,7 +4,7 @@ const jsonServer = require('json-server')
 const multer = require('multer')
 
 const DEFAULT_JSON_SERVER_PORT = 3001
-const TIMESTAMP_CREDIT_COST = 1
+const DOCUMENT_TRANSACTION_CREDIT_COST = 1
 const BYTES_PER_MEGABYTE = 1024 * 1024
 const RECENT_DOCUMENT_LIMIT = 5
 const MAX_DOCUMENT_FILE_SIZE_BYTES = 25 * BYTES_PER_MEGABYTE
@@ -79,6 +79,12 @@ const isValidDocumentTransactionPayload = (requestPayload) =>
   (requestPayload.mimeType === undefined ||
     isNonEmptyString(requestPayload.mimeType))
 
+const createInsufficientCreditsErrorResponse = () => ({
+  error: 'INSUFFICIENT_CREDITS',
+  message: 'Bu işlem için yeterli kontörünüz bulunmuyor.',
+  statusCode: 409,
+})
+
 const createTimestampTransaction = (requestPayload) => {
   const dashboardSummary = database.get('dashboard').value()
   const archivedDocuments = database.get('documents').value()
@@ -92,14 +98,11 @@ const createTimestampTransaction = (requestPayload) => {
     throw new Error('Fake API veritabanı zaman damgası işlemi için hazır değil.')
   }
 
-  if (dashboardSummary.remainingCredits < TIMESTAMP_CREDIT_COST) {
+  if (
+    dashboardSummary.remainingCredits < DOCUMENT_TRANSACTION_CREDIT_COST
+  ) {
     return {
-      errorResponse: {
-        error: 'INSUFFICIENT_CREDITS',
-        message:
-          'Zaman damgalama işlemi için yeterli kontörünüz bulunmuyor.',
-        statusCode: 409,
-      },
+      errorResponse: createInsufficientCreditsErrorResponse(),
     }
   }
 
@@ -110,7 +113,7 @@ const createTimestampTransaction = (requestPayload) => {
     id: getNextNumericRecordId(timestampJobs),
     completedAt: transactionDate,
     createdAt: transactionDate,
-    creditCost: TIMESTAMP_CREDIT_COST,
+    creditCost: DOCUMENT_TRANSACTION_CREDIT_COST,
     fileName: requestPayload.fileName.trim(),
     fileSize: requestPayload.fileSize,
     mimeType: normalizedMimeType,
@@ -127,7 +130,8 @@ const createTimestampTransaction = (requestPayload) => {
     ...dashboardSummary,
     archivedDocumentCount: dashboardSummary.archivedDocumentCount + 1,
     remainingCredits:
-      dashboardSummary.remainingCredits - TIMESTAMP_CREDIT_COST,
+      dashboardSummary.remainingCredits -
+      DOCUMENT_TRANSACTION_CREDIT_COST,
     storageUsedMb: Number(
       (
         dashboardSummary.storageUsedMb +
@@ -174,6 +178,14 @@ const createSignatureTransaction = (requestPayload) => {
     throw new Error('Fake API veritabanı imzalama işlemi için hazır değil.')
   }
 
+  if (
+    dashboardSummary.remainingCredits < DOCUMENT_TRANSACTION_CREDIT_COST
+  ) {
+    return {
+      errorResponse: createInsufficientCreditsErrorResponse(),
+    }
+  }
+
   const transactionDate = new Date().toISOString()
   const signedDocument = {
     id: getNextNumericRecordId(archivedDocuments),
@@ -185,6 +197,9 @@ const createSignatureTransaction = (requestPayload) => {
   const updatedDashboardSummary = {
     ...dashboardSummary,
     archivedDocumentCount: dashboardSummary.archivedDocumentCount + 1,
+    remainingCredits:
+      dashboardSummary.remainingCredits -
+      DOCUMENT_TRANSACTION_CREDIT_COST,
     storageUsedMb: Number(
       (
         dashboardSummary.storageUsedMb +
@@ -268,8 +283,16 @@ jsonServerApplication.post('/signature-transactions', (request, response) => {
     }
 
     try {
-      const { archivedDocumentId, transactionResponse } =
+      const { archivedDocumentId, errorResponse, transactionResponse } =
         createSignatureTransaction(signatureTransactionPayload)
+
+      if (errorResponse) {
+        response.status(errorResponse.statusCode).json({
+          error: errorResponse.error,
+          message: errorResponse.message,
+        })
+        return
+      }
 
       uploadedDocumentContents.set(archivedDocumentId, {
         content: uploadedSignatureFile.buffer,

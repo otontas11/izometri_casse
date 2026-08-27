@@ -110,6 +110,18 @@ export const useSignatureStore = defineStore('signature', () => {
     clearSubmissionFeedback()
   }
 
+  const reportInsufficientSignatureCredits = () => {
+    if (isSignatureSubmitting.value) {
+      return
+    }
+
+    signatureSubmissionStatus.value = 'error'
+    signatureSubmissionErrorMessage.value = translate(
+      'errors.insufficientCredits',
+    )
+    signatureSubmissionSuccessMessage.value = ''
+  }
+
   const submitSignatureFiles = async () => {
     if (isSignatureSubmitting.value) {
       return false
@@ -127,6 +139,14 @@ export const useSignatureStore = defineStore('signature', () => {
       return false
     }
 
+    if (
+      dashboardStore.dashboardSummary &&
+      dashboardStore.dashboardSummary.remainingCredits < 1
+    ) {
+      reportInsufficientSignatureCredits()
+      return false
+    }
+
     signatureSubmissionStatus.value = 'loading'
     signatureFileValidationErrorMessage.value = ''
     signatureSubmissionErrorMessage.value = ''
@@ -136,6 +156,19 @@ export const useSignatureStore = defineStore('signature', () => {
     let failedFileCount = 0
 
     for (const signatureFileItem of signatureFilesToSubmit) {
+      if (
+        dashboardStore.dashboardSummary &&
+        dashboardStore.dashboardSummary.remainingCredits < 1
+      ) {
+        updateSignatureFileItem(signatureFileItem.id, {
+          errorMessage: translate('errors.insufficientCredits'),
+          progressPercentage: 0,
+          status: 'error',
+        })
+        failedFileCount += 1
+        continue
+      }
+
       updateSignatureFileItem(signatureFileItem.id, {
         errorMessage: '',
         progressPercentage: 0,
@@ -201,6 +234,7 @@ export const useSignatureStore = defineStore('signature', () => {
     clearSignaturePage,
     isSignatureSubmitting,
     removeSignatureFile,
+    reportInsufficientSignatureCredits,
     signatureFiles,
     signatureFileValidationErrorMessage,
     signatureSubmissionErrorMessage,

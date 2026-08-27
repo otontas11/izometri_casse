@@ -67,7 +67,7 @@ export const useTimestampStore = defineStore('timestamp', () => {
 
     timestampSubmissionStatus.value = 'error'
     timestampSubmissionErrorMessage.value = translate(
-      'timestamp.feedback.insufficientCredits',
+      'errors.insufficientCredits',
     )
     timestampSubmissionSuccessMessage.value = ''
   }

@@ -152,6 +152,11 @@
       "title": "İmzala",
       "description": "Dosyalarınızı seçin ve kullanıcı hesabınızla ilişkilendirilmiş imza kayıtlarını güvenli arşivde oluşturun.",
       "clear": "Sayfayı temizle",
+      "transactionCost": "İşlem maliyeti",
+      "costPerFile": "1 kontör / dosya",
+      "balanceLoading": "Bakiye yükleniyor…",
+      "availableCredits": "Kullanılabilir kontör: {count}",
+      "noAvailableCredits": "Kullanılabilir kontör yok",
       "simulationTitle": "Case simülasyonu",
       "simulationDescription": "Bu akış gerçek bir nitelikli elektronik imza üretmez; dosyayı R2 arşivine kaydeder ve D1 üzerinde kullanıcıya ait bir imza işlem kaydı oluşturur."
     },
@@ -184,8 +189,8 @@
     },
     "feedback": {
       "selectFiles": "İmzalama işlemine devam etmek için en az bir dosya seçin.",
-      "batchSuccess": "{count} dosyanın imza kaydı oluşturuldu ve dosyalar güvenli arşive kaydedildi.",
-      "partialFailure": "{completedCount} dosya tamamlandı, {failedCount} dosya yüklenemedi. Hatalı dosyaları tekrar deneyebilirsiniz.",
+      "batchSuccess": "{count} dosyanın imza kaydı oluşturuldu. Her dosya için 1 kontör kullanıldı.",
+      "partialFailure": "{completedCount} dosya tamamlandı ve {completedCount} kontör kullanıldı; {failedCount} dosya yüklenemedi.",
       "batchFailure": "{count} dosya yüklenemedi. Dosya kartlarındaki hataları kontrol edip tekrar deneyin.",
       "transactionFailed": "İmzalama işlemi tamamlanamadı. Lütfen tekrar deneyin."
     }
@@ -265,7 +270,6 @@
     },
     "feedback": {
       "endpointMissing": "Zaman damgalama servisi bulunamadı. Fake API’yi durdurup npm run api komutuyla yeniden başlatın.",
-      "insufficientCredits": "Zaman damgalama işlemi için yeterli kontörünüz bulunmuyor.",
       "selectFile": "Zaman damgalama işlemine devam etmek için bir dosya seçin.",
       "success": "{fileName} başarıyla zaman damgalandı. 1 kontör kullanıldı."
     }
@@ -345,6 +349,7 @@
     "unexpected": "Beklenmeyen bir hata oluştu.",
     "timeout": "İstek zaman aşımına uğradı. Lütfen tekrar deneyin.",
     "apiUnavailable": "Fake API sunucusuna ulaşılamadı. `npm run api` komutunun çalıştığını kontrol edin.",
+    "insufficientCredits": "Bu işlem için yeterli kontörünüz bulunmuyor.",
     "invalidSignatureTransaction": "İmzalama için gönderilen dosya bilgileri geçersiz.",
     "signatureTransactionFailed": "İmzalama işlemi tamamlanamadı.",
     "unsupportedSignatureFileType": "Yalnızca görsel, MP3, UDF ve PDF dosyalarına izin verilir.",

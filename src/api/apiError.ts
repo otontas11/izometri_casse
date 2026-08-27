@@ -8,7 +8,7 @@ interface ApiErrorPayload {
 }
 
 const apiErrorTranslationKeys: Record<string, string> = {
-  INSUFFICIENT_CREDITS: 'timestamp.feedback.insufficientCredits',
+  INSUFFICIENT_CREDITS: 'errors.insufficientCredits',
   INVALID_SIGNATURE_TRANSACTION: 'errors.invalidSignatureTransaction',
   INVALID_TIMESTAMP_TRANSACTION: 'errors.invalidTimestampTransaction',
   SIGNATURE_TRANSACTION_FAILED: 'errors.signatureTransactionFailed',

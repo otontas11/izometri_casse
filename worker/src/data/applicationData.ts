@@ -299,7 +299,7 @@ export const insertTimestampDocument = (
 
 type SignatureDocumentDetails = Omit<
   CompletedDocumentDetails,
-  'creditCost' | 'operation'
+  'operation'
 >
 
 export const insertSignatureDocument = (
@@ -309,7 +309,6 @@ export const insertSignatureDocument = (
 ) =>
   insertCompletedDocument(database, authenticatedUserId, {
     ...signatureDocumentDetails,
-    creditCost: 0,
     operation: 'signature',
   })
 

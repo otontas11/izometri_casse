@@ -1,17 +1,17 @@
-<script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { useAuth0 } from '@auth0/auth0-vue'
-import { storeToRefs } from 'pinia'
-import { useI18n } from 'vue-i18n'
+<script lang="ts" setup>
+import {computed, onMounted} from 'vue'
+import {useAuth0} from '@auth0/auth0-vue'
+import {storeToRefs} from 'pinia'
+import {useI18n} from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
-import { useToast } from '@/composables/useToast'
+import {useToast} from '@/composables/useToast'
 import DashboardMetricCard from '@/features/dashboard/components/DashboardMetricCard.vue'
 import DashboardQuickActionsPanel from '@/features/dashboard/components/DashboardQuickActionsPanel.vue'
 import RecentDocumentsTable from '@/features/dashboard/components/RecentDocumentsTable.vue'
-import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
-import type { ArchivedDocument } from '@/features/dashboard/types/dashboard.types'
-import { getApplicationLocaleCode } from '@/locales'
+import {useDashboardStore} from '@/features/dashboard/stores/dashboard.store'
+import type {ArchivedDocument} from '@/features/dashboard/types/dashboard.types'
+import {getApplicationLocaleCode} from '@/locales'
 
 const dashboardStore = useDashboardStore()
 const {
@@ -23,21 +23,21 @@ const {
   isDashboardLoading,
   recentDocuments,
 } = storeToRefs(dashboardStore)
-const { user: authenticatedUser } = useAuth0()
-const { showErrorToast, showSuccessToast } = useToast()
-const { t } = useI18n({ useScope: 'global' })
+const {user: authenticatedUser} = useAuth0()
+const {showErrorToast, showSuccessToast} = useToast()
+const {t} = useI18n({useScope: 'global'})
 
 const formattedCurrentDate = computed(() =>
-  new Intl.DateTimeFormat(getApplicationLocaleCode(), {
-    day: 'numeric',
-    month: 'long',
-    weekday: 'long',
-  }).format(new Date()),
+    new Intl.DateTimeFormat(getApplicationLocaleCode(), {
+      day: 'numeric',
+      month: 'long',
+      weekday: 'long',
+    }).format(new Date()),
 )
 const formatDashboardNumber = (dashboardNumber: number) =>
-  new Intl.NumberFormat(getApplicationLocaleCode(), {
-    maximumFractionDigits: 1,
-  }).format(dashboardNumber)
+    new Intl.NumberFormat(getApplicationLocaleCode(), {
+      maximumFractionDigits: 1,
+    }).format(dashboardNumber)
 const authenticatedUserFirstName = computed(() => {
   const authProfileNameCandidates = [
     authenticatedUser.value?.given_name,
@@ -46,36 +46,36 @@ const authenticatedUserFirstName = computed(() => {
     authenticatedUser.value?.email,
   ]
   const authenticatedUserDisplayName = authProfileNameCandidates.find(
-    (authProfileName): authProfileName is string =>
-      typeof authProfileName === 'string' && authProfileName.trim().length > 0,
+      (authProfileName): authProfileName is string =>
+          typeof authProfileName === 'string' && authProfileName.trim().length > 0,
   )
 
   return (
-    authenticatedUserDisplayName?.trim().split(/\s+/)[0] ??
-    t('dashboard.page.userFallback')
+      authenticatedUserDisplayName?.trim().split(/\s+/)[0] ??
+      t('dashboard.page.userFallback')
   )
 })
 const isInitialDashboardLoading = computed(
-  () =>
-    !dashboardSummary.value &&
-    (dashboardRequestStatus.value === 'idle' || isDashboardLoading.value),
+    () =>
+        !dashboardSummary.value &&
+        (dashboardRequestStatus.value === 'idle' || isDashboardLoading.value),
 )
 const hasInitialDashboardError = computed(
-  () =>
-    !dashboardSummary.value && dashboardRequestStatus.value === 'error',
+    () =>
+        !dashboardSummary.value && dashboardRequestStatus.value === 'error',
 )
 const archiveStorageUsagePercentage = computed(() => {
   if (
-    !dashboardSummary.value ||
-    dashboardSummary.value.storageLimitMb <= 0
+      !dashboardSummary.value ||
+      dashboardSummary.value.storageLimitMb <= 0
   ) {
     return 0
   }
 
   return Math.min(
-    100,
-    (dashboardSummary.value.storageUsedMb /
-      dashboardSummary.value.storageLimitMb) *
+      100,
+      (dashboardSummary.value.storageUsedMb /
+          dashboardSummary.value.storageLimitMb) *
       100,
   )
 })
@@ -93,8 +93,8 @@ const handleDashboardRefresh = () => {
 }
 
 const saveDocumentContent = (
-  documentContent: Blob,
-  documentFileName: string,
+    documentContent: Blob,
+    documentFileName: string,
 ) => {
   const documentObjectUrl = URL.createObjectURL(documentContent)
   const documentDownloadLink = document.createElement('a')
@@ -108,12 +108,12 @@ const saveDocumentContent = (
 
 const handleDocumentDownload = async (archivedDocument: ArchivedDocument) => {
   const documentContent = await dashboardStore.downloadArchivedDocument(
-    archivedDocument.id,
+      archivedDocument.id,
   )
 
   if (!documentContent) {
     showErrorToast(
-      documentDownloadErrorMessage.value ||
+        documentDownloadErrorMessage.value ||
         t('dashboard.recentDocuments.downloadFailed'),
     )
     return
@@ -121,9 +121,9 @@ const handleDocumentDownload = async (archivedDocument: ArchivedDocument) => {
 
   saveDocumentContent(documentContent, archivedDocument.name)
   showSuccessToast(
-    t('dashboard.recentDocuments.downloadRequested', {
-      fileName: archivedDocument.name,
-    }),
+      t('dashboard.recentDocuments.downloadRequested', {
+        fileName: archivedDocument.name,
+      }),
   )
 }
 
@@ -135,12 +135,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="dashboard-page" aria-labelledby="dashboard-page-title">
+  <section aria-labelledby="dashboard-page-title" class="dashboard-page">
     <header class="dashboard-page__header">
       <div>
         <p class="dashboard-page__date">{{ formattedCurrentDate }}</p>
         <h1 id="dashboard-page-title">
-          {{ t('dashboard.page.greeting', { name: authenticatedUserFirstName }) }}
+          {{ t('dashboard.page.greeting', {name: authenticatedUserFirstName}) }}
         </h1>
         <p class="dashboard-page__introduction">
           {{ t('dashboard.page.introduction') }}
@@ -148,24 +148,24 @@ onMounted(() => {
       </div>
 
       <button
-        class="dashboard-page__refresh-button"
-        type="button"
-        :disabled="isDashboardLoading"
-        @click="handleDashboardRefresh"
+          :disabled="isDashboardLoading"
+          class="dashboard-page__refresh-button"
+          type="button"
+          @click="handleDashboardRefresh"
       >
-        <AppIcon name="refresh" :size="18" />
+        <AppIcon :size="18" name="refresh"/>
         {{
           isDashboardLoading
-            ? t('dashboard.page.refreshing')
-            : t('dashboard.page.refreshData')
+              ? t('dashboard.page.refreshing')
+              : t('dashboard.page.refreshData')
         }}
       </button>
     </header>
 
     <div
-      v-if="dashboardErrorMessage && dashboardSummary"
-      class="dashboard-page__warning-notice"
-      role="alert"
+        v-if="dashboardErrorMessage && dashboardSummary"
+        class="dashboard-page__warning-notice"
+        role="alert"
     >
       <span>{{ dashboardErrorMessage }}</span>
       <button type="button" @click="handleDashboardRefresh">
@@ -174,10 +174,10 @@ onMounted(() => {
     </div>
 
     <div
-      v-if="isInitialDashboardLoading"
-      class="dashboard-page__loading-state"
-      :aria-label="t('dashboard.page.loadingAriaLabel')"
-      aria-busy="true"
+        v-if="isInitialDashboardLoading"
+        :aria-label="t('dashboard.page.loadingAriaLabel')"
+        aria-busy="true"
+        class="dashboard-page__loading-state"
     >
       <div class="dashboard-page__metric-skeletons">
         <span v-for="skeletonIndex in 4" :key="skeletonIndex"></span>
@@ -187,11 +187,11 @@ onMounted(() => {
     </div>
 
     <div
-      v-else-if="hasInitialDashboardError"
-      class="dashboard-page__error-state"
-      role="alert"
+        v-else-if="hasInitialDashboardError"
+        class="dashboard-page__error-state"
+        role="alert"
     >
-      <span class="dashboard-page__error-icon" aria-hidden="true">!</span>
+      <span aria-hidden="true" class="dashboard-page__error-icon">!</span>
       <div>
         <h2>{{ t('dashboard.page.loadErrorTitle') }}</h2>
         <p>{{ dashboardErrorMessage }}</p>
@@ -203,56 +203,56 @@ onMounted(() => {
 
     <template v-else-if="dashboardSummary">
       <section
-        class="dashboard-page__metrics"
-        :aria-label="t('dashboard.page.accountSummaryAriaLabel')"
+          :aria-label="t('dashboard.page.accountSummaryAriaLabel')"
+          class="dashboard-page__metrics"
       >
         <DashboardMetricCard
-          :label="t('dashboard.metrics.signedDocuments')"
-          :metric-value="
+            :detail="t('dashboard.metrics.signedDocumentsDetail')"
+            :label="t('dashboard.metrics.signedDocuments')"
+            :metric-value="
             formatDashboardNumber(dashboardSummary.totalSignedDocuments)
           "
-          :detail="t('dashboard.metrics.signedDocumentsDetail')"
-          icon="signature"
-          tone="navy"
+            icon="signature"
+            tone="navy"
         />
         <DashboardMetricCard
-          :label="t('dashboard.metrics.archivedDocuments')"
-          :metric-value="
+            :detail="t('dashboard.metrics.archivedDocumentsDetail')"
+            :label="t('dashboard.metrics.archivedDocuments')"
+            :metric-value="
             formatDashboardNumber(dashboardSummary.archivedDocumentCount)
           "
-          :detail="t('dashboard.metrics.archivedDocumentsDetail')"
-          icon="archive"
-          tone="violet"
+            icon="archive"
+            tone="violet"
         />
         <DashboardMetricCard
-          :label="t('dashboard.metrics.availableCredits')"
-          :metric-value="
+            :detail="t('dashboard.metrics.availableCreditsDetail')"
+            :label="t('dashboard.metrics.availableCredits')"
+            :metric-value="
             formatDashboardNumber(dashboardSummary.remainingCredits)
           "
-          :detail="t('dashboard.metrics.availableCreditsDetail')"
-          icon="wallet"
-          tone="green"
+            icon="wallet"
+            tone="green"
         />
         <DashboardMetricCard
-          :label="t('dashboard.metrics.archiveCapacity')"
-          :metric-value="formatStorageSize(dashboardSummary.storageUsedMb)"
-          :detail="
+            :detail="
             t('dashboard.metrics.totalStorage', {
               size: formatStorageSize(dashboardSummary.storageLimitMb),
             })
           "
-          :progress="archiveStorageUsagePercentage"
-          icon="storage"
-          tone="blue"
+            :label="t('dashboard.metrics.archiveCapacity')"
+            :metric-value="formatStorageSize(dashboardSummary.storageUsedMb)"
+            :progress="archiveStorageUsagePercentage"
+            icon="storage"
+            tone="blue"
         />
       </section>
 
-      <DashboardQuickActionsPanel />
+      <DashboardQuickActionsPanel/>
 
       <RecentDocumentsTable
-        :archived-documents="recentDocuments"
-        :downloading-document-id="downloadingDocumentId"
-        @download="handleDocumentDownload"
+          :archived-documents="recentDocuments"
+          :downloading-document-id="downloadingDocumentId"
+          @download="handleDocumentDownload"
       />
     </template>
   </section>

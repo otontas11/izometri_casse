@@ -152,6 +152,11 @@
       "title": "Sign",
       "description": "Select your files and create signature records associated with your account in the secure archive.",
       "clear": "Clear page",
+      "transactionCost": "Transaction cost",
+      "costPerFile": "1 credit / file",
+      "balanceLoading": "Loading balance…",
+      "availableCredits": "Available credits: {count}",
+      "noAvailableCredits": "No credits available",
       "simulationTitle": "Case simulation",
       "simulationDescription": "This flow does not produce a qualified electronic signature. It stores the file in R2 and creates a user-owned signature transaction record in D1."
     },
@@ -184,8 +189,8 @@
     },
     "feedback": {
       "selectFiles": "Select at least one file to continue with signing.",
-      "batchSuccess": "Signature records were created for {count} files and the files were saved to the secure archive.",
-      "partialFailure": "{completedCount} files completed and {failedCount} files failed. You can retry the failed files.",
+      "batchSuccess": "Signature records were created for {count} files. One credit was used for each file.",
+      "partialFailure": "{completedCount} files completed and used {completedCount} credits; {failedCount} files failed.",
       "batchFailure": "{count} files could not be uploaded. Review the errors on the file cards and try again.",
       "transactionFailed": "The signature transaction could not be completed. Please try again."
     }
@@ -265,7 +270,6 @@
     },
     "feedback": {
       "endpointMissing": "The timestamp service was not found. Stop the fake API and restart it with npm run api.",
-      "insufficientCredits": "You do not have enough credits for timestamping.",
       "selectFile": "Select a file to continue with timestamping.",
       "success": "{fileName} was timestamped successfully. 1 credit was used."
     }
@@ -345,6 +349,7 @@
     "unexpected": "An unexpected error occurred.",
     "timeout": "The request timed out. Please try again.",
     "apiUnavailable": "The fake API server could not be reached. Make sure `npm run api` is running.",
+    "insufficientCredits": "You do not have enough credits for this transaction.",
     "invalidSignatureTransaction": "The file information submitted for signing is invalid.",
     "signatureTransactionFailed": "The signature transaction could not be completed.",
     "unsupportedSignatureFileType": "Only image, MP3, UDF, and PDF files are allowed.",
