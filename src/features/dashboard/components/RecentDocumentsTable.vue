@@ -143,7 +143,7 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
       </span>
       <h3>{{ t('dashboard.recentDocuments.emptyTitle') }}</h3>
       <p>{{ t('dashboard.recentDocuments.emptyDescription') }}</p>
-      <RouterLink :to="{ name: 'timestamp' }">
+      <RouterLink :to="{ name: 'signature' }">
         {{ t('dashboard.recentDocuments.createFirst') }}
       </RouterLink>
     </div>

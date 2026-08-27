@@ -4,7 +4,9 @@ import {
   fetchRecentDocuments,
   fetchTimestampJobs,
   fetchUserProfile,
+  insertSignatureDocument,
   insertTimestampDocument,
+  mapArchivedDocument,
   mapTimestampJob,
   updateUserProfile,
 } from '../data/applicationData'
@@ -15,17 +17,46 @@ import {
 import type {
   AuthenticatedUser,
   DocumentDatabaseRecord,
+  DocumentOperation,
+  SignatureTransactionResponse,
   TimestampTransactionResponse,
   UpdateProfilePayload,
 } from '../types'
 
-const MAX_TIMESTAMP_FILE_SIZE_BYTES = 25 * 1024 * 1024
+const MAX_DOCUMENT_FILE_SIZE_BYTES = 25 * 1024 * 1024
 const TIMESTAMP_CREDIT_COST = 1
 const RECENT_DOCUMENT_LIMIT = 5
 const PROFILE_NAME_MINIMUM_LENGTH = 2
 const PROFILE_NAME_MAXIMUM_LENGTH = 50
 const profileNamePattern = /^[\p{L}\p{M}]+(?:[ '\-’][\p{L}\p{M}]+)*$/u
 const normalizedPhonePattern = /^\+?[1-9]\d{9,14}$/
+
+interface DocumentTransactionConfiguration {
+  actionName: string
+  creditCost: number
+  fileTooLargeErrorCode: string
+  invalidTransactionErrorCode: string
+  operation: DocumentOperation
+  transactionFailedErrorCode: string
+}
+
+const signatureTransactionConfiguration = {
+  actionName: 'İmzalama',
+  creditCost: 0,
+  fileTooLargeErrorCode: 'SIGNATURE_FILE_TOO_LARGE',
+  invalidTransactionErrorCode: 'INVALID_SIGNATURE_TRANSACTION',
+  operation: 'signature',
+  transactionFailedErrorCode: 'SIGNATURE_TRANSACTION_FAILED',
+} satisfies DocumentTransactionConfiguration
+
+const timestampTransactionConfiguration = {
+  actionName: 'Zaman damgalama',
+  creditCost: TIMESTAMP_CREDIT_COST,
+  fileTooLargeErrorCode: 'TIMESTAMP_FILE_TOO_LARGE',
+  invalidTransactionErrorCode: 'INVALID_TIMESTAMP_TRANSACTION',
+  operation: 'timestamp',
+  transactionFailedErrorCode: 'TIMESTAMP_TRANSACTION_FAILED',
+} satisfies DocumentTransactionConfiguration
 
 const getNormalizedPathname = (pathname: string) =>
   pathname.replace(/\/+$/, '') || '/'
@@ -96,7 +127,10 @@ const readProfileUpdatePayload = async (
   return { firstName, lastName, phone }
 }
 
-const readTimestampFile = async (request: Request) => {
+const readDocumentTransactionFile = async (
+  request: Request,
+  transactionConfiguration: DocumentTransactionConfiguration,
+) => {
   if (!request.headers.get('Content-Type')?.includes('multipart/form-data')) {
     throw new WorkerApiError(
       415,
@@ -105,71 +139,75 @@ const readTimestampFile = async (request: Request) => {
     )
   }
 
-  let timestampFormData: FormData
+  let documentFormData: FormData
 
   try {
-    timestampFormData = await request.formData()
+    documentFormData = await request.formData()
   } catch {
     throw new WorkerApiError(
       400,
-      'INVALID_TIMESTAMP_TRANSACTION',
-      'Zaman damgalama için gönderilen dosya okunamadı.',
+      transactionConfiguration.invalidTransactionErrorCode,
+      `${transactionConfiguration.actionName} için gönderilen dosya okunamadı.`,
     )
   }
 
-  const timestampFile = timestampFormData.get('file')
+  const transactionFile = documentFormData.get('file')
 
-  if (!(timestampFile instanceof File) || timestampFile.size === 0) {
+  if (!(transactionFile instanceof File) || transactionFile.size === 0) {
     throw new WorkerApiError(
       400,
-      'INVALID_TIMESTAMP_TRANSACTION',
-      'Zaman damgalama için geçerli bir dosya gönderin.',
+      transactionConfiguration.invalidTransactionErrorCode,
+      `${transactionConfiguration.actionName} için geçerli bir dosya gönderin.`,
     )
   }
 
-  if (timestampFile.size > MAX_TIMESTAMP_FILE_SIZE_BYTES) {
+  if (transactionFile.size > MAX_DOCUMENT_FILE_SIZE_BYTES) {
     throw new WorkerApiError(
       413,
-      'TIMESTAMP_FILE_TOO_LARGE',
+      transactionConfiguration.fileTooLargeErrorCode,
       'Dosya boyutu 25 MB sınırını aşamaz.',
     )
   }
 
   const safeFileName =
-    timestampFile.name.split(/[\\/]/).pop()?.trim().slice(0, 255) ?? ''
+    transactionFile.name.split(/[\\/]/).pop()?.trim().slice(0, 255) ?? ''
 
   if (!safeFileName) {
     throw new WorkerApiError(
       400,
-      'INVALID_TIMESTAMP_TRANSACTION',
+      transactionConfiguration.invalidTransactionErrorCode,
       'Dosya adı geçersiz.',
     )
   }
 
   return {
-    file: timestampFile,
+    file: transactionFile,
     fileName: safeFileName,
     mimeType:
-      timestampFile.type.trim().slice(0, 255) || 'application/octet-stream',
+      transactionFile.type.trim().slice(0, 255) || 'application/octet-stream',
   }
 }
 
-const createTimestampTransaction = async (
+const createDocumentTransaction = async (
   request: Request,
   environment: Env,
   authenticatedUser: AuthenticatedUser,
+  transactionConfiguration: DocumentTransactionConfiguration,
 ) => {
-  const timestampFileDetails = await readTimestampFile(request)
+  const documentFileDetails = await readDocumentTransactionFile(
+    request,
+    transactionConfiguration,
+  )
   const transactionDate = new Date().toISOString()
-  const timestampDocumentObjectKey = `documents/${crypto.randomUUID()}`
+  const documentObjectKey = `documents/${crypto.randomUUID()}`
 
   try {
     await environment.DOCUMENT_STORAGE.put(
-      timestampDocumentObjectKey,
-      timestampFileDetails.file.stream(),
+      documentObjectKey,
+      documentFileDetails.file.stream(),
       {
         httpMetadata: {
-          contentType: timestampFileDetails.mimeType,
+          contentType: documentFileDetails.mimeType,
         },
       },
     )
@@ -180,8 +218,8 @@ const createTimestampTransaction = async (
           fileStorageError instanceof Error
             ? fileStorageError.message
             : String(fileStorageError),
-        message: 'Zaman damgası dosyası R2 arşivine kaydedilemedi.',
-        objectKey: timestampDocumentObjectKey,
+        message: `${transactionConfiguration.actionName} dosyası R2 arşivine kaydedilemedi.`,
+        objectKey: documentObjectKey,
       }),
     )
 
@@ -192,25 +230,36 @@ const createTimestampTransaction = async (
     )
   }
 
-  let createdTimestampDocument: DocumentDatabaseRecord
+  let createdDocument: DocumentDatabaseRecord
 
   try {
-    createdTimestampDocument = await insertTimestampDocument(
-      environment.DATABASE,
-      authenticatedUser.userId,
-      {
-        completedAt: transactionDate,
-        createdAt: transactionDate,
-        creditCost: TIMESTAMP_CREDIT_COST,
-        fileName: timestampFileDetails.fileName,
-        fileSize: timestampFileDetails.file.size,
-        mimeType: timestampFileDetails.mimeType,
-        objectKey: timestampDocumentObjectKey,
-      },
-    )
+    const completedDocumentDetails = {
+      completedAt: transactionDate,
+      createdAt: transactionDate,
+      fileName: documentFileDetails.fileName,
+      fileSize: documentFileDetails.file.size,
+      mimeType: documentFileDetails.mimeType,
+      objectKey: documentObjectKey,
+    }
+
+    createdDocument =
+      transactionConfiguration.operation === 'timestamp'
+        ? await insertTimestampDocument(
+            environment.DATABASE,
+            authenticatedUser.userId,
+            {
+              ...completedDocumentDetails,
+              creditCost: transactionConfiguration.creditCost,
+            },
+          )
+        : await insertSignatureDocument(
+            environment.DATABASE,
+            authenticatedUser.userId,
+            completedDocumentDetails,
+          )
   } catch (documentCreationError) {
     try {
-      await environment.DOCUMENT_STORAGE.delete(timestampDocumentObjectKey)
+      await environment.DOCUMENT_STORAGE.delete(documentObjectKey)
     } catch (fileCleanupError) {
       console.error(
         JSON.stringify({
@@ -220,12 +269,15 @@ const createTimestampTransaction = async (
               : String(fileCleanupError),
           message:
             'D1 kayıt hatasından sonra R2 dosyası temizlenemedi.',
-          objectKey: timestampDocumentObjectKey,
+          objectKey: documentObjectKey,
         }),
       )
     }
 
-    if (String(documentCreationError).includes('INSUFFICIENT_CREDITS')) {
+    if (
+      transactionConfiguration.operation === 'timestamp' &&
+      String(documentCreationError).includes('INSUFFICIENT_CREDITS')
+    ) {
       throw new WorkerApiError(
         409,
         'INSUFFICIENT_CREDITS',
@@ -233,7 +285,22 @@ const createTimestampTransaction = async (
       )
     }
 
-    throw documentCreationError
+    console.error(
+      JSON.stringify({
+        error:
+          documentCreationError instanceof Error
+            ? documentCreationError.message
+            : String(documentCreationError),
+        message: `${transactionConfiguration.actionName} D1 kaydı oluşturulamadı.`,
+        objectKey: documentObjectKey,
+      }),
+    )
+
+    throw new WorkerApiError(
+      500,
+      transactionConfiguration.transactionFailedErrorCode,
+      `${transactionConfiguration.actionName} işlemi tamamlanamadı.`,
+    )
   }
 
   const [dashboardSummary, recentDocuments] = await Promise.all([
@@ -247,10 +314,46 @@ const createTimestampTransaction = async (
       RECENT_DOCUMENT_LIMIT,
     ),
   ])
+  return { createdDocument, dashboardSummary, recentDocuments }
+}
+
+const createSignatureTransaction = async (
+  request: Request,
+  environment: Env,
+  authenticatedUser: AuthenticatedUser,
+) => {
+  const signatureTransaction = await createDocumentTransaction(
+    request,
+    environment,
+    authenticatedUser,
+    signatureTransactionConfiguration,
+  )
+  const signatureTransactionResponse: SignatureTransactionResponse = {
+    dashboardSummary: signatureTransaction.dashboardSummary,
+    recentDocuments: signatureTransaction.recentDocuments,
+    signedDocument: mapArchivedDocument(
+      signatureTransaction.createdDocument,
+    ),
+  }
+
+  return signatureTransactionResponse
+}
+
+const createTimestampTransaction = async (
+  request: Request,
+  environment: Env,
+  authenticatedUser: AuthenticatedUser,
+) => {
+  const timestampTransaction = await createDocumentTransaction(
+    request,
+    environment,
+    authenticatedUser,
+    timestampTransactionConfiguration,
+  )
   const timestampTransactionResponse: TimestampTransactionResponse = {
-    dashboardSummary,
-    recentDocuments,
-    timestampJob: mapTimestampJob(createdTimestampDocument),
+    dashboardSummary: timestampTransaction.dashboardSummary,
+    recentDocuments: timestampTransaction.recentDocuments,
+    timestampJob: mapTimestampJob(timestampTransaction.createdDocument),
   }
 
   return timestampTransactionResponse
@@ -324,6 +427,18 @@ export const routeAuthenticatedRequest = async (
       authenticatedUser.userId,
     )
     return createJsonResponse(timestampJobs, 200, corsHeaders)
+  }
+
+  if (
+    request.method === 'POST' &&
+    requestPathname === '/signature-transactions'
+  ) {
+    const signatureTransaction = await createSignatureTransaction(
+      request,
+      environment,
+      authenticatedUser,
+    )
+    return createJsonResponse(signatureTransaction, 201, corsHeaders)
   }
 
   if (

@@ -30,19 +30,25 @@ export const applicationRoutes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'dashboard',
-        component: () => import('@/pages/DashboardPage.vue'),
+        component: () => import('@/pages/dashboard/DashboardPage.vue'),
         meta: { titleKey: 'routes.dashboard' },
+      },
+      {
+        path: 'signature',
+        name: 'signature',
+        component: () => import('@/pages/signature/SignaturePage.vue'),
+        meta: { titleKey: 'routes.signature' },
       },
       {
         path: 'timestamp',
         name: 'timestamp',
-        component: () => import('@/pages/TimestampPage.vue'),
+        component: () => import('@/pages/timestamp/TimestampPage.vue'),
         meta: { titleKey: 'routes.timestamp' },
       },
       {
         path: 'settings/profile',
         name: 'profile',
-        component: () => import('@/pages/ProfilePage.vue'),
+        component: () => import('@/pages/profile/ProfilePage.vue'),
         meta: { titleKey: 'routes.profile' },
       },
     ],

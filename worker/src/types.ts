@@ -28,7 +28,7 @@ export interface DashboardSummary {
   totalSignedDocuments: number
 }
 
-type DocumentOperation = 'signature' | 'timestamp'
+export type DocumentOperation = 'signature' | 'timestamp'
 type DocumentStatus = 'completed' | 'failed' | 'processing'
 
 export interface ArchivedDocument {
@@ -54,6 +54,12 @@ export interface TimestampTransactionResponse {
   dashboardSummary: DashboardSummary
   recentDocuments: ArchivedDocument[]
   timestampJob: TimestampJob
+}
+
+export interface SignatureTransactionResponse {
+  dashboardSummary: DashboardSummary
+  recentDocuments: ArchivedDocument[]
+  signedDocument: ArchivedDocument
 }
 
 export interface ProfileDatabaseRecord {

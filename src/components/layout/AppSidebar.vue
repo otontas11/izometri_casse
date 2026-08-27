@@ -9,7 +9,7 @@ import type { AppIconName } from '@/types/icon'
 interface SidebarNavigationItem {
   icon: AppIconName
   label: string
-  routeName: 'dashboard' | 'profile' | 'timestamp'
+  routeName: 'dashboard' | 'profile' | 'signature' | 'timestamp'
 }
 
 const props = defineProps<{
@@ -30,6 +30,11 @@ const sidebarNavigationItems = computed<SidebarNavigationItem[]>(() => [
     label: t('layout.sidebar.dashboard'),
     icon: 'dashboard',
     routeName: 'dashboard',
+  },
+  {
+    label: t('layout.sidebar.signature'),
+    icon: 'signature',
+    routeName: 'signature',
   },
   {
     label: t('layout.sidebar.timestamp'),

@@ -104,7 +104,7 @@ export const useTimestampStore = defineStore('timestamp', () => {
       const timestampTransaction =
         await timestampApi.createTimestampTransaction(submittedTimestampFile)
 
-      dashboardStore.synchronizeDashboardAfterTimestamp(
+      dashboardStore.synchronizeDashboardData(
         timestampTransaction.dashboardSummary,
         timestampTransaction.recentDocuments,
       )

@@ -26,6 +26,7 @@ const iconPaths: Record<AppIconName, string> = {
   signature: 'M4 19c3-1 4-4 6-8 1-2 2-3 3-3 2 0 1 4-1 6-1 2-2 4 0 4 1 0 2-2 3-3 1-1 2-1 2 1v2',
   storage: 'M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9a4.5 4.5 0 0 0 1 9Z',
   timestamp: 'M12 21a9 9 0 1 0-9-9 9 9 0 0 0 9 9ZM12 7v5l3.5 2',
+  trash: 'M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6',
   upload: 'M12 16V4m0 0-4 4m4-4 4 4M4 16v4h16v-4',
   wallet: 'M3 6h16v14H3zM3 9h17a2 2 0 0 1 2 2v5h-6a3 3 0 0 1 0-6h6',
 }

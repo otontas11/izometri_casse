@@ -11,5 +11,6 @@ export type AppIconName =
   | 'signature'
   | 'storage'
   | 'timestamp'
+  | 'trash'
   | 'upload'
   | 'wallet'

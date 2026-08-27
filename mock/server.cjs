@@ -7,7 +7,7 @@ const DEFAULT_JSON_SERVER_PORT = 3001
 const TIMESTAMP_CREDIT_COST = 1
 const BYTES_PER_MEGABYTE = 1024 * 1024
 const RECENT_DOCUMENT_LIMIT = 5
-const MAX_TIMESTAMP_FILE_SIZE_BYTES = 25 * BYTES_PER_MEGABYTE
+const MAX_DOCUMENT_FILE_SIZE_BYTES = 25 * BYTES_PER_MEGABYTE
 
 const jsonServerApplication = jsonServer.create()
 const defaultDatabasePath = path.join(__dirname, 'db.json')
@@ -18,10 +18,10 @@ const databasePath = configuredDatabasePath
 const jsonServerRouter = jsonServer.router(databasePath)
 const database = jsonServerRouter.db
 const uploadedDocumentContents = new Map()
-const timestampFileUpload = multer({
+const documentFileUpload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: MAX_TIMESTAMP_FILE_SIZE_BYTES,
+    fileSize: MAX_DOCUMENT_FILE_SIZE_BYTES,
     files: 1,
   },
 }).single('file')
@@ -42,7 +42,7 @@ const getNextNumericRecordId = (records) =>
 const isNonEmptyString = (stringCandidate) =>
   typeof stringCandidate === 'string' && stringCandidate.trim().length > 0
 
-const isValidTimestampTransactionPayload = (requestPayload) =>
+const isValidDocumentTransactionPayload = (requestPayload) =>
   requestPayload &&
   isNonEmptyString(requestPayload.fileName) &&
   Number.isSafeInteger(requestPayload.fileSize) &&
@@ -137,11 +137,119 @@ const createTimestampTransaction = (requestPayload) => {
   }
 }
 
+const createSignatureTransaction = (requestPayload) => {
+  const dashboardSummary = database.get('dashboard').value()
+  const archivedDocuments = database.get('documents').value()
+
+  if (!dashboardSummary || !Array.isArray(archivedDocuments)) {
+    throw new Error('Fake API veritabanı imzalama işlemi için hazır değil.')
+  }
+
+  const transactionDate = new Date().toISOString()
+  const signedDocument = {
+    id: getNextNumericRecordId(archivedDocuments),
+    createdAt: transactionDate,
+    name: requestPayload.fileName.trim(),
+    operation: 'signature',
+    sizeBytes: requestPayload.fileSize,
+  }
+  const updatedDashboardSummary = {
+    ...dashboardSummary,
+    archivedDocumentCount: dashboardSummary.archivedDocumentCount + 1,
+    storageUsedMb: Number(
+      (
+        dashboardSummary.storageUsedMb +
+        signedDocument.sizeBytes / BYTES_PER_MEGABYTE
+      ).toFixed(2),
+    ),
+    totalSignedDocuments: dashboardSummary.totalSignedDocuments + 1,
+  }
+  const updatedArchivedDocuments = [...archivedDocuments, signedDocument]
+  const recentDocuments = [...updatedArchivedDocuments]
+    .sort(
+      (firstDocument, secondDocument) =>
+        new Date(secondDocument.createdAt).getTime() -
+        new Date(firstDocument.createdAt).getTime(),
+    )
+    .slice(0, RECENT_DOCUMENT_LIMIT)
+
+  database
+    .assign({
+      dashboard: updatedDashboardSummary,
+      documents: updatedArchivedDocuments,
+    })
+    .write()
+
+  return {
+    archivedDocumentId: signedDocument.id,
+    transactionResponse: {
+      dashboardSummary: updatedDashboardSummary,
+      recentDocuments,
+      signedDocument,
+    },
+  }
+}
+
 jsonServerApplication.use(jsonServer.defaults())
 jsonServerApplication.use(jsonServer.bodyParser)
 
+jsonServerApplication.post('/signature-transactions', (request, response) => {
+  documentFileUpload(request, response, (fileUploadError) => {
+    if (fileUploadError) {
+      const isFileTooLarge = fileUploadError.code === 'LIMIT_FILE_SIZE'
+
+      response.status(isFileTooLarge ? 413 : 400).json({
+        error: isFileTooLarge
+          ? 'SIGNATURE_FILE_TOO_LARGE'
+          : 'INVALID_SIGNATURE_TRANSACTION',
+        message: isFileTooLarge
+          ? 'Dosya boyutu 25 MB sınırını aşamaz.'
+          : 'İmzalama için gönderilen dosya okunamadı.',
+      })
+      return
+    }
+
+    const uploadedSignatureFile = request.file
+    const signatureTransactionPayload = uploadedSignatureFile
+      ? {
+          fileName: uploadedSignatureFile.originalname,
+          fileSize: uploadedSignatureFile.size,
+          mimeType:
+            uploadedSignatureFile.mimetype || 'application/octet-stream',
+        }
+      : null
+
+    if (!isValidDocumentTransactionPayload(signatureTransactionPayload)) {
+      response.status(400).json({
+        error: 'INVALID_SIGNATURE_TRANSACTION',
+        message: 'İmzalama için gönderilen dosya bilgileri geçersiz.',
+      })
+      return
+    }
+
+    try {
+      const { archivedDocumentId, transactionResponse } =
+        createSignatureTransaction(signatureTransactionPayload)
+
+      uploadedDocumentContents.set(archivedDocumentId, {
+        content: uploadedSignatureFile.buffer,
+        mimeType: signatureTransactionPayload.mimeType,
+      })
+      response.status(201).json(transactionResponse)
+    } catch (transactionError) {
+      response.status(500).json({
+        error: 'SIGNATURE_TRANSACTION_FAILED',
+        message:
+          transactionError instanceof Error
+            ? transactionError.message
+            : 'İmzalama işlemi tamamlanamadı.',
+      })
+    }
+  })
+})
+
 jsonServerApplication.post('/timestamp-transactions', (request, response) => {
-  timestampFileUpload(request, response, (fileUploadError) => {
+  documentFileUpload(request, response, (fileUploadError) => {
     if (fileUploadError) {
       const isFileTooLarge = fileUploadError.code === 'LIMIT_FILE_SIZE'
 
@@ -166,7 +274,7 @@ jsonServerApplication.post('/timestamp-transactions', (request, response) => {
         }
       : null
 
-    if (!isValidTimestampTransactionPayload(timestampTransactionPayload)) {
+    if (!isValidDocumentTransactionPayload(timestampTransactionPayload)) {
       response.status(400).json({
         error: 'INVALID_TIMESTAMP_TRANSACTION',
         message: 'Zaman damgalama için gönderilen dosya bilgileri geçersiz.',
@@ -193,11 +301,11 @@ jsonServerApplication.post('/timestamp-transactions', (request, response) => {
       response.status(201).json(transactionResponse)
     } catch (transactionError) {
       response.status(500).json({
-        error: 'TIMESTAMP_TRANSACTION_FAILED',
+        error: 'SIGNATURE_TRANSACTION_FAILED',
         message:
           transactionError instanceof Error
             ? transactionError.message
-            : 'Zaman damgalama işlemi tamamlanamadı.',
+            : 'İmzalama işlemi tamamlanamadı.',
       })
     }
   })

@@ -64,7 +64,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     }
   }
 
-  const synchronizeDashboardAfterTimestamp = (
+  const synchronizeDashboardData = (
     updatedDashboardSummary: DashboardSummary,
     updatedRecentDocuments: ArchivedDocument[],
   ) => {
@@ -84,6 +84,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
     fetchDashboardData,
     isDashboardLoading,
     recentDocuments,
-    synchronizeDashboardAfterTimestamp,
+    synchronizeDashboardData,
   }
 })

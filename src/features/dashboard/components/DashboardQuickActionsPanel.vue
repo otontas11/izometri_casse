@@ -23,18 +23,18 @@ const { t } = useI18n({ useScope: 'global' })
       </div>
 
       <RouterLink
-        class="dashboard-quick-actions-panel__timestamp-link"
-        :to="{ name: 'timestamp' }"
+        class="dashboard-quick-actions-panel__signature-link"
+        :to="{ name: 'signature' }"
       >
         <span
-          class="dashboard-quick-actions-panel__timestamp-icon"
+          class="dashboard-quick-actions-panel__signature-icon"
           aria-hidden="true"
         >
-          <AppIcon name="upload" :size="24" />
+          <AppIcon name="signature" :size="24" />
         </span>
-        <span class="dashboard-quick-actions-panel__timestamp-copy">
+        <span class="dashboard-quick-actions-panel__signature-copy">
           <strong>{{ t('dashboard.quickActions.startSelectingFile') }}</strong>
-          <small>{{ t('dashboard.quickActions.goToTimestamp') }}</small>
+          <small>{{ t('dashboard.quickActions.goToSignature') }}</small>
         </span>
         <AppIcon name="arrow-right" :size="20" />
       </RouterLink>
@@ -49,7 +49,7 @@ const { t } = useI18n({ useScope: 'global' })
           class="dashboard-quick-actions-panel__trust-icon"
           aria-hidden="true"
         >
-          <AppIcon name="timestamp" :size="21" />
+          <AppIcon name="signature" :size="21" />
         </span>
         <div>
           <small>{{ t('dashboard.quickActions.assurance') }}</small>
@@ -72,8 +72,10 @@ const { t } = useI18n({ useScope: 'global' })
         <li>
           <span>02</span>
           <div>
-            <strong>{{ t('dashboard.quickActions.timeProof') }}</strong>
-            <small>{{ t('dashboard.quickActions.timeProofDescription') }}</small>
+            <strong>{{ t('dashboard.quickActions.identityAssociation') }}</strong>
+            <small>
+              {{ t('dashboard.quickActions.identityAssociationDescription') }}
+            </small>
           </div>
         </li>
         <li>
@@ -138,7 +140,7 @@ const { t } = useI18n({ useScope: 'global' })
 }
 
 .dashboard-quick-actions-panel__primary-copy,
-.dashboard-quick-actions-panel__timestamp-link {
+.dashboard-quick-actions-panel__signature-link {
   position: relative;
   z-index: 1;
 }
@@ -190,7 +192,7 @@ const { t } = useI18n({ useScope: 'global' })
   line-height: 1.75;
 }
 
-.dashboard-quick-actions-panel__timestamp-link {
+.dashboard-quick-actions-panel__signature-link {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 0.875rem;
@@ -208,12 +210,12 @@ const { t } = useI18n({ useScope: 'global' })
     transform var(--transition-fast);
 }
 
-.dashboard-quick-actions-panel__timestamp-link:hover {
+.dashboard-quick-actions-panel__signature-link:hover {
   background: #fff;
   transform: translateY(-3px);
 }
 
-.dashboard-quick-actions-panel__timestamp-icon {
+.dashboard-quick-actions-panel__signature-icon {
   display: grid;
   width: 3.25rem;
   height: 3.25rem;
@@ -223,16 +225,16 @@ const { t } = useI18n({ useScope: 'global' })
   border-radius: 1rem;
 }
 
-.dashboard-quick-actions-panel__timestamp-copy {
+.dashboard-quick-actions-panel__signature-copy {
   display: grid;
   gap: 0.35rem;
 }
 
-.dashboard-quick-actions-panel__timestamp-copy strong {
+.dashboard-quick-actions-panel__signature-copy strong {
   font-size: 0.86rem;
 }
 
-.dashboard-quick-actions-panel__timestamp-copy small {
+.dashboard-quick-actions-panel__signature-copy small {
   color: var(--color-text-secondary);
   font-size: var(--font-size-small);
   font-weight: 600;

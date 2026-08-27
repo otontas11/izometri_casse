@@ -5,6 +5,7 @@ import type {
   DashboardDatabaseRecord,
   DashboardSummary,
   DocumentDatabaseRecord,
+  DocumentOperation,
   ProfileDatabaseRecord,
   TimestampJob,
   UpdateProfilePayload,
@@ -26,7 +27,7 @@ const mapProfileDatabaseRecord = (
   phone: profileRecord.phone,
 })
 
-const mapArchivedDocument = (
+export const mapArchivedDocument = (
   documentRecord: DocumentDatabaseRecord,
 ): ArchivedDocument => ({
   createdAt: documentRecord.created_at,
@@ -222,18 +223,21 @@ export const fetchTimestampJobs = async (
   return timestampDocumentRecords.map(mapTimestampJob)
 }
 
-export const insertTimestampDocument = async (
+interface CompletedDocumentDetails {
+  completedAt: string
+  createdAt: string
+  creditCost: number
+  fileName: string
+  fileSize: number
+  mimeType: string
+  objectKey: string
+  operation: DocumentOperation
+}
+
+const insertCompletedDocument = async (
   database: D1Database,
   authenticatedUserId: string,
-  timestampDocumentDetails: {
-    completedAt: string
-    createdAt: string
-    creditCost: number
-    fileName: string
-    fileSize: number
-    mimeType: string
-    objectKey: string
-  },
+  documentDetails: CompletedDocumentDetails,
 ) => {
   const documentInsertResult = await database
     .prepare(
@@ -248,34 +252,66 @@ export const insertTimestampDocument = async (
         credit_cost,
         created_at,
         completed_at
-      ) VALUES (?, ?, ?, ?, ?, 'timestamp', 'completed', ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?)`,
     )
     .bind(
       authenticatedUserId,
-      timestampDocumentDetails.objectKey,
-      timestampDocumentDetails.fileName,
-      timestampDocumentDetails.fileSize,
-      timestampDocumentDetails.mimeType,
-      timestampDocumentDetails.creditCost,
-      timestampDocumentDetails.createdAt,
-      timestampDocumentDetails.completedAt,
+      documentDetails.objectKey,
+      documentDetails.fileName,
+      documentDetails.fileSize,
+      documentDetails.mimeType,
+      documentDetails.operation,
+      documentDetails.creditCost,
+      documentDetails.createdAt,
+      documentDetails.completedAt,
     )
     .run()
 
   return {
     auth0_user_id: authenticatedUserId,
-    completed_at: timestampDocumentDetails.completedAt,
-    created_at: timestampDocumentDetails.createdAt,
-    credit_cost: timestampDocumentDetails.creditCost,
-    file_name: timestampDocumentDetails.fileName,
-    file_size: timestampDocumentDetails.fileSize,
+    completed_at: documentDetails.completedAt,
+    created_at: documentDetails.createdAt,
+    credit_cost: documentDetails.creditCost,
+    file_name: documentDetails.fileName,
+    file_size: documentDetails.fileSize,
     id: documentInsertResult.meta.last_row_id,
-    mime_type: timestampDocumentDetails.mimeType,
-    object_key: timestampDocumentDetails.objectKey,
-    operation: 'timestamp',
+    mime_type: documentDetails.mimeType,
+    object_key: documentDetails.objectKey,
+    operation: documentDetails.operation,
     status: 'completed',
   } satisfies DocumentDatabaseRecord
 }
+
+type TimestampDocumentDetails = Omit<
+  CompletedDocumentDetails,
+  'operation'
+>
+
+export const insertTimestampDocument = (
+  database: D1Database,
+  authenticatedUserId: string,
+  timestampDocumentDetails: TimestampDocumentDetails,
+) =>
+  insertCompletedDocument(database, authenticatedUserId, {
+    ...timestampDocumentDetails,
+    operation: 'timestamp',
+  })
+
+type SignatureDocumentDetails = Omit<
+  CompletedDocumentDetails,
+  'creditCost' | 'operation'
+>
+
+export const insertSignatureDocument = (
+  database: D1Database,
+  authenticatedUserId: string,
+  signatureDocumentDetails: SignatureDocumentDetails,
+) =>
+  insertCompletedDocument(database, authenticatedUserId, {
+    ...signatureDocumentDetails,
+    creditCost: 0,
+    operation: 'signature',
+  })
 
 export const fetchOwnedDocument = async (
   database: D1Database,
