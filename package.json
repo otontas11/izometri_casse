@@ -34,18 +34,11 @@
     "@storybook/vue3-vite": "^10.5.10",
     "@vitejs/plugin-vue": "^5.2.4",
     "json-server": "^0.17.4",
-    "msw": "^2.15.0",
-    "msw-storybook-addon": "^3.0.0",
     "multer": "^2.2.0",
     "storybook": "^10.5.10",
     "typescript": "~5.9.3",
     "vite": "^6.4.3",
     "vue-tsc": "^3.3.11",
     "wrangler": "^4.126.0"
-  },
-  "msw": {
-    "workerDirectory": [
-      "public"
-    ]
   }
 }

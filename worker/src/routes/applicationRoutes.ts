@@ -1,10 +1,10 @@
 import {
-  createTimestampDocument,
   fetchDashboardSummary,
   fetchOwnedDocument,
   fetchRecentDocuments,
   fetchTimestampJobs,
   fetchUserProfile,
+  insertTimestampDocument,
   mapTimestampJob,
   updateUserProfile,
 } from '../data/applicationData'
@@ -161,18 +161,30 @@ const createTimestampTransaction = async (
 ) => {
   const timestampFileDetails = await readTimestampFile(request)
   const transactionDate = new Date().toISOString()
-  const storedObjectKey = `documents/${crypto.randomUUID()}`
-  const storedTimestampObject = await environment.DOCUMENT_STORAGE.put(
-    storedObjectKey,
-    timestampFileDetails.file.stream(),
-    {
-      httpMetadata: {
-        contentType: timestampFileDetails.mimeType,
-      },
-    },
-  )
+  const timestampDocumentObjectKey = `documents/${crypto.randomUUID()}`
 
-  if (!storedTimestampObject) {
+  try {
+    await environment.DOCUMENT_STORAGE.put(
+      timestampDocumentObjectKey,
+      timestampFileDetails.file.stream(),
+      {
+        httpMetadata: {
+          contentType: timestampFileDetails.mimeType,
+        },
+      },
+    )
+  } catch (fileStorageError) {
+    console.error(
+      JSON.stringify({
+        error:
+          fileStorageError instanceof Error
+            ? fileStorageError.message
+            : String(fileStorageError),
+        message: 'Zaman damgası dosyası R2 arşivine kaydedilemedi.',
+        objectKey: timestampDocumentObjectKey,
+      }),
+    )
+
     throw new WorkerApiError(
       500,
       'FILE_STORAGE_FAILED',
@@ -183,7 +195,7 @@ const createTimestampTransaction = async (
   let createdTimestampDocument: DocumentDatabaseRecord
 
   try {
-    createdTimestampDocument = await createTimestampDocument(
+    createdTimestampDocument = await insertTimestampDocument(
       environment.DATABASE,
       authenticatedUser.userId,
       {
@@ -193,11 +205,25 @@ const createTimestampTransaction = async (
         fileName: timestampFileDetails.fileName,
         fileSize: timestampFileDetails.file.size,
         mimeType: timestampFileDetails.mimeType,
-        objectKey: storedObjectKey,
+        objectKey: timestampDocumentObjectKey,
       },
     )
   } catch (documentCreationError) {
-    await environment.DOCUMENT_STORAGE.delete(storedObjectKey)
+    try {
+      await environment.DOCUMENT_STORAGE.delete(timestampDocumentObjectKey)
+    } catch (fileCleanupError) {
+      console.error(
+        JSON.stringify({
+          error:
+            fileCleanupError instanceof Error
+              ? fileCleanupError.message
+              : String(fileCleanupError),
+          message:
+            'D1 kayıt hatasından sonra R2 dosyası temizlenemedi.',
+          objectKey: timestampDocumentObjectKey,
+        }),
+      )
+    }
 
     if (String(documentCreationError).includes('INSUFFICIENT_CREDITS')) {
       throw new WorkerApiError(

@@ -15,14 +15,16 @@ const dashboardMetricCardMeta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  title: 'Dashboard/DashboardMetricCard',
+  title: 'Bileşenler/Dashboard/Özet Kartı',
 } satisfies Meta<typeof DashboardMetricCard>
 
 export default dashboardMetricCardMeta
 
 type DashboardMetricCardStory = StoryObj<typeof dashboardMetricCardMeta>
 
-export const SignedDocuments: DashboardMetricCardStory = {}
+export const SignedDocuments: DashboardMetricCardStory = {
+  name: 'İmzalanan Belgeler',
+}
 
 export const AvailableCredits: DashboardMetricCardStory = {
   args: {
@@ -32,6 +34,7 @@ export const AvailableCredits: DashboardMetricCardStory = {
     tone: 'green',
     value: '18',
   },
+  name: 'Kullanılabilir Kontör',
 }
 
 export const ArchiveCapacity: DashboardMetricCardStory = {
@@ -43,4 +46,5 @@ export const ArchiveCapacity: DashboardMetricCardStory = {
     tone: 'blue',
     value: '430 MB',
   },
+  name: 'Arşiv Kapasitesi',
 }

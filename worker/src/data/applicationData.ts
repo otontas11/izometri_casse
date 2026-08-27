@@ -223,10 +223,10 @@ export const fetchTimestampJobs = async (
   return timestampDocumentRecords.map(mapTimestampJob)
 }
 
-export const createTimestampDocument = async (
+export const insertTimestampDocument = async (
   database: D1Database,
   authenticatedUserId: string,
-  documentDetails: {
+  timestampDocumentDetails: {
     completedAt: string
     createdAt: string
     creditCost: number
@@ -253,30 +253,29 @@ export const createTimestampDocument = async (
     )
     .bind(
       authenticatedUserId,
-      documentDetails.objectKey,
-      documentDetails.fileName,
-      documentDetails.fileSize,
-      documentDetails.mimeType,
-      documentDetails.creditCost,
-      documentDetails.createdAt,
-      documentDetails.completedAt,
+      timestampDocumentDetails.objectKey,
+      timestampDocumentDetails.fileName,
+      timestampDocumentDetails.fileSize,
+      timestampDocumentDetails.mimeType,
+      timestampDocumentDetails.creditCost,
+      timestampDocumentDetails.createdAt,
+      timestampDocumentDetails.completedAt,
     )
     .run()
-  const createdDocumentId = Number(documentInsertResult.meta.last_row_id)
-  const createdDocument = await database
-    .prepare('SELECT * FROM documents WHERE id = ? AND auth0_user_id = ?')
-    .bind(createdDocumentId, authenticatedUserId)
-    .first<DocumentDatabaseRecord>()
 
-  if (!createdDocument) {
-    throw new WorkerApiError(
-      500,
-      'DOCUMENT_CREATION_FAILED',
-      'Zaman damgası kaydı oluşturulamadı.',
-    )
-  }
-
-  return createdDocument
+  return {
+    auth0_user_id: authenticatedUserId,
+    completed_at: timestampDocumentDetails.completedAt,
+    created_at: timestampDocumentDetails.createdAt,
+    credit_cost: timestampDocumentDetails.creditCost,
+    file_name: timestampDocumentDetails.fileName,
+    file_size: timestampDocumentDetails.fileSize,
+    id: documentInsertResult.meta.last_row_id,
+    mime_type: timestampDocumentDetails.mimeType,
+    object_key: timestampDocumentDetails.objectKey,
+    operation: 'timestamp',
+    status: 'completed',
+  } satisfies DocumentDatabaseRecord
 }
 
 export const fetchOwnedDocument = async (
