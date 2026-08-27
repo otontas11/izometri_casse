@@ -121,7 +121,12 @@ export const useDashboardStore = defineStore('dashboard', () => {
     }
   }
 
+  const clearDocumentDeleteError = () => {
+    documentDeleteErrorMessage.value = ''
+  }
+
   return {
+    clearDocumentDeleteError,
     dashboardErrorMessage,
     dashboardRequestStatus,
     dashboardSummary,

@@ -102,23 +102,45 @@
                             :deleting-document-id="deletingDocumentId"
                             :downloading-document-id="downloadingDocumentId"
                             :previewing-document-id="previewingDocumentId"
-                            @delete="handleDocumentDelete"
+                            @delete="handleDocumentDeleteRequest"
                             @download="handleDocumentDownload"
                             @preview="handleDocumentPreview"
                             @send-email="handleDocumentEmailSend"
       />
     </template>
+
+    <ArchivedDocumentPreviewDrawer
+        :archived-document="selectedDocumentForPreview"
+        :document-content="previewDocumentContent"
+        :error-message="documentPreviewErrorMessage"
+        :is-loading="isSelectedDocumentPreviewLoading"
+        :is-open="isDocumentPreviewDrawerOpen"
+        @close="handleDocumentPreviewDrawerClose"
+        @download="handleDocumentDownload"
+        @retry="handleDocumentPreview"
+    />
+
+    <ArchivedDocumentDeleteModal
+        :archived-document="documentPendingDeletion"
+        :error-message="documentDeleteErrorMessage"
+        :is-deleting="isSelectedDocumentDeleting"
+        :is-open="isDocumentDeleteModalOpen"
+        @close="handleDocumentDeleteModalClose"
+        @confirm="handleDocumentDeleteConfirm"
+    />
   </section>
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted} from 'vue'
+import {computed, onMounted, ref, shallowRef} from 'vue'
 import {useAuth0} from '@auth0/auth0-vue'
 import {storeToRefs} from 'pinia'
 import {useI18n} from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import {useToast} from '@/composables/useToast'
+import ArchivedDocumentDeleteModal from '@/features/dashboard/components/ArchivedDocumentDeleteModal.vue'
+import ArchivedDocumentPreviewDrawer from '@/features/dashboard/components/ArchivedDocumentPreviewDrawer.vue'
 import DashboardMetricCard from '@/features/dashboard/components/DashboardMetricCard.vue'
 import DashboardQuickActionsPanel from '@/features/dashboard/components/DashboardQuickActionsPanel.vue'
 import RecentDocumentsTable from '@/features/dashboard/components/RecentDocumentsTable.vue'
@@ -143,7 +165,9 @@ const {
 const {user: authenticatedUser} = useAuth0()
 const {showErrorToast, showSuccessToast} = useToast()
 const {t} = useI18n({useScope: 'global'})
-const DOCUMENT_PREVIEW_URL_LIFETIME_MILLISECONDS = 60_000
+const selectedDocumentForPreview = ref<ArchivedDocument | null>(null)
+const documentPendingDeletion = ref<ArchivedDocument | null>(null)
+const previewDocumentContent = shallowRef<Blob | null>(null)
 
 const formatDashboardNumber = (dashboardNumber: number) =>
     new Intl.NumberFormat(getApplicationLocaleCode(), {
@@ -173,6 +197,22 @@ const authenticatedUserEmailAddress = computed(() => {
       ? auth0EmailAddress.trim()
       : t('dashboard.recentDocuments.registeredEmailAddress')
 })
+const isDocumentPreviewDrawerOpen = computed(
+    () => selectedDocumentForPreview.value !== null,
+)
+const isDocumentDeleteModalOpen = computed(
+    () => documentPendingDeletion.value !== null,
+)
+const isSelectedDocumentDeleting = computed(
+    () =>
+        documentPendingDeletion.value !== null &&
+        deletingDocumentId.value === documentPendingDeletion.value.id,
+)
+const isSelectedDocumentPreviewLoading = computed(
+    () =>
+        selectedDocumentForPreview.value !== null &&
+        previewingDocumentId.value === selectedDocumentForPreview.value.id,
+)
 const isInitialDashboardLoading = computed(
     () =>
         !dashboardSummary.value &&
@@ -243,51 +283,27 @@ const handleDocumentDownload = async (archivedDocument: ArchivedDocument) => {
   )
 }
 
-const openDocumentPreviewWindow = () => {
-  const documentPreviewWindow = window.open('', '_blank')
-
-  if (!documentPreviewWindow) {
-    return null
-  }
-
-  documentPreviewWindow.opener = null
-  documentPreviewWindow.document.title = t(
-      'dashboard.recentDocuments.previewWindowTitle',
-  )
-  documentPreviewWindow.document.body.textContent = t(
-      'dashboard.recentDocuments.previewLoading',
-  )
-
-  return documentPreviewWindow
-}
-
 const handleDocumentPreview = async (archivedDocument: ArchivedDocument) => {
-  const documentPreviewWindow = openDocumentPreviewWindow()
-
-  if (!documentPreviewWindow) {
-    showErrorToast(t('dashboard.recentDocuments.previewPopupBlocked'))
-    return
-  }
+  selectedDocumentForPreview.value = archivedDocument
+  previewDocumentContent.value = null
 
   const documentContent = await dashboardStore.previewArchivedDocument(
       archivedDocument.id,
   )
 
-  if (!documentContent) {
-    documentPreviewWindow.close()
-    showErrorToast(
-        documentPreviewErrorMessage.value ||
-        t('dashboard.recentDocuments.previewFailed'),
-    )
+  if (
+      selectedDocumentForPreview.value?.id !== archivedDocument.id ||
+      !documentContent
+  ) {
     return
   }
 
-  const documentPreviewUrl = URL.createObjectURL(documentContent)
-  documentPreviewWindow.location.replace(documentPreviewUrl)
-  window.setTimeout(
-      () => URL.revokeObjectURL(documentPreviewUrl),
-      DOCUMENT_PREVIEW_URL_LIFETIME_MILLISECONDS,
-  )
+  previewDocumentContent.value = documentContent
+}
+
+const handleDocumentPreviewDrawerClose = () => {
+  selectedDocumentForPreview.value = null
+  previewDocumentContent.value = null
 }
 
 const handleDocumentEmailSend = (archivedDocument: ArchivedDocument) => {
@@ -299,14 +315,24 @@ const handleDocumentEmailSend = (archivedDocument: ArchivedDocument) => {
   )
 }
 
-const handleDocumentDelete = async (archivedDocument: ArchivedDocument) => {
-  const shouldDeleteDocument = window.confirm(
-      t('dashboard.recentDocuments.deleteConfirmation', {
-        fileName: archivedDocument.name,
-      }),
-  )
+const handleDocumentDeleteRequest = (archivedDocument: ArchivedDocument) => {
+  dashboardStore.clearDocumentDeleteError()
+  documentPendingDeletion.value = archivedDocument
+}
 
-  if (!shouldDeleteDocument) {
+const handleDocumentDeleteModalClose = () => {
+  if (isSelectedDocumentDeleting.value) {
+    return
+  }
+
+  dashboardStore.clearDocumentDeleteError()
+  documentPendingDeletion.value = null
+}
+
+const handleDocumentDeleteConfirm = async () => {
+  const archivedDocument = documentPendingDeletion.value
+
+  if (!archivedDocument || isSelectedDocumentDeleting.value) {
     return
   }
 
@@ -315,11 +341,13 @@ const handleDocumentDelete = async (archivedDocument: ArchivedDocument) => {
   )
 
   if (!isDocumentDeleted) {
-    showErrorToast(
-        documentDeleteErrorMessage.value ||
-        t('dashboard.recentDocuments.deleteFailed'),
-    )
     return
+  }
+
+  documentPendingDeletion.value = null
+
+  if (selectedDocumentForPreview.value?.id === archivedDocument.id) {
+    handleDocumentPreviewDrawerClose()
   }
 
   showSuccessToast(

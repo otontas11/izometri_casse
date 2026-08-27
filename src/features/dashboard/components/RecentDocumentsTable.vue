@@ -119,11 +119,6 @@ onBeforeUnmount(() => {
       </caption>
       <thead>
         <tr class="recent-documents-table__column-headings">
-          <th scope="col">
-            <span class="visually-hidden">
-              {{ t('dashboard.recentDocuments.menuColumn') }}
-            </span>
-          </th>
           <th scope="col">{{ t('dashboard.recentDocuments.document') }}</th>
           <th scope="col">{{ t('dashboard.recentDocuments.operation') }}</th>
           <th scope="col">{{ t('dashboard.recentDocuments.date') }}</th>
@@ -137,53 +132,6 @@ onBeforeUnmount(() => {
           :key="archivedDocument.id"
           class="recent-documents-table__row"
         >
-          <td
-            class="recent-documents-table__menu-cell"
-            data-document-menu
-          >
-            <button
-              type="button"
-              class="recent-documents-table__menu-button"
-              :disabled="deletingDocumentId !== null"
-              aria-haspopup="menu"
-              :aria-expanded="openDocumentMenuId === archivedDocument.id"
-              :aria-controls="getDocumentMenuElementId(archivedDocument.id)"
-              :aria-label="
-                t('dashboard.recentDocuments.menuAriaLabel', {
-                  fileName: archivedDocument.name,
-                })
-              "
-              @click="handleDocumentMenuToggle(archivedDocument.id)"
-            >
-              <AppIcon name="more-horizontal" :size="19" />
-            </button>
-
-            <div
-              v-if="openDocumentMenuId === archivedDocument.id"
-              :id="getDocumentMenuElementId(archivedDocument.id)"
-              class="recent-documents-table__menu"
-              role="menu"
-            >
-              <button
-                type="button"
-                role="menuitem"
-                @click="handleDocumentEmailSend(archivedDocument)"
-              >
-                <AppIcon name="mail" :size="17" />
-                <span>{{ t('dashboard.recentDocuments.sendByEmail') }}</span>
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                class="recent-documents-table__delete-menu-button"
-                :disabled="deletingDocumentId !== null"
-                @click="handleDocumentDelete(archivedDocument)"
-              >
-                <AppIcon name="trash" :size="17" />
-                <span>{{ t('dashboard.recentDocuments.deleteDocument') }}</span>
-              </button>
-            </div>
-          </td>
           <td
             class="recent-documents-table__file"
             :data-label="t('dashboard.recentDocuments.document')"
@@ -241,10 +189,10 @@ onBeforeUnmount(() => {
                   fileName: archivedDocument.name,
                 })
               "
+              :title="t('dashboard.recentDocuments.previewTitle')"
               @click="handleDocumentPreview(archivedDocument)"
             >
               <AppIcon name="eye" :size="17" />
-              <span>{{ t('dashboard.recentDocuments.preview') }}</span>
             </button>
             <button
               type="button"
@@ -263,6 +211,56 @@ onBeforeUnmount(() => {
             >
               <AppIcon name="download" :size="18" />
             </button>
+
+            <div
+              class="recent-documents-table__action-menu"
+              data-document-menu
+            >
+              <button
+                type="button"
+                class="recent-documents-table__menu-button"
+                :disabled="deletingDocumentId !== null"
+                aria-haspopup="menu"
+                :aria-expanded="openDocumentMenuId === archivedDocument.id"
+                :aria-controls="getDocumentMenuElementId(archivedDocument.id)"
+                :aria-label="
+                  t('dashboard.recentDocuments.menuAriaLabel', {
+                    fileName: archivedDocument.name,
+                  })
+                "
+                @click="handleDocumentMenuToggle(archivedDocument.id)"
+              >
+                <AppIcon name="more-horizontal" :size="19" />
+              </button>
+
+              <div
+                v-if="openDocumentMenuId === archivedDocument.id"
+                :id="getDocumentMenuElementId(archivedDocument.id)"
+                class="recent-documents-table__menu"
+                role="menu"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  @click="handleDocumentEmailSend(archivedDocument)"
+                >
+                  <AppIcon name="mail" :size="17" />
+                  <span>{{ t('dashboard.recentDocuments.sendByEmail') }}</span>
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  class="recent-documents-table__delete-menu-button"
+                  :disabled="deletingDocumentId !== null"
+                  @click="handleDocumentDelete(archivedDocument)"
+                >
+                  <AppIcon name="trash" :size="17" />
+                  <span>
+                    {{ t('dashboard.recentDocuments.deleteDocument') }}
+                  </span>
+                </button>
+              </div>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -341,7 +339,7 @@ onBeforeUnmount(() => {
 .recent-documents-table__column-headings,
 .recent-documents-table__row {
   display: grid;
-  grid-template-columns: 2.5rem minmax(15rem, 2fr) minmax(8rem, 0.8fr) minmax(10rem, 1fr) minmax(5rem, 0.55fr) 8.5rem;
+  grid-template-columns: minmax(15rem, 2fr) minmax(8rem, 0.8fr) minmax(10rem, 1fr) minmax(5rem, 0.55fr) 7rem;
   gap: 1rem;
   align-items: center;
   padding-inline: 1.5rem;
@@ -378,8 +376,9 @@ onBeforeUnmount(() => {
   border-top: 1px solid var(--color-border);
 }
 
-.recent-documents-table__menu-cell {
+.recent-documents-table__action-menu {
   position: relative;
+  flex: 0 0 auto;
 }
 
 .recent-documents-table__menu-button {
@@ -395,6 +394,10 @@ onBeforeUnmount(() => {
   border-radius: 0.5rem;
 }
 
+.recent-documents-table__menu-button :deep(.app-icon) {
+  stroke-width: 3.4;
+}
+
 .recent-documents-table__menu-button:hover:not(:disabled),
 .recent-documents-table__menu-button[aria-expanded='true'] {
   color: var(--color-brand-950);
@@ -408,8 +411,8 @@ onBeforeUnmount(() => {
 
 .recent-documents-table__menu {
   position: absolute;
-  top: calc(100% + 0.4rem);
-  left: 0;
+  bottom: calc(100% + 0.4rem);
+  right: 0;
   z-index: 20;
   display: grid;
   width: 12rem;
@@ -515,9 +518,9 @@ onBeforeUnmount(() => {
 
 .recent-documents-table__actions > button {
   display: inline-flex;
-  gap: 0.35rem;
   align-items: center;
   justify-content: center;
+  width: 2rem;
   height: 2rem;
   padding: 0;
   color: var(--color-text-secondary);
@@ -527,14 +530,6 @@ onBeforeUnmount(() => {
   background: transparent;
   border: 0;
   border-radius: 0.5rem;
-}
-
-.recent-documents-table__actions > .recent-documents-table__preview-button {
-  padding-inline: 0.55rem;
-}
-
-.recent-documents-table__download-button {
-  width: 2rem;
 }
 
 .recent-documents-table__actions > button:hover:not(:disabled) {
@@ -592,10 +587,10 @@ onBeforeUnmount(() => {
 @media (max-width: 79.99rem) {
   .recent-documents-table__column-headings,
   .recent-documents-table__row {
-    grid-template-columns: 2.5rem minmax(13rem, 1.7fr) minmax(7rem, 0.8fr) minmax(9rem, 1fr) 8.5rem;
+    grid-template-columns: minmax(13rem, 1.7fr) minmax(7rem, 0.8fr) minmax(9rem, 1fr) 7rem;
   }
 
-  .recent-documents-table__column-headings > th:nth-child(5),
+  .recent-documents-table__column-headings > th:nth-child(4),
   .recent-documents-table__size-cell {
     display: none;
   }
@@ -613,26 +608,19 @@ onBeforeUnmount(() => {
 
   .recent-documents-table__row {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 0.85rem 1rem;
     padding-block: 1.1rem;
   }
 
-  .recent-documents-table__menu-cell {
-    grid-row: 1;
-    grid-column: 1;
-    align-self: center;
-  }
-
   .recent-documents-table__file {
-    grid-row: 1;
-    grid-column: 2 / -1;
+    grid-column: 1 / -1;
   }
 
   .recent-documents-table__date-cell,
   .recent-documents-table__size-cell {
     display: block;
-    grid-column: 2;
+    grid-column: 1;
     font-size: var(--font-size-small);
   }
 
@@ -645,22 +633,13 @@ onBeforeUnmount(() => {
   }
 
   .recent-documents-table__operation-cell {
-    grid-column: 2;
+    grid-column: 1;
   }
 
   .recent-documents-table__actions {
     grid-row: 2 / span 3;
-    grid-column: 3;
+    grid-column: 2;
     align-self: center;
-  }
-
-  .recent-documents-table__preview-button > span {
-    display: none;
-  }
-
-  .recent-documents-table__actions > .recent-documents-table__preview-button {
-    width: 2rem;
-    padding: 0;
   }
 }
 </style>
