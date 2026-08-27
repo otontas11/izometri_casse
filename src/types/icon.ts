@@ -5,7 +5,6 @@ export type AppIconName =
   | 'dashboard'
   | 'document'
   | 'download'
-  | 'eye'
   | 'menu'
   | 'profile'
   | 'refresh'

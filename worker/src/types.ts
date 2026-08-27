@@ -28,11 +28,10 @@ export interface DashboardSummary {
   totalSignedDocuments: number
 }
 
-export type DocumentOperation = 'signature' | 'timestamp'
-export type DocumentStatus = 'completed' | 'failed' | 'processing'
+type DocumentOperation = 'signature' | 'timestamp'
+type DocumentStatus = 'completed' | 'failed' | 'processing'
 
 export interface ArchivedDocument {
-  canPreview: boolean
   createdAt: string
   id: number
   name: string

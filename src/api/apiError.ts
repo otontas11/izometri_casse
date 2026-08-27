@@ -13,7 +13,7 @@ const apiErrorTranslationKeys: Record<string, string> = {
   TIMESTAMP_TRANSACTION_FAILED: 'errors.timestampTransactionFailed',
 }
 
-export class ApiRequestError extends Error {
+class ApiRequestError extends Error {
   readonly statusCode: number | null
   readonly errorCode: string | null
 

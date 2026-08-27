@@ -10,7 +10,6 @@ const { t } = useI18n({ useScope: 'global' })
 
 const notificationSymbols = {
   error: '!',
-  info: 'i',
   success: '✓',
   warning: '!',
 } as const

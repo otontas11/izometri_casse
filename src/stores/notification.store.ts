@@ -1,9 +1,9 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-export type NotificationVariant = 'error' | 'info' | 'success' | 'warning'
+export type NotificationVariant = 'error' | 'success' | 'warning'
 
-export interface AppNotification {
+interface AppNotification {
   id: number
   message: string
   variant: NotificationVariant
@@ -12,7 +12,7 @@ export interface AppNotification {
 interface ShowNotificationOptions {
   durationMilliseconds?: number
   message: string
-  variant?: NotificationVariant
+  variant: NotificationVariant
 }
 
 const DEFAULT_NOTIFICATION_DURATION_MILLISECONDS = 4_000
@@ -30,7 +30,7 @@ export const useNotificationStore = defineStore('notification', () => {
   const showNotification = ({
     durationMilliseconds = DEFAULT_NOTIFICATION_DURATION_MILLISECONDS,
     message,
-    variant = 'info',
+    variant,
   }: ShowNotificationOptions) => {
     const notificationId = nextNotificationId
     nextNotificationId += 1

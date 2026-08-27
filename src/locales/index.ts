@@ -3,7 +3,7 @@ import { createI18n } from 'vue-i18n'
 import englishMessages from './en.json'
 import turkishMessages from './tr.json'
 
-export const supportedApplicationLocales = ['tr', 'en'] as const
+const supportedApplicationLocales = ['tr', 'en'] as const
 export type SupportedApplicationLocale =
   (typeof supportedApplicationLocales)[number]
 
@@ -45,7 +45,7 @@ export const i18n = createI18n({
 
 document.documentElement.lang = initialApplicationLocale
 
-export const getApplicationLocale = () =>
+const getApplicationLocale = () =>
   i18n.global.locale.value as SupportedApplicationLocale
 
 export const getApplicationLocaleCode = () =>

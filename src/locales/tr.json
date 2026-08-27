@@ -8,10 +8,7 @@
   "common": {
     "appName": "İzİmza",
     "retry": "Tekrar dene",
-    "refresh": "Yenile",
-    "cancel": "Vazgeç",
-    "loading": "Yükleniyor…",
-    "credit": "kontör"
+    "cancel": "Vazgeç"
   },
   "routes": {
     "login": "Giriş",
@@ -128,7 +125,6 @@
       "secureArchiveDescription": "Sonuç belgeniz hesabınızda saklanır."
     },
     "recentDocuments": {
-      "previewPreparing": "{fileName} için güvenli önizleme hazırlanıyor.",
       "downloadRequested": "{fileName} için indirme isteği oluşturuldu.",
       "downloadFailed": "Belge indirilemedi. Lütfen tekrar deneyin.",
       "eyebrow": "Yakın geçmiş",
@@ -141,10 +137,7 @@
       "actions": "İşlemler",
       "electronicSignature": "E-imza",
       "timestamp": "Zaman damgası",
-      "previewAriaLabel": "{fileName} belgesini önizle",
       "downloadAriaLabel": "{fileName} belgesini indir",
-      "previewTitle": "Belgeyi önizle",
-      "previewUnavailableTitle": "Bu dosya türü önizlenemiyor",
       "downloadTitle": "Belgeyi indir",
       "emptyTitle": "Arşiviniz henüz boş",
       "emptyDescription": "İlk zaman damgası işleminiz tamamlandığında belgeniz burada görünür.",
@@ -308,10 +301,5 @@
     "apiUnavailable": "Fake API sunucusuna ulaşılamadı. `npm run api` komutunun çalıştığını kontrol edin.",
     "invalidTimestampTransaction": "Zaman damgalama için gönderilen dosya bilgileri geçersiz.",
     "timestampTransactionFailed": "Zaman damgalama işlemi tamamlanamadı."
-  },
-  "placeholder": {
-    "ready": "İskelet hazır",
-    "title": "Sayfa bileşenleri bir sonraki aşamada eklenecek.",
-    "description": "Route, responsive uygulama kabuğu ve temel tasarım token’ları kullanıma hazır."
   }
 }

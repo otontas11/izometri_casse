@@ -9,9 +9,9 @@ withDefaults(
     detail: string
     icon: AppIconName
     label: string
+    metricValue: string
     progress?: number
     tone: 'blue' | 'green' | 'navy' | 'violet'
-    value: string
   }>(),
   {
     progress: undefined,
@@ -30,7 +30,7 @@ const { t } = useI18n({ useScope: 'global' })
       <span class="dashboard-metric-card__label">{{ label }}</span>
     </div>
 
-    <strong class="dashboard-metric-card__value">{{ value }}</strong>
+    <strong class="dashboard-metric-card__value">{{ metricValue }}</strong>
 
     <div class="dashboard-metric-card__footer">
       <span>{{ detail }}</span>

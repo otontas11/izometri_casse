@@ -3,7 +3,7 @@ import { formatFileSize } from '@/utils/formatters'
 
 export const MAX_TIMESTAMP_FILE_SIZE_BYTES = 25 * 1024 * 1024
 
-export type TimestampFileValidationResult =
+type TimestampFileValidationResult =
   | { isValid: true }
   | { errorMessage: string; isValid: false }
 

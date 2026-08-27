@@ -3,7 +3,6 @@ import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
-import { useToast } from '@/composables/useToast'
 import type {
   ArchivedDocument,
   DocumentOperation,
@@ -19,24 +18,11 @@ const emit = defineEmits<{
   download: [archivedDocument: ArchivedDocument]
 }>()
 
-const { showInfoToast } = useToast()
 const { t } = useI18n({ useScope: 'global' })
 
 const documentOperationTranslationKeys: Record<DocumentOperation, string> = {
   signature: 'dashboard.recentDocuments.electronicSignature',
   timestamp: 'dashboard.recentDocuments.timestamp',
-}
-
-const handleDocumentPreview = (archivedDocument: ArchivedDocument) => {
-  if (!archivedDocument.canPreview) {
-    return
-  }
-
-  showInfoToast(
-    t('dashboard.recentDocuments.previewPreparing', {
-      fileName: archivedDocument.name,
-    }),
-  )
 }
 
 const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
@@ -132,23 +118,6 @@ const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
             class="recent-documents-table__actions"
             :data-label="t('dashboard.recentDocuments.actions')"
           >
-            <button
-              type="button"
-              :disabled="!archivedDocument.canPreview"
-              :aria-label="
-                t('dashboard.recentDocuments.previewAriaLabel', {
-                  fileName: archivedDocument.name,
-                })
-              "
-              :title="
-                archivedDocument.canPreview
-                  ? t('dashboard.recentDocuments.previewTitle')
-                  : t('dashboard.recentDocuments.previewUnavailableTitle')
-              "
-              @click="handleDocumentPreview(archivedDocument)"
-            >
-              <AppIcon name="eye" :size="18" />
-            </button>
             <button
               type="button"
               :disabled="downloadingDocumentId !== null"

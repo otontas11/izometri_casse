@@ -97,7 +97,15 @@ export const validateAuth0AccessToken = async (
       userId: accessTokenPayload.sub,
     }
   } catch (tokenValidationError) {
-    console.warn('Auth0 access token doğrulanamadı.', tokenValidationError)
+    console.warn(
+      JSON.stringify({
+        error:
+          tokenValidationError instanceof Error
+            ? tokenValidationError.message
+            : String(tokenValidationError),
+        message: 'Auth0 access token doğrulanamadı.',
+      }),
+    )
 
     throw new WorkerApiError(
       401,

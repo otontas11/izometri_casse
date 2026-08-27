@@ -20,7 +20,6 @@ const iconPaths: Record<AppIconName, string> = {
   dashboard: 'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z',
   document: 'M6 2h8l4 4v16H6zM14 2v5h5M9 12h6M9 16h6',
   download: 'M12 3v12m0 0 4-4m-4 4-4-4M5 21h14',
-  eye: 'M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
   menu: 'M4 7h16M4 12h16M4 17h16',
   profile: 'M20 21a8 8 0 0 0-16 0M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z',
   refresh: 'M20 7v5h-5M4 17v-5h5M18.5 9a7 7 0 0 0-12-2M5.5 15a7 7 0 0 0 12 2',
@@ -31,7 +30,7 @@ const iconPaths: Record<AppIconName, string> = {
   wallet: 'M3 6h16v14H3zM3 9h17a2 2 0 0 1 2 2v5h-6a3 3 0 0 1 0-6h6',
 }
 
-const path = computed(() => iconPaths[props.name])
+const selectedIconPath = computed(() => iconPaths[props.name])
 </script>
 
 <template>
@@ -47,6 +46,6 @@ const path = computed(() => iconPaths[props.name])
     stroke-linejoin="round"
     aria-hidden="true"
   >
-    <path :d="path" />
+    <path :d="selectedIconPath" />
   </svg>
 </template>

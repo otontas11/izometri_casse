@@ -150,7 +150,6 @@ export const useTimestampStore = defineStore('timestamp', () => {
     timestampJobs,
     timestampJobsLoadStatus,
     timestampSubmissionErrorMessage,
-    timestampSubmissionStatus,
     timestampSubmissionSuccessMessage,
   }
 })

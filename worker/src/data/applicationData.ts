@@ -29,7 +29,6 @@ const mapProfileDatabaseRecord = (
 const mapArchivedDocument = (
   documentRecord: DocumentDatabaseRecord,
 ): ArchivedDocument => ({
-  canPreview: documentRecord.mime_type === 'application/pdf',
   createdAt: documentRecord.created_at,
   id: documentRecord.id,
   name: documentRecord.file_name,

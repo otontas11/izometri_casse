@@ -49,4 +49,4 @@ export default {
       return createErrorResponse(requestError, corsHeaders)
     }
   },
-}
+} satisfies ExportedHandler<Env>

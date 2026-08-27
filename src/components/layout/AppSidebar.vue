@@ -4,7 +4,13 @@ import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
-import type { NavigationItem } from '@/types/navigation'
+import type { AppIconName } from '@/types/icon'
+
+interface SidebarNavigationItem {
+  icon: AppIconName
+  label: string
+  routeName: 'dashboard' | 'profile' | 'timestamp'
+}
 
 const props = defineProps<{
   isOpen: boolean
@@ -19,7 +25,7 @@ const sidebarElement = ref<HTMLElement | null>(null)
 const sidebarCloseButtonElement = ref<HTMLButtonElement | null>(null)
 const { t } = useI18n({ useScope: 'global' })
 
-const navigationItems = computed<NavigationItem[]>(() => [
+const sidebarNavigationItems = computed<SidebarNavigationItem[]>(() => [
   {
     label: t('layout.sidebar.dashboard'),
     icon: 'dashboard',
@@ -138,14 +144,14 @@ watch(
       :aria-label="t('layout.sidebar.navigationAriaLabel')"
     >
       <RouterLink
-        v-for="item in navigationItems"
-        :key="item.routeName"
+        v-for="navigationItem in sidebarNavigationItems"
+        :key="navigationItem.routeName"
         class="app-sidebar__link"
-        :to="{ name: item.routeName }"
+        :to="{ name: navigationItem.routeName }"
         @click="emit('navigate')"
       >
-        <AppIcon :name="item.icon" :size="21" />
-        <span>{{ item.label }}</span>
+        <AppIcon :name="navigationItem.icon" :size="21" />
+        <span>{{ navigationItem.label }}</span>
       </RouterLink>
     </nav>
 

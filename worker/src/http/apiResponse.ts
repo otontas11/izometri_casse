@@ -88,7 +88,15 @@ export const createErrorResponse = (
     )
   }
 
-  console.error('Cloudflare Worker isteği tamamlanamadı.', requestError)
+  console.error(
+    JSON.stringify({
+      error:
+        requestError instanceof Error
+          ? requestError.message
+          : String(requestError),
+      message: 'Cloudflare Worker isteği tamamlanamadı.',
+    }),
+  )
 
   return createJsonResponse(
     {

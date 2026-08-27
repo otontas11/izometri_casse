@@ -21,9 +21,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const isDashboardLoading = computed(
     () => dashboardRequestStatus.value === 'loading',
   )
-  const isDashboardReady = computed(
-    () => dashboardRequestStatus.value === 'success',
-  )
 
   const fetchDashboardData = async () => {
     if (isDashboardLoading.value) {
@@ -34,10 +31,11 @@ export const useDashboardStore = defineStore('dashboard', () => {
     dashboardErrorMessage.value = ''
 
     try {
-      const [dashboardSummaryResponse, recentDocumentsResponse] = await Promise.all([
-        dashboardApi.fetchDashboardSummary(),
-        dashboardApi.fetchRecentDocuments(),
-      ])
+      const [dashboardSummaryResponse, recentDocumentsResponse] =
+        await Promise.all([
+          dashboardApi.fetchDashboardSummary(),
+          dashboardApi.fetchRecentDocuments(),
+        ])
 
       dashboardSummary.value = dashboardSummaryResponse
       recentDocuments.value = recentDocumentsResponse
@@ -46,10 +44,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
       dashboardRequestStatus.value = 'error'
       dashboardErrorMessage.value = getApiErrorMessage(requestError)
     }
-  }
-
-  const clearDashboardError = () => {
-    dashboardErrorMessage.value = ''
   }
 
   const downloadArchivedDocument = async (documentId: number) => {
@@ -81,7 +75,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
   }
 
   return {
-    clearDashboardError,
     dashboardErrorMessage,
     dashboardRequestStatus,
     dashboardSummary,
@@ -90,7 +83,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
     downloadingDocumentId,
     fetchDashboardData,
     isDashboardLoading,
-    isDashboardReady,
     recentDocuments,
     synchronizeDashboardAfterTimestamp,
   }

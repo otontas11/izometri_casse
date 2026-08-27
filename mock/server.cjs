@@ -39,8 +39,8 @@ const getNextNumericRecordId = (records) =>
       : largestRecordId
   }, 0) + 1
 
-const isNonEmptyString = (value) =>
-  typeof value === 'string' && value.trim().length > 0
+const isNonEmptyString = (stringCandidate) =>
+  typeof stringCandidate === 'string' && stringCandidate.trim().length > 0
 
 const isValidTimestampTransactionPayload = (requestPayload) =>
   requestPayload &&
@@ -89,7 +89,6 @@ const createTimestampTransaction = (requestPayload) => {
   }
   const archivedDocument = {
     id: getNextNumericRecordId(archivedDocuments),
-    canPreview: normalizedMimeType === 'application/pdf',
     createdAt: transactionDate,
     name: timestampJob.fileName,
     operation: 'timestamp',

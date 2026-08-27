@@ -318,10 +318,7 @@ export const routeAuthenticatedRequest = async (
     return createJsonResponse(recentDocuments, 200, corsHeaders)
   }
 
-  if (
-    request.method === 'GET' &&
-    ['/timestamp-jobs', '/timestampJobs'].includes(requestPathname)
-  ) {
+  if (request.method === 'GET' && requestPathname === '/timestampJobs') {
     const timestampJobs = await fetchTimestampJobs(
       environment.DATABASE,
       authenticatedUser.userId,

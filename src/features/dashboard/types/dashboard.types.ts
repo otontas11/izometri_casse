@@ -14,5 +14,4 @@ export interface ArchivedDocument {
   createdAt: string
   operation: DocumentOperation
   sizeBytes: number
-  canPreview: boolean
 }

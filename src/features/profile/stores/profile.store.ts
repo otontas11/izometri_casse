@@ -87,7 +87,6 @@ export const useProfileStore = defineStore('profile', () => {
     profileLoadErrorMessage,
     profileLoadStatus,
     profileSaveErrorMessage,
-    profileSaveStatus,
     profileSaveSuccessMessage,
     updateUserProfile,
     userProfile,

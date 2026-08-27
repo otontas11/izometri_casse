@@ -14,7 +14,7 @@
 		}
 	},
 	"vars": {
-		"ALLOWED_ORIGINS": "http://localhost:5173,http://localhost:6006",
+		"ALLOWED_ORIGINS": "http://localhost:5173",
 		"AUTH0_AUDIENCE": "https://izimza-case-api",
 		"AUTH0_DOMAIN": "dev-tnts.us.auth0.com"
 	},

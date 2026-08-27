@@ -7,8 +7,8 @@ const dashboardMetricCardMeta = {
     detail: 'Tüm zamanlardaki işlemler',
     icon: 'signature',
     label: 'İmzalanan belge',
+    metricValue: '8',
     tone: 'navy',
-    value: '8',
   },
   component: DashboardMetricCard,
   parameters: {
@@ -31,8 +31,8 @@ export const AvailableCredits: DashboardMetricCardStory = {
     detail: 'Her zaman damgası 1 kontör',
     icon: 'wallet',
     label: 'Kullanılabilir kontör',
+    metricValue: '18',
     tone: 'green',
-    value: '18',
   },
   name: 'Kullanılabilir Kontör',
 }
@@ -42,9 +42,9 @@ export const ArchiveCapacity: DashboardMetricCardStory = {
     detail: '1 GB toplam alan',
     icon: 'storage',
     label: 'Arşiv kapasitesi',
+    metricValue: '430 MB',
     progress: 42,
     tone: 'blue',
-    value: '430 MB',
   },
   name: 'Arşiv Kapasitesi',
 }

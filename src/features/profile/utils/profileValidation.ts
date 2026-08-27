@@ -3,7 +3,7 @@ import { translate } from '@/locales'
 import type { UpdateProfilePayload } from '../types/profile.types'
 
 export type ProfileEditableFieldName = keyof UpdateProfilePayload
-export type ProfileFormErrors = Record<ProfileEditableFieldName, string>
+type ProfileFormErrors = Record<ProfileEditableFieldName, string>
 
 const PROFILE_NAME_MINIMUM_LENGTH = 2
 const PROFILE_NAME_MAXIMUM_LENGTH = 50

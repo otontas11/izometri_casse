@@ -8,10 +8,7 @@
   "common": {
     "appName": "İzİmza",
     "retry": "Try again",
-    "refresh": "Refresh",
-    "cancel": "Cancel",
-    "loading": "Loading…",
-    "credit": "credit"
+    "cancel": "Cancel"
   },
   "routes": {
     "login": "Sign In",
@@ -128,7 +125,6 @@
       "secureArchiveDescription": "Your resulting document is stored in your account."
     },
     "recentDocuments": {
-      "previewPreparing": "A secure preview is being prepared for {fileName}.",
       "downloadRequested": "A download request was created for {fileName}.",
       "downloadFailed": "The document could not be downloaded. Please try again.",
       "eyebrow": "Recent activity",
@@ -141,10 +137,7 @@
       "actions": "Actions",
       "electronicSignature": "E-signature",
       "timestamp": "Timestamp",
-      "previewAriaLabel": "Preview {fileName}",
       "downloadAriaLabel": "Download {fileName}",
-      "previewTitle": "Preview document",
-      "previewUnavailableTitle": "This file type cannot be previewed",
       "downloadTitle": "Download document",
       "emptyTitle": "Your archive is empty",
       "emptyDescription": "Your document will appear here after your first timestamp transaction is completed.",
@@ -308,10 +301,5 @@
     "apiUnavailable": "The fake API server could not be reached. Make sure `npm run api` is running.",
     "invalidTimestampTransaction": "The file information submitted for timestamping is invalid.",
     "timestampTransactionFailed": "The timestamp transaction could not be completed."
-  },
-  "placeholder": {
-    "ready": "Skeleton ready",
-    "title": "Page components will be added in the next step.",
-    "description": "The routes, responsive application shell, and core design tokens are ready."
   }
 }

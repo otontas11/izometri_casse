@@ -12,24 +12,21 @@
       "name": "tedarik-sozlesmesi-2026.pdf",
       "createdAt": "2026-08-25T20:42:00.000Z",
       "operation": "timestamp",
-      "sizeBytes": 842752,
-      "canPreview": true
+      "sizeBytes": 842752
     },
     {
       "id": 2,
       "name": "fatura-arsivi-agustos.zip",
       "createdAt": "2026-08-25T20:21:00.000Z",
       "operation": "timestamp",
-      "sizeBytes": 1456128,
-      "canPreview": false
+      "sizeBytes": 1456128
     },
     {
       "id": 3,
       "name": "teklif-formu.pdf",
       "createdAt": "2026-08-24T12:16:00.000Z",
       "operation": "signature",
-      "sizeBytes": 524288,
-      "canPreview": true
+      "sizeBytes": 524288
     }
   ],
   "profile": {

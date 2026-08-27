@@ -208,28 +208,34 @@ onMounted(() => {
       >
         <DashboardMetricCard
           :label="t('dashboard.metrics.signedDocuments')"
-          :value="formatDashboardNumber(dashboardSummary.totalSignedDocuments)"
+          :metric-value="
+            formatDashboardNumber(dashboardSummary.totalSignedDocuments)
+          "
           :detail="t('dashboard.metrics.signedDocumentsDetail')"
           icon="signature"
           tone="navy"
         />
         <DashboardMetricCard
           :label="t('dashboard.metrics.archivedDocuments')"
-          :value="formatDashboardNumber(dashboardSummary.archivedDocumentCount)"
+          :metric-value="
+            formatDashboardNumber(dashboardSummary.archivedDocumentCount)
+          "
           :detail="t('dashboard.metrics.archivedDocumentsDetail')"
           icon="archive"
           tone="violet"
         />
         <DashboardMetricCard
           :label="t('dashboard.metrics.availableCredits')"
-          :value="formatDashboardNumber(dashboardSummary.remainingCredits)"
+          :metric-value="
+            formatDashboardNumber(dashboardSummary.remainingCredits)
+          "
           :detail="t('dashboard.metrics.availableCreditsDetail')"
           icon="wallet"
           tone="green"
         />
         <DashboardMetricCard
           :label="t('dashboard.metrics.archiveCapacity')"
-          :value="formatStorageSize(dashboardSummary.storageUsedMb)"
+          :metric-value="formatStorageSize(dashboardSummary.storageUsedMb)"
           :detail="
             t('dashboard.metrics.totalStorage', {
               size: formatStorageSize(dashboardSummary.storageLimitMb),
