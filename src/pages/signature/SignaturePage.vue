@@ -14,12 +14,13 @@ const signatureStore = useSignatureStore()
 const { dashboardRequestStatus, dashboardSummary } =
   storeToRefs(dashboardStore)
 const {
-  canSubmitSignatureFiles,
-  isSignatureSubmitting,
+  canProcessSignatureFiles,
+  canUploadSignatureFiles,
+  isSignatureActionInProgress,
+  signatureActionErrorMessage,
+  signatureActionSuccessMessage,
   signatureFiles,
   signatureFileValidationErrorMessage,
-  signatureSubmissionErrorMessage,
-  signatureSubmissionSuccessMessage,
 } = storeToRefs(signatureStore)
 const { showErrorToast, showSuccessToast, showWarningToast } = useToast()
 const { t } = useI18n({ useScope: 'global' })
@@ -34,7 +35,7 @@ const hasAvailableSignatureCredits = computed(
 )
 const canStartSignatureTransaction = computed(
   () =>
-    canSubmitSignatureFiles.value &&
+    canProcessSignatureFiles.value &&
     hasAvailableSignatureCredits.value,
 )
 
@@ -43,29 +44,46 @@ const handleSignatureFilesAdded = (signatureFiles: File[]) => {
 }
 
 const handleSignatureFileRemoval = (signatureFileId: string) => {
-  signatureStore.removeSignatureFile(signatureFileId)
+  void signatureStore.removeSignatureFile(signatureFileId)
 }
 
 const handleSignaturePageClear = () => {
-  signatureStore.clearSignaturePage()
+  void signatureStore.clearSignaturePage()
+}
+
+const handleSignatureUploadRequest = async () => {
+  const areFilesUploaded = await signatureStore.uploadSignatureFiles()
+
+  if (areFilesUploaded) {
+    showSuccessToast(signatureActionSuccessMessage.value)
+    return
+  }
+
+  showErrorToast(
+    signatureActionErrorMessage.value ||
+      t('signature.feedback.uploadFailure', {
+        failedCount: 1,
+        uploadedCount: 0,
+      }),
+  )
 }
 
 const handleSignatureRequest = async () => {
   if (!hasAvailableSignatureCredits.value) {
     signatureStore.reportInsufficientSignatureCredits()
-    showWarningToast(signatureSubmissionErrorMessage.value)
+    showWarningToast(signatureActionErrorMessage.value)
     return
   }
 
-  const areSignaturesCreated = await signatureStore.submitSignatureFiles()
+  const areSignaturesCreated = await signatureStore.processSignatureFiles()
 
   if (areSignaturesCreated) {
-    showSuccessToast(signatureSubmissionSuccessMessage.value)
+    showSuccessToast(signatureActionSuccessMessage.value)
     return
   }
 
   showErrorToast(
-    signatureSubmissionErrorMessage.value ||
+    signatureActionErrorMessage.value ||
       t('signature.feedback.transactionFailed'),
   )
 }
@@ -74,6 +92,8 @@ onMounted(() => {
   if (dashboardRequestStatus.value === 'idle') {
     void dashboardStore.fetchDashboardData()
   }
+
+  void signatureStore.loadUploadedSignatureFiles()
 })
 </script>
 
@@ -121,7 +141,7 @@ onMounted(() => {
         <button
           class="signature-page__clear-button"
           type="button"
-          :disabled="isSignatureSubmitting"
+          :disabled="isSignatureActionInProgress"
           @click="handleSignaturePageClear"
         >
           <AppIcon name="refresh" :size="18" />
@@ -141,31 +161,33 @@ onMounted(() => {
     </aside>
 
     <p
-      v-if="signatureSubmissionSuccessMessage"
+      v-if="signatureActionSuccessMessage"
       class="signature-page__feedback signature-page__feedback--success"
       role="status"
     >
       <span aria-hidden="true">✓</span>
-      {{ signatureSubmissionSuccessMessage }}
+      {{ signatureActionSuccessMessage }}
     </p>
 
     <p
-      v-if="signatureSubmissionErrorMessage"
+      v-if="signatureActionErrorMessage"
       class="signature-page__feedback signature-page__feedback--error"
       role="alert"
     >
       <span aria-hidden="true">!</span>
-      {{ signatureSubmissionErrorMessage }}
+      {{ signatureActionErrorMessage }}
     </p>
 
     <SignatureFileWorkspace
-      :can-submit="canStartSignatureTransaction"
+      :can-process="canStartSignatureTransaction"
+      :can-upload="canUploadSignatureFiles"
       :file-validation-error-message="signatureFileValidationErrorMessage"
-      :is-submitting="isSignatureSubmitting"
+      :is-busy="isSignatureActionInProgress"
       :signature-files="signatureFiles"
       @add-files="handleSignatureFilesAdded"
       @remove-file="handleSignatureFileRemoval"
       @request-signature="handleSignatureRequest"
+      @request-upload="handleSignatureUploadRequest"
     />
   </section>
 </template>

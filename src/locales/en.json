@@ -105,7 +105,7 @@
       "archivedDocuments": "Archived records",
       "archivedDocumentsDetail": "Documents stored securely",
       "availableCredits": "Available credits",
-      "availableCreditsDetail": "Each timestamp costs 1 credit",
+      "availableCreditsDetail": "Each signature and timestamp costs 1 credit",
       "archiveCapacity": "Archive capacity",
       "totalStorage": "{size} total storage",
       "archiveUsageAriaLabel": "Archive storage usage"
@@ -146,11 +146,18 @@
       "createFirst": "Create first transaction"
     }
   },
+  "draftFiles": {
+    "validation": {
+      "emptyFile": "Empty files cannot be uploaded.",
+      "fileTooLarge": "The file size cannot exceed {maximumSize}.",
+      "unsupportedFileType": "Only PDF, Word, XML, UBL, and image files are allowed."
+    }
+  },
   "signature": {
     "page": {
       "eyebrow": "Secure signature center",
       "title": "Sign",
-      "description": "Select your files and create signature records associated with your account in the secure archive.",
+      "description": "Upload your files to the secure area for free, then select the files you want to sign.",
       "clear": "Clear page",
       "transactionCost": "Transaction cost",
       "costPerFile": "1 credit / file",
@@ -158,7 +165,7 @@
       "availableCredits": "Available credits: {count}",
       "noAvailableCredits": "No credits available",
       "simulationTitle": "Case simulation",
-      "simulationDescription": "This flow does not produce a qualified electronic signature. It stores the file in R2 and creates a user-owned signature transaction record in D1."
+      "simulationDescription": "Uploading is free and stores the file in R2. Signing creates a D1 transaction record and uses 1 credit per file."
     },
     "workspace": {
       "inputAriaLabel": "Select files to sign",
@@ -166,32 +173,39 @@
       "uploadTitle": "Drop your files here",
       "uploadDescription": "Drag and drop one or more files or select them from your device. Each file is displayed as a separate card.",
       "selectFromDevice": "Select files from device",
-      "requirements": "Images, MP3, UDF, and PDF · Maximum {maximumSize} per file",
+      "requirements": "PDF, Word, XML, UBL, and images · Maximum {maximumSize} per file",
       "listEyebrow": "Upload queue",
       "listTitle": "Selected files",
       "selectedFileCount": "{count} files",
       "progressAriaLabel": "Upload progress for {fileName}",
       "removeAriaLabel": "Remove {fileName}",
+      "uploadFiles": "Upload files",
       "signFiles": "Sign files",
-      "signingFiles": "Signing files…",
       "status": {
-        "pending": "Pending",
+        "selected": "Selected",
         "uploading": "Uploading",
-        "completed": "Completed",
-        "error": "Error"
+        "uploaded": "Draft uploaded",
+        "processing": "Signing",
+        "completed": "Signed",
+        "upload-error": "Upload error",
+        "process-error": "Signing error",
+        "deleting": "Deleting"
       }
     },
     "validation": {
-      "emptyFile": "Empty files cannot be submitted for signing.",
-      "fileTooLarge": "The file size cannot exceed {maximumSize}.",
-      "unsupportedFileType": "Only image, MP3, UDF, and PDF files are allowed.",
       "fileError": "{fileName}: {message}"
     },
     "feedback": {
-      "selectFiles": "Select at least one file to continue with signing.",
+      "draftDeleted": "The draft file was deleted from the secure area.",
+      "clearFailure": "Some draft files could not be deleted. Review the errors on the file cards.",
+      "selectFilesToUpload": "Select at least one file to upload.",
+      "uploadSuccess": "{count} files were uploaded to the secure area for free.",
+      "uploadPartialFailure": "{uploadedCount} files were uploaded; {failedCount} files failed to upload.",
+      "uploadFailure": "{failedCount} files could not be uploaded. Review the errors on the file cards.",
+      "uploadFilesBeforeSigning": "Upload the selected files before signing them.",
       "batchSuccess": "Signature records were created for {count} files. One credit was used for each file.",
-      "partialFailure": "{completedCount} files completed and used {completedCount} credits; {failedCount} files failed.",
-      "batchFailure": "{count} files could not be uploaded. Review the errors on the file cards and try again.",
+      "partialFailure": "{completedCount} files were signed and used {completedCount} credits; {failedCount} files could not be processed.",
+      "batchFailure": "{count} files could not be signed. Review the errors on the file cards and try again.",
       "transactionFailed": "The signature transaction could not be completed. Please try again."
     }
   },
@@ -208,7 +222,7 @@
       "guideEyebrow": "Complete in three steps",
       "guideTitle": "From your file to a verification record",
       "selectFile": "Select your file",
-      "selectFileDescription": "Add one file up to {maximumSize}.",
+      "selectFileDescription": "Select and upload one file up to {maximumSize} for free.",
       "confirmInformation": "Confirm the information",
       "confirmInformationDescription": "Review the file name, size, and credit cost.",
       "followRecord": "Track the record",
@@ -225,13 +239,26 @@
       "description": "Drag and drop your file or select it from your device. You can review the file information before continuing.",
       "selectAnother": "Select another file",
       "selectFromDevice": "Select from device",
-      "requirements": "All file types are supported · Maximum {maximumSize}",
+      "draftStored": "Draft stored securely",
+      "requirements": "PDF, Word, XML, UBL, and images · Maximum {maximumSize}",
       "selectedFileAriaLabel": "Selected file",
-      "ready": "Ready to process",
       "removeAriaLabel": "Remove {fileName}",
+      "progressAriaLabel": "Upload progress for {fileName}",
+      "uploadCost": "Upload cost",
+      "free": "Free",
+      "uploadFile": "Upload file",
       "transactionCost": "Transaction cost",
       "oneCredit": "1 credit",
-      "continue": "Continue to timestamp"
+      "continue": "Continue to timestamp",
+      "status": {
+        "selected": "Selected",
+        "uploading": "Uploading",
+        "uploaded": "Draft uploaded",
+        "processing": "Timestamping",
+        "upload-error": "Upload error",
+        "process-error": "Timestamp error",
+        "deleting": "Deleting"
+      }
     },
     "modal": {
       "eyebrow": "Final review",
@@ -264,13 +291,11 @@
       "emptyTitle": "No timestamp records yet",
       "emptyDescription": "Your verification record will appear here after your first transaction is completed."
     },
-    "validation": {
-      "emptyFile": "Empty files cannot be timestamped.",
-      "fileTooLarge": "The file size cannot exceed {maximumSize}."
-    },
     "feedback": {
-      "endpointMissing": "The timestamp service was not found. Stop the fake API and restart it with npm run api.",
-      "selectFile": "Select a file to continue with timestamping.",
+      "draftDeleted": "The draft file was deleted from the secure area.",
+      "selectFileToUpload": "Select a file to upload.",
+      "uploadSuccess": "{fileName} was uploaded to the secure area for free.",
+      "uploadFileBeforeTimestamping": "Upload the selected file before timestamping it.",
       "success": "{fileName} was timestamped successfully. 1 credit was used."
     }
   },
@@ -352,8 +377,17 @@
     "insufficientCredits": "You do not have enough credits for this transaction.",
     "invalidSignatureTransaction": "The file information submitted for signing is invalid.",
     "signatureTransactionFailed": "The signature transaction could not be completed.",
-    "unsupportedSignatureFileType": "Only image, MP3, UDF, and PDF files are allowed.",
+    "unsupportedSignatureFileType": "Only PDF, Word, XML, UBL, and image files are allowed.",
     "invalidTimestampTransaction": "The file information submitted for timestamping is invalid.",
-    "timestampTransactionFailed": "The timestamp transaction could not be completed."
+    "timestampTransactionFailed": "The timestamp transaction could not be completed.",
+    "invalidDraftFileUpload": "The file information submitted for upload is invalid.",
+    "invalidDraftFileOperation": "The selected operation for this file is invalid.",
+    "draftFileTooLarge": "The file size cannot exceed 25 MB.",
+    "unsupportedDraftFileType": "Only PDF, Word, XML, UBL, and image files are allowed.",
+    "draftFileUploadFailed": "The file could not be uploaded to the secure area.",
+    "draftFileNotAvailable": "The draft file was not found or has already been processed.",
+    "draftFileContentNotFound": "The draft file content was not found in secure storage.",
+    "draftFileAlreadyProcessed": "This draft file has already been processed.",
+    "draftFileDeleteFailed": "The draft file could not be deleted. Please try again."
   }
 }

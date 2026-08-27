@@ -2,7 +2,7 @@
   "dashboard": {
     "totalSignedDocuments": 1,
     "archivedDocumentCount": 3,
-    "remainingCredits": 18,
+    "remainingCredits": 17,
     "storageUsedMb": 2.69,
     "storageLimitMb": 1024
   },
@@ -16,7 +16,7 @@
     },
     {
       "id": 2,
-      "name": "fatura-arsivi-agustos.zip",
+      "name": "fatura-arsivi-agustos.xml",
       "createdAt": "2026-08-25T20:21:00.000Z",
       "operation": "timestamp",
       "sizeBytes": 1456128
@@ -29,6 +29,7 @@
       "sizeBytes": 524288
     }
   ],
+  "draftFiles": [],
   "profile": {
     "id": "current-user",
     "firstName": "Oktay",
@@ -50,9 +51,9 @@
     },
     {
       "id": 2,
-      "fileName": "fatura-arsivi-agustos.zip",
+      "fileName": "fatura-arsivi-agustos.xml",
       "fileSize": 1456128,
-      "mimeType": "application/zip",
+      "mimeType": "application/xml",
       "status": "completed",
       "creditCost": 1,
       "createdAt": "2026-08-25T20:21:00.000Z",

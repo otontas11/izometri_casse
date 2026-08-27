@@ -8,11 +8,23 @@ interface ApiErrorPayload {
 }
 
 const apiErrorTranslationKeys: Record<string, string> = {
+  DRAFT_FILE_ALREADY_PROCESSED: 'errors.draftFileAlreadyProcessed',
+  DRAFT_FILE_CONTENT_NOT_FOUND: 'errors.draftFileContentNotFound',
+  DRAFT_FILE_DELETE_CONFLICT: 'errors.draftFileDeleteFailed',
+  DRAFT_FILE_NOT_AVAILABLE: 'errors.draftFileNotAvailable',
+  DRAFT_FILE_NOT_FOUND: 'errors.draftFileDeleteFailed',
+  DRAFT_FILE_PROCESSING_CONFLICT: 'errors.draftFileNotAvailable',
+  DRAFT_FILE_STORAGE_FAILED: 'errors.draftFileUploadFailed',
+  DRAFT_FILE_TOO_LARGE: 'errors.draftFileTooLarge',
+  DRAFT_FILE_UPLOAD_FAILED: 'errors.draftFileUploadFailed',
   INSUFFICIENT_CREDITS: 'errors.insufficientCredits',
+  INVALID_DRAFT_FILE_OPERATION: 'errors.invalidDraftFileOperation',
+  INVALID_DRAFT_FILE_UPLOAD: 'errors.invalidDraftFileUpload',
   INVALID_SIGNATURE_TRANSACTION: 'errors.invalidSignatureTransaction',
   INVALID_TIMESTAMP_TRANSACTION: 'errors.invalidTimestampTransaction',
   SIGNATURE_TRANSACTION_FAILED: 'errors.signatureTransactionFailed',
   TIMESTAMP_TRANSACTION_FAILED: 'errors.timestampTransactionFailed',
+  UNSUPPORTED_DRAFT_FILE_TYPE: 'errors.unsupportedDraftFileType',
   UNSUPPORTED_SIGNATURE_FILE_TYPE:
     'errors.unsupportedSignatureFileType',
 }

@@ -173,16 +173,20 @@
   border-radius: var(--radius-md);
 }
 
-.signature-file-workspace__file-card--uploading {
+.signature-file-workspace__file-card--uploading,
+.signature-file-workspace__file-card--processing,
+.signature-file-workspace__file-card--deleting {
   border-color: #9fc0e8;
   box-shadow: 0 0 0 3px rgb(37 99 235 / 8%);
 }
 
+.signature-file-workspace__file-card--uploaded,
 .signature-file-workspace__file-card--completed {
   border-color: #acd9c0;
 }
 
-.signature-file-workspace__file-card--error {
+.signature-file-workspace__file-card--upload-error,
+.signature-file-workspace__file-card--process-error {
   border-color: #efb7bf;
 }
 
@@ -233,17 +237,21 @@
   white-space: nowrap;
 }
 
-.signature-file-workspace__status-badge--uploading {
+.signature-file-workspace__status-badge--uploading,
+.signature-file-workspace__status-badge--processing,
+.signature-file-workspace__status-badge--deleting {
   color: var(--color-primary-700);
   background: var(--color-primary-100);
 }
 
+.signature-file-workspace__status-badge--uploaded,
 .signature-file-workspace__status-badge--completed {
   color: var(--color-success);
   background: var(--color-accent-100);
 }
 
-.signature-file-workspace__status-badge--error {
+.signature-file-workspace__status-badge--upload-error,
+.signature-file-workspace__status-badge--process-error {
   color: var(--color-danger);
   background: #fff0f1;
 }
@@ -299,13 +307,19 @@
   transition: width 180ms ease;
 }
 
+.signature-file-workspace__file-card--uploaded
+  .signature-file-workspace__progress-track
+  span,
 .signature-file-workspace__file-card--completed
   .signature-file-workspace__progress-track
   span {
   background: var(--color-success);
 }
 
-.signature-file-workspace__file-card--error
+.signature-file-workspace__file-card--upload-error
+  .signature-file-workspace__progress-track
+  span,
+.signature-file-workspace__file-card--process-error
   .signature-file-workspace__progress-track
   span {
   background: var(--color-danger);
@@ -319,6 +333,13 @@
   line-height: 1.45;
 }
 
+.signature-file-workspace__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.signature-file-workspace__upload-button,
 .signature-file-workspace__submit-button {
   display: inline-flex;
   gap: 0.65rem;
@@ -332,10 +353,27 @@
   cursor: pointer;
   background: var(--color-brand-950);
   border-radius: var(--radius-sm);
-  box-shadow: 0 14px 28px rgb(16 42 67 / 16%);
   transition:
     background-color var(--transition-fast),
     transform var(--transition-fast);
+}
+
+.signature-file-workspace__upload-button {
+  color: var(--color-brand-950);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+}
+
+.signature-file-workspace__submit-button {
+  color: var(--color-text-inverse);
+  background: var(--color-brand-950);
+  box-shadow: 0 14px 28px rgb(16 42 67 / 16%);
+}
+
+.signature-file-workspace__upload-button:hover:not(:disabled) {
+  color: var(--color-primary-700);
+  border-color: var(--color-primary-600);
+  transform: translateY(-1px);
 }
 
 .signature-file-workspace__submit-button:hover:not(:disabled) {
@@ -343,25 +381,11 @@
   transform: translateY(-1px);
 }
 
+.signature-file-workspace__upload-button:disabled,
 .signature-file-workspace__submit-button:disabled {
   cursor: not-allowed;
   opacity: 0.48;
   box-shadow: none;
-}
-
-.signature-file-workspace__spinner {
-  width: 1.15rem;
-  height: 1.15rem;
-  border: 2px solid rgb(255 255 255 / 35%);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: signature-file-workspace-spin 0.75s linear infinite;
-}
-
-@keyframes signature-file-workspace-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 @media (max-width: 39.99rem) {
@@ -381,5 +405,9 @@
   .signature-file-workspace__status-badge {
     grid-column: 2 / -1;
     justify-self: start;
+  }
+
+  .signature-file-workspace__actions {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

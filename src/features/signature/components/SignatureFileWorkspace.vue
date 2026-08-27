@@ -3,20 +3,21 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
+import {
+  DRAFT_FILE_INPUT_ACCEPT,
+  MAX_DRAFT_FILE_SIZE_BYTES,
+} from '@/features/draft-files/utils/draftFileValidation'
 import type {
   SignatureFileItem,
-  SignatureFileUploadStatus,
+  SignatureFileStatus,
 } from '@/features/signature/types/signature.types'
-import {
-  MAX_SIGNATURE_FILE_SIZE_BYTES,
-  SIGNATURE_FILE_INPUT_ACCEPT,
-} from '@/features/signature/utils/signatureFileValidation'
 import { formatFileSize } from '@/utils/formatters'
 
 const props = defineProps<{
-  canSubmit: boolean
+  canProcess: boolean
+  canUpload: boolean
   fileValidationErrorMessage: string
-  isSubmitting: boolean
+  isBusy: boolean
   signatureFiles: SignatureFileItem[]
 }>()
 
@@ -24,6 +25,7 @@ const emit = defineEmits<{
   'add-files': [signatureFiles: File[]]
   'remove-file': [signatureFileId: string]
   'request-signature': []
+  'request-upload': []
 }>()
 
 const { t } = useI18n({ useScope: 'global' })
@@ -31,7 +33,7 @@ const fileInputElement = ref<HTMLInputElement | null>(null)
 const isFileDraggedOver = ref(false)
 
 const maximumFileSizeLabel = computed(() =>
-  formatFileSize(MAX_SIGNATURE_FILE_SIZE_BYTES),
+  formatFileSize(MAX_DRAFT_FILE_SIZE_BYTES),
 )
 const signatureFileInputDescriptionIds = computed(() =>
   [
@@ -45,7 +47,7 @@ const signatureFileInputDescriptionIds = computed(() =>
 )
 
 const openFilePicker = () => {
-  if (!props.isSubmitting) {
+  if (!props.isBusy) {
     fileInputElement.value?.click()
   }
 }
@@ -65,7 +67,7 @@ const handleFileInputChange = (inputEvent: Event) => {
 }
 
 const handleFileDragOver = () => {
-  if (!props.isSubmitting) {
+  if (!props.isBusy) {
     isFileDraggedOver.value = true
   }
 }
@@ -77,14 +79,13 @@ const handleFileDragLeave = () => {
 const handleFileDrop = (dropEvent: DragEvent) => {
   isFileDraggedOver.value = false
 
-  if (!props.isSubmitting) {
+  if (!props.isBusy) {
     addSignatureFiles(dropEvent.dataTransfer?.files ?? null)
   }
 }
 
-const getUploadStatusLabel = (
-  uploadStatus: SignatureFileUploadStatus,
-) => t(`signature.workspace.status.${uploadStatus}`)
+const getSignatureFileStatusLabel = (fileStatus: SignatureFileStatus) =>
+  t(`signature.workspace.status.${fileStatus}`)
 </script>
 
 <template>
@@ -98,12 +99,12 @@ const getUploadStatusLabel = (
         {
           'signature-file-workspace__drop-area--dragging':
             isFileDraggedOver,
-          'signature-file-workspace__drop-area--disabled': isSubmitting,
+          'signature-file-workspace__drop-area--disabled': isBusy,
         },
       ]"
       role="button"
-      :tabindex="isSubmitting ? -1 : 0"
-      :aria-disabled="isSubmitting"
+      :tabindex="isBusy ? -1 : 0"
+      :aria-disabled="isBusy"
       :aria-describedby="signatureFileInputDescriptionIds"
       @click="openFilePicker"
       @keydown.enter.prevent="openFilePicker"
@@ -120,8 +121,8 @@ const getUploadStatusLabel = (
         type="file"
         multiple
         tabindex="-1"
-        :accept="SIGNATURE_FILE_INPUT_ACCEPT"
-        :disabled="isSubmitting"
+        :accept="DRAFT_FILE_INPUT_ACCEPT"
+        :disabled="isBusy"
         :aria-label="t('signature.workspace.inputAriaLabel')"
         :aria-describedby="signatureFileInputDescriptionIds"
         :aria-invalid="fileValidationErrorMessage ? 'true' : undefined"
@@ -200,10 +201,10 @@ const getUploadStatusLabel = (
             </span>
 
             <div class="signature-file-workspace__file-information">
-              <strong :title="signatureFileItem.file.name">
-                {{ signatureFileItem.file.name }}
+              <strong :title="signatureFileItem.fileName">
+                {{ signatureFileItem.fileName }}
               </strong>
-              <small>{{ formatFileSize(signatureFileItem.file.size) }}</small>
+              <small>{{ formatFileSize(signatureFileItem.fileSize) }}</small>
             </div>
 
             <span
@@ -212,15 +213,15 @@ const getUploadStatusLabel = (
                 `signature-file-workspace__status-badge--${signatureFileItem.status}`,
               ]"
             >
-              {{ getUploadStatusLabel(signatureFileItem.status) }}
+              {{ getSignatureFileStatusLabel(signatureFileItem.status) }}
             </span>
 
             <button
               type="button"
-              :disabled="isSubmitting"
+              :disabled="isBusy"
               :aria-label="
                 t('signature.workspace.removeAriaLabel', {
-                  fileName: signatureFileItem.file.name,
+                  fileName: signatureFileItem.fileName,
                 })
               "
               @click="emit('remove-file', signatureFileItem.id)"
@@ -230,7 +231,9 @@ const getUploadStatusLabel = (
           </div>
 
           <div class="signature-file-workspace__progress-information">
-            <span>{{ getUploadStatusLabel(signatureFileItem.status) }}</span>
+            <span>
+              {{ getSignatureFileStatusLabel(signatureFileItem.status) }}
+            </span>
             <strong>{{ signatureFileItem.progressPercentage }}%</strong>
           </div>
           <div
@@ -238,7 +241,7 @@ const getUploadStatusLabel = (
             role="progressbar"
             :aria-label="
               t('signature.workspace.progressAriaLabel', {
-                fileName: signatureFileItem.file.name,
+                fileName: signatureFileItem.fileName,
               })
             "
             aria-valuemin="0"
@@ -263,25 +266,29 @@ const getUploadStatusLabel = (
       </ul>
     </section>
 
-    <button
-      class="signature-file-workspace__submit-button"
-      type="button"
-      :disabled="!canSubmit || isSubmitting"
-      :aria-busy="isSubmitting"
-      @click="emit('request-signature')"
-    >
-      <span
-        v-if="isSubmitting"
-        class="signature-file-workspace__spinner"
-        aria-hidden="true"
-      ></span>
-      <AppIcon v-else name="signature" :size="21" />
-      {{
-        isSubmitting
-          ? t('signature.workspace.signingFiles')
-          : t('signature.workspace.signFiles')
-      }}
-    </button>
+    <div class="signature-file-workspace__actions">
+      <button
+        class="signature-file-workspace__upload-button"
+        type="button"
+        :disabled="!canUpload || isBusy"
+        :aria-busy="isBusy"
+        @click="emit('request-upload')"
+      >
+        <AppIcon name="upload" :size="21" />
+        {{ t('signature.workspace.uploadFiles') }}
+      </button>
+
+      <button
+        class="signature-file-workspace__submit-button"
+        type="button"
+        :disabled="!canProcess || isBusy"
+        :aria-busy="isBusy"
+        @click="emit('request-signature')"
+      >
+        <AppIcon name="signature" :size="21" />
+        {{ t('signature.workspace.signFiles') }}
+      </button>
+    </div>
   </section>
 </template>
 

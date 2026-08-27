@@ -21,3 +21,23 @@ export interface TimestampTransactionResponse {
   recentDocuments: ArchivedDocument[]
   timestampJob: TimestampJob
 }
+
+export type TimestampFileStatus =
+  | 'selected'
+  | 'uploading'
+  | 'uploaded'
+  | 'processing'
+  | 'upload-error'
+  | 'process-error'
+  | 'deleting'
+
+export interface TimestampFileItem {
+  draftFileId: number | null
+  errorMessage: string
+  file: File | null
+  fileName: string
+  fileSize: number
+  id: string
+  progressPercentage: number
+  status: TimestampFileStatus
+}

@@ -3,6 +3,7 @@ import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
+import type { TimestampFileItem } from '@/features/timestamp/types/timestamp.types'
 import { formatFileSize } from '@/utils/formatters'
 
 const props = withDefaults(
@@ -10,7 +11,7 @@ const props = withDefaults(
     errorMessage?: string
     isOpen: boolean
     isSubmitting: boolean
-    timestampFile: File | null
+    timestampFile: TimestampFileItem | null
   }>(),
   {
     errorMessage: '',
@@ -160,8 +161,8 @@ onBeforeUnmount(() => {
               <AppIcon name="document" :size="22" />
             </span>
             <div>
-              <strong>{{ timestampFile.name }}</strong>
-              <small>{{ formatFileSize(timestampFile.size) }}</small>
+              <strong>{{ timestampFile.fileName }}</strong>
+              <small>{{ formatFileSize(timestampFile.fileSize) }}</small>
             </div>
           </div>
 

@@ -105,7 +105,7 @@
       "archivedDocuments": "Arşivdeki kayıt",
       "archivedDocumentsDetail": "Güvenle saklanan doküman",
       "availableCredits": "Kullanılabilir kontör",
-      "availableCreditsDetail": "Her zaman damgası 1 kontör",
+      "availableCreditsDetail": "Her imza ve zaman damgası 1 kontör",
       "archiveCapacity": "Arşiv kapasitesi",
       "totalStorage": "{size} toplam alan",
       "archiveUsageAriaLabel": "Arşiv kullanım oranı"
@@ -146,11 +146,18 @@
       "createFirst": "İlk işlemi oluştur"
     }
   },
+  "draftFiles": {
+    "validation": {
+      "emptyFile": "Boş dosyalar yüklenemez.",
+      "fileTooLarge": "Dosya boyutu {maximumSize} sınırını aşamaz.",
+      "unsupportedFileType": "Yalnızca PDF, Word, XML, UBL ve görsel dosyalarına izin verilir."
+    }
+  },
   "signature": {
     "page": {
       "eyebrow": "Güvenli imza merkezi",
       "title": "İmzala",
-      "description": "Dosyalarınızı seçin ve kullanıcı hesabınızla ilişkilendirilmiş imza kayıtlarını güvenli arşivde oluşturun.",
+      "description": "Dosyalarınızı önce ücretsiz olarak güvenli alana yükleyin, ardından imzalamak istediklerinizi seçin.",
       "clear": "Sayfayı temizle",
       "transactionCost": "İşlem maliyeti",
       "costPerFile": "1 kontör / dosya",
@@ -158,7 +165,7 @@
       "availableCredits": "Kullanılabilir kontör: {count}",
       "noAvailableCredits": "Kullanılabilir kontör yok",
       "simulationTitle": "Case simülasyonu",
-      "simulationDescription": "Bu akış gerçek bir nitelikli elektronik imza üretmez; dosyayı R2 arşivine kaydeder ve D1 üzerinde kullanıcıya ait bir imza işlem kaydı oluşturur."
+      "simulationDescription": "Yükleme ücretsizdir ve dosyayı R2 arşivine kaydeder. İmzalama işlemi D1 üzerinde kayıt oluşturur ve dosya başına 1 kontör kullanır."
     },
     "workspace": {
       "inputAriaLabel": "İmzalanacak dosyaları seçin",
@@ -166,32 +173,39 @@
       "uploadTitle": "Dosyalarınızı buraya bırakın",
       "uploadDescription": "Bir veya daha fazla dosyayı sürükleyip bırakın ya da cihazınızdan seçin. Dosyalar ayrı kartlar halinde gösterilir.",
       "selectFromDevice": "Cihazdan dosya seç",
-      "requirements": "Görsel, MP3, UDF ve PDF · Dosya başına en fazla {maximumSize}",
+      "requirements": "PDF, Word, XML, UBL ve görsel · Dosya başına en fazla {maximumSize}",
       "listEyebrow": "Yükleme sırası",
       "listTitle": "Seçilen dosyalar",
       "selectedFileCount": "{count} dosya",
       "progressAriaLabel": "{fileName} yükleme ilerlemesi",
       "removeAriaLabel": "{fileName} dosyasını kaldır",
+      "uploadFiles": "Dosyaları yükle",
       "signFiles": "Dosyaları imzala",
-      "signingFiles": "Dosyalar imzalanıyor…",
       "status": {
-        "pending": "Bekliyor",
+        "selected": "Seçildi",
         "uploading": "Yükleniyor",
-        "completed": "Tamamlandı",
-        "error": "Hata"
+        "uploaded": "Taslak yüklendi",
+        "processing": "İmzalanıyor",
+        "completed": "İmzalandı",
+        "upload-error": "Yükleme hatası",
+        "process-error": "İmzalama hatası",
+        "deleting": "Siliniyor"
       }
     },
     "validation": {
-      "emptyFile": "Boş dosyalar imzalama işlemine alınamaz.",
-      "fileTooLarge": "Dosya boyutu {maximumSize} sınırını aşamaz.",
-      "unsupportedFileType": "Yalnızca görsel, MP3, UDF ve PDF dosyalarına izin verilir.",
       "fileError": "{fileName}: {message}"
     },
     "feedback": {
-      "selectFiles": "İmzalama işlemine devam etmek için en az bir dosya seçin.",
+      "draftDeleted": "Taslak dosya güvenli alandan silindi.",
+      "clearFailure": "Bazı taslak dosyalar silinemedi. Dosya kartlarındaki hataları kontrol edin.",
+      "selectFilesToUpload": "Yüklemek için en az bir dosya seçin.",
+      "uploadSuccess": "{count} dosya ücretsiz olarak güvenli alana yüklendi.",
+      "uploadPartialFailure": "{uploadedCount} dosya yüklendi; {failedCount} dosya yüklenemedi.",
+      "uploadFailure": "{failedCount} dosya yüklenemedi. Dosya kartlarındaki hataları kontrol edin.",
+      "uploadFilesBeforeSigning": "İmzalamadan önce seçtiğiniz dosyaları yükleyin.",
       "batchSuccess": "{count} dosyanın imza kaydı oluşturuldu. Her dosya için 1 kontör kullanıldı.",
-      "partialFailure": "{completedCount} dosya tamamlandı ve {completedCount} kontör kullanıldı; {failedCount} dosya yüklenemedi.",
-      "batchFailure": "{count} dosya yüklenemedi. Dosya kartlarındaki hataları kontrol edip tekrar deneyin.",
+      "partialFailure": "{completedCount} dosya imzalandı ve {completedCount} kontör kullanıldı; {failedCount} dosya işlenemedi.",
+      "batchFailure": "{count} dosya imzalanamadı. Dosya kartlarındaki hataları kontrol edip tekrar deneyin.",
       "transactionFailed": "İmzalama işlemi tamamlanamadı. Lütfen tekrar deneyin."
     }
   },
@@ -208,7 +222,7 @@
       "guideEyebrow": "Üç adımda tamamlayın",
       "guideTitle": "Dosyanızdan doğrulama kaydına",
       "selectFile": "Dosyanızı seçin",
-      "selectFileDescription": "En fazla {maximumSize} boyutunda tek dosya ekleyin.",
+      "selectFileDescription": "En fazla {maximumSize} boyutunda tek dosya seçip ücretsiz yükleyin.",
       "confirmInformation": "Bilgileri onaylayın",
       "confirmInformationDescription": "Dosya adı, boyutu ve kontör maliyetini kontrol edin.",
       "followRecord": "Kaydı takip edin",
@@ -225,13 +239,26 @@
       "description": "Sürükleyip bırakabilir veya cihazınızdan seçebilirsiniz. İşlem öncesinde dosya bilgilerini tekrar kontrol edebilirsiniz.",
       "selectAnother": "Başka dosya seç",
       "selectFromDevice": "Cihazdan dosya seç",
-      "requirements": "Tüm dosya türleri desteklenir · En fazla {maximumSize}",
+      "draftStored": "Taslak güvenli alanda",
+      "requirements": "PDF, Word, XML, UBL ve görsel · En fazla {maximumSize}",
       "selectedFileAriaLabel": "Seçilen dosya",
-      "ready": "İşleme hazır",
       "removeAriaLabel": "{fileName} dosyasını kaldır",
+      "progressAriaLabel": "{fileName} yükleme ilerlemesi",
+      "uploadCost": "Yükleme maliyeti",
+      "free": "Ücretsiz",
+      "uploadFile": "Dosyayı yükle",
       "transactionCost": "İşlem maliyeti",
       "oneCredit": "1 kontör",
-      "continue": "Zaman damgalamaya devam et"
+      "continue": "Zaman damgalamaya devam et",
+      "status": {
+        "selected": "Seçildi",
+        "uploading": "Yükleniyor",
+        "uploaded": "Taslak yüklendi",
+        "processing": "Damgalanıyor",
+        "upload-error": "Yükleme hatası",
+        "process-error": "Damgalama hatası",
+        "deleting": "Siliniyor"
+      }
     },
     "modal": {
       "eyebrow": "Son kontrol",
@@ -264,13 +291,11 @@
       "emptyTitle": "Henüz zaman damgası kaydınız yok",
       "emptyDescription": "İlk işleminiz tamamlandığında doğrulama kaydı burada görünecek."
     },
-    "validation": {
-      "emptyFile": "Boş dosyalar zaman damgalama işlemine alınamaz.",
-      "fileTooLarge": "Dosya boyutu {maximumSize} sınırını aşamaz."
-    },
     "feedback": {
-      "endpointMissing": "Zaman damgalama servisi bulunamadı. Fake API’yi durdurup npm run api komutuyla yeniden başlatın.",
-      "selectFile": "Zaman damgalama işlemine devam etmek için bir dosya seçin.",
+      "draftDeleted": "Taslak dosya güvenli alandan silindi.",
+      "selectFileToUpload": "Yüklemek için bir dosya seçin.",
+      "uploadSuccess": "{fileName} ücretsiz olarak güvenli alana yüklendi.",
+      "uploadFileBeforeTimestamping": "Zaman damgalamadan önce seçtiğiniz dosyayı yükleyin.",
       "success": "{fileName} başarıyla zaman damgalandı. 1 kontör kullanıldı."
     }
   },
@@ -352,8 +377,17 @@
     "insufficientCredits": "Bu işlem için yeterli kontörünüz bulunmuyor.",
     "invalidSignatureTransaction": "İmzalama için gönderilen dosya bilgileri geçersiz.",
     "signatureTransactionFailed": "İmzalama işlemi tamamlanamadı.",
-    "unsupportedSignatureFileType": "Yalnızca görsel, MP3, UDF ve PDF dosyalarına izin verilir.",
+    "unsupportedSignatureFileType": "Yalnızca PDF, Word, XML, UBL ve görsel dosyalarına izin verilir.",
     "invalidTimestampTransaction": "Zaman damgalama için gönderilen dosya bilgileri geçersiz.",
-    "timestampTransactionFailed": "Zaman damgalama işlemi tamamlanamadı."
+    "timestampTransactionFailed": "Zaman damgalama işlemi tamamlanamadı.",
+    "invalidDraftFileUpload": "Yüklenecek dosya bilgileri geçersiz.",
+    "invalidDraftFileOperation": "Dosyanın kullanılacağı işlem geçersiz.",
+    "draftFileTooLarge": "Dosya boyutu 25 MB sınırını aşamaz.",
+    "unsupportedDraftFileType": "Yalnızca PDF, Word, XML, UBL ve görsel dosyalarına izin verilir.",
+    "draftFileUploadFailed": "Dosya güvenli alana yüklenemedi.",
+    "draftFileNotAvailable": "Taslak dosya bulunamadı veya daha önce işlenmiş.",
+    "draftFileContentNotFound": "Taslak dosyanın içeriği güvenli arşivde bulunamadı.",
+    "draftFileAlreadyProcessed": "Bu taslak dosya daha önce işlenmiş.",
+    "draftFileDeleteFailed": "Taslak dosya silinemedi. Lütfen tekrar deneyin."
   }
 }

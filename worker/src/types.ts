@@ -30,6 +30,17 @@ export interface DashboardSummary {
 
 export type DocumentOperation = 'signature' | 'timestamp'
 type DocumentStatus = 'completed' | 'failed' | 'processing'
+export type DraftFileStatus = 'processed' | 'uploaded'
+
+export interface DraftFile {
+  createdAt: string
+  fileName: string
+  fileSize: number
+  id: number
+  intendedOperation: DocumentOperation
+  mimeType: string
+  status: DraftFileStatus
+}
 
 export interface ArchivedDocument {
   createdAt: string
@@ -78,6 +89,7 @@ export interface DocumentDatabaseRecord {
   completed_at: string | null
   created_at: string
   credit_cost: number
+  draft_file_id: number | null
   file_name: string
   file_size: number
   id: number
@@ -85,6 +97,19 @@ export interface DocumentDatabaseRecord {
   object_key: string
   operation: DocumentOperation
   status: DocumentStatus
+}
+
+export interface DraftFileDatabaseRecord {
+  auth0_user_id: string
+  created_at: string
+  file_name: string
+  file_size: number
+  id: number
+  intended_operation: DocumentOperation
+  mime_type: string
+  object_key: string
+  processed_at: string | null
+  status: DraftFileStatus
 }
 
 export interface DashboardDatabaseRecord {

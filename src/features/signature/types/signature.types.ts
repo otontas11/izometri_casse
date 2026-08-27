@@ -9,16 +9,23 @@ export interface SignatureTransactionResponse {
   signedDocument: ArchivedDocument
 }
 
-export type SignatureFileUploadStatus =
-  | 'pending'
+export type SignatureFileStatus =
+  | 'selected'
   | 'uploading'
+  | 'uploaded'
+  | 'processing'
   | 'completed'
-  | 'error'
+  | 'upload-error'
+  | 'process-error'
+  | 'deleting'
 
 export interface SignatureFileItem {
+  draftFileId: number | null
   errorMessage: string
-  file: File
+  file: File | null
+  fileName: string
+  fileSize: number
   id: string
   progressPercentage: number
-  status: SignatureFileUploadStatus
+  status: SignatureFileStatus
 }

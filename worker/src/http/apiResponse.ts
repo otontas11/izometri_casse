@@ -45,7 +45,7 @@ export const createCorsHeaders = (request: Request, environment: Env) => {
     corsHeaders.set('Access-Control-Allow-Headers', 'Authorization, Content-Type')
     corsHeaders.set(
       'Access-Control-Allow-Methods',
-      'GET, HEAD, PATCH, POST, OPTIONS',
+      'DELETE, GET, HEAD, PATCH, POST, OPTIONS',
     )
     corsHeaders.set('Access-Control-Max-Age', '86400')
   }

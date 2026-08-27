@@ -4,16 +4,21 @@ import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import {
-  MAX_TIMESTAMP_FILE_SIZE_BYTES,
-  validateTimestampFile,
-} from '@/features/timestamp/utils/timestampFileValidation'
+  DRAFT_FILE_INPUT_ACCEPT,
+  MAX_DRAFT_FILE_SIZE_BYTES,
+  validateDraftFile,
+} from '@/features/draft-files/utils/draftFileValidation'
+import type {
+  TimestampFileItem,
+  TimestampFileStatus,
+} from '@/features/timestamp/types/timestamp.types'
 import { getApplicationLocaleCode } from '@/locales'
 import { formatFileSize } from '@/utils/formatters'
 
 const props = withDefaults(
   defineProps<{
     isDisabled?: boolean
-    selectedFile: File | null
+    selectedFile: TimestampFileItem | null
   }>(),
   {
     isDisabled: false,
@@ -22,7 +27,9 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'request-timestamp': []
-  'select-file': [timestampFile: File | null]
+  'request-upload': []
+  'remove-file': []
+  'select-file': [timestampFile: File]
 }>()
 
 const { t } = useI18n({ useScope: 'global' })
@@ -31,7 +38,7 @@ const isFileDraggedOver = ref(false)
 const fileValidationErrorMessage = ref('')
 
 const maximumFileSizeLabel = computed(() =>
-  formatFileSize(MAX_TIMESTAMP_FILE_SIZE_BYTES),
+  formatFileSize(MAX_DRAFT_FILE_SIZE_BYTES),
 )
 const timestampFileInputDescriptionIds = computed(() =>
   [
@@ -44,7 +51,7 @@ const timestampFileInputDescriptionIds = computed(() =>
     .join(' '),
 )
 const selectedFileExtensionLabel = computed(() => {
-  const selectedFileName = props.selectedFile?.name ?? ''
+  const selectedFileName = props.selectedFile?.fileName ?? ''
   const fileExtension = selectedFileName.split('.').pop()
 
   if (!fileExtension || fileExtension === selectedFileName) {
@@ -55,15 +62,23 @@ const selectedFileExtensionLabel = computed(() => {
     extension: fileExtension.toLocaleUpperCase(getApplicationLocaleCode()),
   })
 })
+const canSelectNewFile = computed(
+  () => !props.selectedFile || props.selectedFile.draftFileId === null,
+)
+const shouldUploadSelectedFile = computed(() =>
+  ['selected', 'uploading', 'upload-error'].includes(
+    props.selectedFile?.status ?? '',
+  ),
+)
 
 const openFilePicker = () => {
-  if (!props.isDisabled) {
+  if (!props.isDisabled && canSelectNewFile.value) {
     fileInputElement.value?.click()
   }
 }
 
 const validateAndSelectFile = (timestampFile: File) => {
-  const validationResult = validateTimestampFile(timestampFile)
+  const validationResult = validateDraftFile(timestampFile)
 
   if (!validationResult.isValid) {
     fileValidationErrorMessage.value = validationResult.errorMessage
@@ -86,7 +101,7 @@ const handleFileInputChange = (inputEvent: Event) => {
 }
 
 const handleFileDragOver = () => {
-  if (!props.isDisabled) {
+  if (!props.isDisabled && canSelectNewFile.value) {
     isFileDraggedOver.value = true
   }
 }
@@ -98,7 +113,7 @@ const handleFileDragLeave = () => {
 const handleFileDrop = (dropEvent: DragEvent) => {
   isFileDraggedOver.value = false
 
-  if (props.isDisabled) {
+  if (props.isDisabled || !canSelectNewFile.value) {
     return
   }
 
@@ -122,8 +137,20 @@ const handleFileDrop = (dropEvent: DragEvent) => {
 
 const handleSelectedFileRemove = () => {
   fileValidationErrorMessage.value = ''
-  emit('select-file', null)
+  emit('remove-file')
 }
+
+const handleSelectedFileAction = () => {
+  if (shouldUploadSelectedFile.value) {
+    emit('request-upload')
+    return
+  }
+
+  emit('request-timestamp')
+}
+
+const getFileStatusLabel = (fileStatus: TimestampFileStatus) =>
+  t(`timestamp.upload.status.${fileStatus}`)
 
 watch(
   () => props.selectedFile,
@@ -145,7 +172,8 @@ watch(
         'timestamp-file-upload-zone__drop-area',
         {
           'timestamp-file-upload-zone__drop-area--dragging': isFileDraggedOver,
-          'timestamp-file-upload-zone__drop-area--disabled': isDisabled,
+          'timestamp-file-upload-zone__drop-area--disabled':
+            isDisabled || !canSelectNewFile,
         },
       ]"
       @dragenter.prevent="handleFileDragOver"
@@ -159,7 +187,8 @@ watch(
         class="visually-hidden"
         type="file"
         tabindex="-1"
-        :disabled="isDisabled"
+        :accept="DRAFT_FILE_INPUT_ACCEPT"
+        :disabled="isDisabled || !canSelectNewFile"
         :aria-label="t('timestamp.upload.inputAriaLabel')"
         :aria-describedby="timestampFileInputDescriptionIds"
         :aria-invalid="fileValidationErrorMessage ? 'true' : undefined"
@@ -181,15 +210,17 @@ watch(
       <button
         class="timestamp-file-upload-zone__select-button"
         type="button"
-        :disabled="isDisabled"
+        :disabled="isDisabled || !canSelectNewFile"
         :aria-describedby="timestampFileInputDescriptionIds"
         @click="openFilePicker"
       >
         <AppIcon name="document" :size="18" />
         {{
-          selectedFile
-            ? t('timestamp.upload.selectAnother')
-            : t('timestamp.upload.selectFromDevice')
+          selectedFile && !canSelectNewFile
+            ? t('timestamp.upload.draftStored')
+            : selectedFile
+              ? t('timestamp.upload.selectAnother')
+              : t('timestamp.upload.selectFromDevice')
         }}
       </button>
 
@@ -214,7 +245,10 @@ watch(
 
     <article
       v-if="selectedFile"
-      class="timestamp-file-upload-zone__selected-file"
+      :class="[
+        'timestamp-file-upload-zone__selected-file',
+        `timestamp-file-upload-zone__selected-file--${selectedFile.status}`,
+      ]"
       :aria-label="t('timestamp.upload.selectedFileAriaLabel')"
     >
       <span class="timestamp-file-upload-zone__file-icon" aria-hidden="true">
@@ -222,10 +256,10 @@ watch(
       </span>
 
       <div class="timestamp-file-upload-zone__file-information">
-        <span>{{ t('timestamp.upload.ready') }}</span>
-        <strong>{{ selectedFile.name }}</strong>
+        <span>{{ getFileStatusLabel(selectedFile.status) }}</span>
+        <strong>{{ selectedFile.fileName }}</strong>
         <small>
-          {{ selectedFileExtensionLabel }} · {{ formatFileSize(selectedFile.size) }}
+          {{ selectedFileExtensionLabel }} · {{ formatFileSize(selectedFile.fileSize) }}
         </small>
       </div>
 
@@ -235,7 +269,7 @@ watch(
         :disabled="isDisabled"
         :aria-label="
           t('timestamp.upload.removeAriaLabel', {
-            fileName: selectedFile.name,
+            fileName: selectedFile.fileName,
           })
         "
         @click="handleSelectedFileRemove"
@@ -243,17 +277,59 @@ watch(
         <AppIcon name="close" :size="18" />
       </button>
 
+      <div class="timestamp-file-upload-zone__progress">
+        <div
+          class="timestamp-file-upload-zone__progress-track"
+          role="progressbar"
+          :aria-label="
+            t('timestamp.upload.progressAriaLabel', {
+              fileName: selectedFile.fileName,
+            })
+          "
+          aria-valuemin="0"
+          aria-valuemax="100"
+          :aria-valuenow="selectedFile.progressPercentage"
+        >
+          <span
+            :style="{ width: `${selectedFile.progressPercentage}%` }"
+          ></span>
+        </div>
+        <strong>{{ selectedFile.progressPercentage }}%</strong>
+      </div>
+
+      <p
+        v-if="selectedFile.errorMessage"
+        class="timestamp-file-upload-zone__file-error"
+        role="alert"
+      >
+        {{ selectedFile.errorMessage }}
+      </p>
+
       <div class="timestamp-file-upload-zone__action">
         <span>
-          {{ t('timestamp.upload.transactionCost') }}
-          <strong>{{ t('timestamp.upload.oneCredit') }}</strong>
+          {{
+            shouldUploadSelectedFile
+              ? t('timestamp.upload.uploadCost')
+              : t('timestamp.upload.transactionCost')
+          }}
+          <strong>
+            {{
+              shouldUploadSelectedFile
+                ? t('timestamp.upload.free')
+                : t('timestamp.upload.oneCredit')
+            }}
+          </strong>
         </span>
         <button
           type="button"
           :disabled="isDisabled"
-          @click="emit('request-timestamp')"
+          @click="handleSelectedFileAction"
         >
-          {{ t('timestamp.upload.continue') }}
+          {{
+            shouldUploadSelectedFile
+              ? t('timestamp.upload.uploadFile')
+              : t('timestamp.upload.continue')
+          }}
           <AppIcon name="arrow-right" :size="18" />
         </button>
       </div>
@@ -492,6 +568,61 @@ watch(
     var(--color-danger) 9%,
     var(--color-surface-raised)
   );
+}
+
+.timestamp-file-upload-zone__progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-column: 1 / -1;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.timestamp-file-upload-zone__progress-track {
+  height: 0.45rem;
+  overflow: hidden;
+  background: var(--color-surface-subtle);
+  border-radius: 999px;
+}
+
+.timestamp-file-upload-zone__progress-track span {
+  display: block;
+  height: 100%;
+  background: var(--color-success);
+  border-radius: inherit;
+  transition: width 180ms ease;
+}
+
+.timestamp-file-upload-zone__selected-file--uploading
+  .timestamp-file-upload-zone__progress-track
+  span,
+.timestamp-file-upload-zone__selected-file--processing
+  .timestamp-file-upload-zone__progress-track
+  span {
+  background: var(--color-primary-600);
+}
+
+.timestamp-file-upload-zone__selected-file--upload-error
+  .timestamp-file-upload-zone__progress-track
+  span,
+.timestamp-file-upload-zone__selected-file--process-error
+  .timestamp-file-upload-zone__progress-track
+  span {
+  background: var(--color-danger);
+}
+
+.timestamp-file-upload-zone__progress > strong {
+  color: var(--color-brand-950);
+  font-size: var(--font-size-small);
+}
+
+.timestamp-file-upload-zone__file-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .timestamp-file-upload-zone__action {

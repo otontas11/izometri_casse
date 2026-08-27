@@ -6,32 +6,33 @@ import { useI18n } from 'vue-i18n'
 import AppIcon from '@/components/common/AppIcon.vue'
 import { useToast } from '@/composables/useToast'
 import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
+import { MAX_DRAFT_FILE_SIZE_BYTES } from '@/features/draft-files/utils/draftFileValidation'
 import TimestampConfirmationModal from '@/features/timestamp/components/TimestampConfirmationModal.vue'
 import TimestampFileUploadZone from '@/features/timestamp/components/TimestampFileUploadZone.vue'
 import TimestampHistoryTable from '@/features/timestamp/components/TimestampHistoryTable.vue'
 import { useTimestampStore } from '@/features/timestamp/stores/timestamp.store'
-import { MAX_TIMESTAMP_FILE_SIZE_BYTES } from '@/features/timestamp/utils/timestampFileValidation'
 import { formatFileSize } from '@/utils/formatters'
 
 const dashboardStore = useDashboardStore()
 const timestampStore = useTimestampStore()
-const { dashboardSummary } = storeToRefs(dashboardStore)
+const { dashboardRequestStatus, dashboardSummary } = storeToRefs(dashboardStore)
 const {
+  isTimestampActionInProgress,
   isTimestampHistoryLoading,
   isTimestampSubmitting,
-  selectedTimestampFile,
+  selectedTimestampFileItem,
+  timestampActionErrorMessage,
+  timestampActionSuccessMessage,
   timestampHistoryErrorMessage,
   timestampJobs,
   timestampJobsLoadStatus,
-  timestampSubmissionErrorMessage,
-  timestampSubmissionSuccessMessage,
 } = storeToRefs(timestampStore)
 const { showErrorToast, showSuccessToast, showWarningToast } = useToast()
 const { t } = useI18n({ useScope: 'global' })
 
 const isConfirmationModalOpen = ref(false)
 const maximumTimestampFileSizeLabel = computed(() =>
-  formatFileSize(MAX_TIMESTAMP_FILE_SIZE_BYTES),
+  formatFileSize(MAX_DRAFT_FILE_SIZE_BYTES),
 )
 const availableTimestampCredits = computed(
   () => dashboardSummary.value?.remainingCredits ?? null,
@@ -42,20 +43,36 @@ const hasAvailableTimestampCredits = computed(
     availableTimestampCredits.value > 0,
 )
 
-const handleTimestampFileSelection = (timestampFile: File | null) => {
+const handleTimestampFileSelection = (timestampFile: File) => {
   timestampStore.selectTimestampFile(timestampFile)
 }
 
-const handleTimestampConfirmationRequest = () => {
-  if (!selectedTimestampFile.value) {
+const handleTimestampFileRemoval = () => {
+  void timestampStore.removeSelectedTimestampFile()
+}
+
+const handleTimestampUploadRequest = async () => {
+  const isTimestampFileUploaded =
+    await timestampStore.uploadSelectedTimestampFile()
+
+  if (isTimestampFileUploaded) {
+    showSuccessToast(timestampActionSuccessMessage.value)
     return
   }
 
-  timestampStore.clearTimestampSubmissionFeedback()
+  showErrorToast(timestampActionErrorMessage.value)
+}
+
+const handleTimestampConfirmationRequest = () => {
+  if (!selectedTimestampFileItem.value?.draftFileId) {
+    return
+  }
+
+  timestampStore.clearTimestampActionFeedback()
 
   if (!hasAvailableTimestampCredits.value) {
     timestampStore.reportInsufficientTimestampCredits()
-    showWarningToast(timestampSubmissionErrorMessage.value)
+    showWarningToast(timestampActionErrorMessage.value)
     return
   }
 
@@ -69,15 +86,16 @@ const handleConfirmationModalClose = () => {
 }
 
 const handleTimestampSubmission = async () => {
-  const isTimestampCreated = await timestampStore.submitSelectedTimestampFile()
+  const isTimestampCreated =
+    await timestampStore.submitSelectedTimestampDraft()
 
   if (isTimestampCreated) {
     isConfirmationModalOpen.value = false
-    showSuccessToast(timestampSubmissionSuccessMessage.value)
+    showSuccessToast(timestampActionSuccessMessage.value)
     return
   }
 
-  showErrorToast(timestampSubmissionErrorMessage.value)
+  showErrorToast(timestampActionErrorMessage.value)
 }
 
 const handleTimestampHistoryRefresh = () => {
@@ -85,9 +103,15 @@ const handleTimestampHistoryRefresh = () => {
 }
 
 onMounted(() => {
+  if (dashboardRequestStatus.value === 'idle') {
+    void dashboardStore.fetchDashboardData()
+  }
+
   if (timestampJobsLoadStatus.value === 'idle') {
     void timestampStore.fetchTimestampJobs()
   }
+
+  void timestampStore.loadUploadedTimestampFile()
 })
 </script>
 
@@ -133,30 +157,32 @@ onMounted(() => {
     <div class="timestamp-page__workspace">
       <div class="timestamp-page__upload-workflow">
         <TimestampFileUploadZone
-          :selected-file="selectedTimestampFile"
-          :is-disabled="isTimestampSubmitting"
+          :selected-file="selectedTimestampFileItem"
+          :is-disabled="isTimestampActionInProgress"
+          @remove-file="handleTimestampFileRemoval"
           @select-file="handleTimestampFileSelection"
           @request-timestamp="handleTimestampConfirmationRequest"
+          @request-upload="handleTimestampUploadRequest"
         />
 
         <p
-          v-if="timestampSubmissionSuccessMessage"
+          v-if="timestampActionSuccessMessage"
           class="timestamp-page__feedback timestamp-page__feedback--success"
           role="status"
         >
           <span aria-hidden="true">✓</span>
-          {{ timestampSubmissionSuccessMessage }}
+          {{ timestampActionSuccessMessage }}
         </p>
 
         <p
           v-else-if="
-            timestampSubmissionErrorMessage && !isConfirmationModalOpen
+            timestampActionErrorMessage && !isConfirmationModalOpen
           "
           class="timestamp-page__feedback timestamp-page__feedback--error"
           role="alert"
         >
           <span aria-hidden="true">!</span>
-          {{ timestampSubmissionErrorMessage }}
+          {{ timestampActionErrorMessage }}
         </p>
       </div>
 
@@ -216,8 +242,8 @@ onMounted(() => {
     <TimestampConfirmationModal
       :is-open="isConfirmationModalOpen"
       :is-submitting="isTimestampSubmitting"
-      :timestamp-file="selectedTimestampFile"
-      :error-message="timestampSubmissionErrorMessage"
+      :timestamp-file="selectedTimestampFileItem"
+      :error-message="timestampActionErrorMessage"
       @close="handleConfirmationModalClose"
       @confirm="handleTimestampSubmission"
     />
