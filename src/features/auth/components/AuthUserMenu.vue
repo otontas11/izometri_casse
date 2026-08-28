@@ -17,13 +17,7 @@
             @click="isUserMenuOpen = !isUserMenuOpen"
             @keydown="handleUserMenuTriggerKeydown"
     >
-      <img v-if="shouldDisplayAuthenticatedUserPicture"
-           :src="authenticatedUserPicture"
-           alt=""
-           referrerpolicy="no-referrer"
-           @error="hasAuthenticatedUserPictureError = true"
-      />
-      <span v-else>{{ authenticatedUserInitials }}</span>
+      <span>{{ userMenuAvatarInitials }}</span>
     </button>
 
     <div v-if="isUserMenuOpen"
@@ -32,10 +26,8 @@
          class="auth-user-menu__popover"
     >
       <div class="auth-user-menu__identity">
-        <strong>{{ authenticatedUserDisplayName }}</strong>
-        <small v-if="authenticatedUserEmail">{{
-          authenticatedUserEmail
-        }}</small>
+        <strong>{{ userMenuDisplayName }}</strong>
+        <small v-if="userEmailAddress">{{ userEmailAddress }}</small>
       </div>
 
       <RouterLink :to="{ name: 'profile' }" @click="closeUserMenu">
@@ -49,54 +41,63 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
+import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 import { auth0Config } from '@/config/auth0.config'
+import { useProfileStore } from '@/features/profile/stores/profile.store'
 import { getApplicationLocaleCode } from '@/locales'
 
 const { logout: logoutFromAuth0, user: authenticatedUser } = useAuth0()
+const profileStore = useProfileStore()
+const { profileFullName, profileLoadStatus, userProfile } =
+  storeToRefs(profileStore)
 const isUserMenuOpen = ref(false)
 const userMenuElement = ref<HTMLElement | null>(null)
 const userMenuTriggerElement = ref<HTMLButtonElement | null>(null)
 const userMenuPopoverElement = ref<HTMLElement | null>(null)
-const hasAuthenticatedUserPictureError = ref(false)
 const { t } = useI18n({ useScope: 'global' })
 
-const authenticatedUserDisplayName = computed(
+const userMenuDisplayName = computed(
   () =>
+    profileFullName.value ||
     authenticatedUser.value?.name ||
     authenticatedUser.value?.nickname ||
     authenticatedUser.value?.email ||
     t('auth.userMenu.fallbackName'),
 )
-const authenticatedUserEmail = computed(
-  () => authenticatedUser.value?.email ?? '',
+const userEmailAddress = computed(
+  () => userProfile.value?.email.trim() || authenticatedUser.value?.email || '',
 )
-const authenticatedUserPicture = computed(
-  () => authenticatedUser.value?.picture ?? '',
-)
-const shouldDisplayAuthenticatedUserPicture = computed(
-  () =>
-    Boolean(authenticatedUserPicture.value) &&
-    !hasAuthenticatedUserPictureError.value,
-)
-const authenticatedUserInitials = computed(() => {
-  const displayNameWords = authenticatedUserDisplayName.value
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
+const userMenuAvatarInitials = computed(() => {
+  const profileNameParts = [
+    userProfile.value?.firstName,
+    userProfile.value?.lastName,
+  ].filter(
+    (profileNamePart): profileNamePart is string =>
+      typeof profileNamePart === 'string' && profileNamePart.trim().length > 0,
+  )
 
-  if (displayNameWords.length === 0) {
-    return 'İZ'
+  if (profileNameParts.length > 0) {
+    return profileNameParts
+      .map((profileNamePart) =>
+        profileNamePart
+          .trim()
+          .charAt(0)
+          .toLocaleUpperCase(getApplicationLocaleCode()),
+      )
+      .join('')
   }
 
-  return displayNameWords
-    .slice(0, 2)
-    .map((word) => word.charAt(0).toLocaleUpperCase(getApplicationLocaleCode()))
-    .join('')
+  return (
+    userEmailAddress.value
+      .trim()
+      .charAt(0)
+      .toLocaleUpperCase(getApplicationLocaleCode()) || 'İ'
+  )
 })
 
 const closeUserMenu = () => {
@@ -157,13 +158,13 @@ const handleLogout = async () => {
   })
 }
 
-watch(authenticatedUserPicture, () => {
-  hasAuthenticatedUserPictureError.value = false
-})
+onMounted(() => {
+  document.addEventListener('pointerdown', handleOutsidePointerDown)
 
-onMounted(() =>
-  document.addEventListener('pointerdown', handleOutsidePointerDown),
-)
+  if (profileLoadStatus.value === 'idle') {
+    void profileStore.fetchUserProfile()
+  }
+})
 onBeforeUnmount(() =>
   document.removeEventListener('pointerdown', handleOutsidePointerDown),
 )
@@ -189,12 +190,6 @@ onBeforeUnmount(() =>
   border: 2px solid var(--color-surface-raised);
   border-radius: 50%;
   box-shadow: 0 0 0 1px var(--color-border);
-}
-
-.auth-user-menu__trigger img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .auth-user-menu__popover {
