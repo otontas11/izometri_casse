@@ -10,9 +10,8 @@
         </p>
       </div>
 
-      <PendingTransactionCard
-          v-if="latestUploadedDraftFile"
-          :draft-file="latestUploadedDraftFile"
+      <PendingTransactionCard v-if="latestUploadedDraftFile"
+                              :draft-file="latestUploadedDraftFile"
       />
     </header>
 

@@ -1,10 +1,9 @@
 <template>
   <main class="login-page">
-    <section class="login-page__story" aria-labelledby="login-story-title">
-      <a
-        class="login-page__brand"
-        href="/"
-        :aria-label="t('auth.login.homeAriaLabel')"
+    <section aria-labelledby="login-story-title" class="login-page__story">
+      <a :aria-label="t('auth.login.homeAriaLabel')"
+         class="login-page__brand"
+         href="/"
       >
         iz<span>imza</span>
       </a>
@@ -33,11 +32,11 @@
       <small>{{ t('auth.login.footer') }}</small>
     </section>
 
-    <section class="login-page__panel" aria-labelledby="login-title">
-      <LanguageSwitcher class="login-page__language-switcher" />
+    <section aria-labelledby="login-title" class="login-page__panel">
+      <LanguageSwitcher class="login-page__language-switcher"/>
 
       <div class="login-page__card">
-        <div class="login-page__card-seal" aria-hidden="true">
+        <div aria-hidden="true" class="login-page__card-seal">
           <span>✓</span>
         </div>
 
@@ -47,10 +46,9 @@
           <p>{{ t('auth.login.panelDescription') }}</p>
         </div>
 
-        <div
-          v-if="hasAuth0ConfigurationError"
-          class="login-page__card-notice login-page__card-notice--warning"
-          role="alert"
+        <div v-if="hasAuth0ConfigurationError"
+             class="login-page__card-notice login-page__card-notice--warning"
+             role="alert"
         >
           <strong>{{ t('auth.login.configurationTitle') }}</strong>
           <p>
@@ -66,13 +64,9 @@
           </small>
         </div>
 
-        <div
-          v-else-if="
-            authenticationErrorMessage ||
-            currentRoute.query.reason === 'auth_error'
-          "
-          class="login-page__card-notice login-page__card-notice--error"
-          role="alert"
+        <div v-else-if=" authenticationErrorMessage || currentRoute.query.reason === 'auth_error'"
+             class="login-page__card-notice login-page__card-notice--error"
+             role="alert"
         >
           <strong>{{ t('auth.login.authenticationErrorTitle') }}</strong>
           <p>
@@ -84,36 +78,34 @@
         </div>
 
         <div class="login-page__card-actions">
-          <button
-            class="login-page__card-button login-page__card-button--primary"
-            type="button"
-            :disabled="
+          <button :disabled="
               !isAuth0Configured ||
               isAuth0Loading ||
               isAuthenticationSubmitting
             "
-            @click="handleAuthenticationStart('login')"
+                  class="login-page__card-button login-page__card-button--primary"
+                  type="button"
+                  @click="handleAuthenticationStart('login')"
           >
             <span
-              v-if="isAuth0Loading || isAuthenticationSubmitting"
-              class="login-page__card-spinner"
+                v-if="isAuth0Loading || isAuthenticationSubmitting"
+                class="login-page__card-spinner"
             ></span>
             {{
               isAuth0Loading || isAuthenticationSubmitting
-                ? t('auth.login.checkingSession')
-                : t('auth.login.signIn')
+                  ? t('auth.login.checkingSession')
+                  : t('auth.login.signIn')
             }}
           </button>
 
-          <button
-            class="login-page__card-button login-page__card-button--secondary"
-            type="button"
-            :disabled="
+          <button :disabled="
               !isAuth0Configured ||
               isAuth0Loading ||
               isAuthenticationSubmitting
             "
-            @click="handleAuthenticationStart('signup')"
+                  class="login-page__card-button login-page__card-button--secondary"
+                  type="button"
+                  @click="handleAuthenticationStart('signup')"
           >
             {{ t('auth.login.signUp') }}
           </button>
@@ -127,11 +119,11 @@
   </main>
 </template>
 
-<script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useAuth0 } from '@auth0/auth0-vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
+<script lang="ts" setup>
+import {computed, ref, watch} from 'vue'
+import {useAuth0} from '@auth0/auth0-vue'
+import {useRoute, useRouter} from 'vue-router'
+import {useI18n} from 'vue-i18n'
 
 import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
 import {
@@ -144,7 +136,7 @@ type AuthMode = 'login' | 'signup'
 const currentRoute = useRoute()
 const applicationRouter = useRouter()
 const auth0Client = isAuth0Configured ? useAuth0() : null
-const { locale, t } = useI18n({ useScope: 'global' })
+const {locale, t} = useI18n({useScope: 'global'})
 const isAuthenticationSubmitting = ref(false)
 const localAuthenticationError = ref('')
 
@@ -152,11 +144,11 @@ const authenticationRedirectTarget = computed(() => {
   const requestedRedirectPath = currentRoute.query.redirect
 
   if (
-    typeof requestedRedirectPath !== 'string' ||
-    !requestedRedirectPath.startsWith('/') ||
-    requestedRedirectPath.startsWith('//') ||
-    requestedRedirectPath.startsWith('/login') ||
-    requestedRedirectPath.startsWith('/auth/callback')
+      typeof requestedRedirectPath !== 'string' ||
+      !requestedRedirectPath.startsWith('/') ||
+      requestedRedirectPath.startsWith('//') ||
+      requestedRedirectPath.startsWith('/login') ||
+      requestedRedirectPath.startsWith('/auth/callback')
   ) {
     return '/'
   }
@@ -166,15 +158,15 @@ const authenticationRedirectTarget = computed(() => {
 
 const isAuth0Loading = computed(() => auth0Client?.isLoading.value ?? false)
 const authenticationErrorMessage = computed(
-  () =>
-    localAuthenticationError.value ||
-    (auth0Client?.error.value
-      ? t('auth.login.authenticationErrorDescription')
-      : ''),
+    () =>
+        localAuthenticationError.value ||
+        (auth0Client?.error.value
+            ? t('auth.login.authenticationErrorDescription')
+            : ''),
 )
 const hasAuth0ConfigurationError = computed(
-  () =>
-    !isAuth0Configured || currentRoute.query.reason === 'configuration',
+    () =>
+        !isAuth0Configured || currentRoute.query.reason === 'configuration',
 )
 
 const handleAuthenticationStart = async (authenticationMode: AuthMode) => {
@@ -187,10 +179,10 @@ const handleAuthenticationStart = async (authenticationMode: AuthMode) => {
 
   try {
     await auth0Client.loginWithRedirect({
-      appState: { target: authenticationRedirectTarget.value },
+      appState: {target: authenticationRedirectTarget.value},
       authorizationParams: {
         ui_locales: locale.value,
-        ...(authenticationMode === 'signup' ? { screen_hint: 'signup' } : {}),
+        ...(authenticationMode === 'signup' ? {screen_hint: 'signup'} : {}),
       },
     })
   } catch {
@@ -200,13 +192,13 @@ const handleAuthenticationStart = async (authenticationMode: AuthMode) => {
 }
 
 watch(
-  () => auth0Client?.isAuthenticated.value,
-  (isAuthenticated) => {
-    if (isAuthenticated) {
-      void applicationRouter.replace(authenticationRedirectTarget.value)
-    }
-  },
-  { immediate: true },
+    () => auth0Client?.isAuthenticated.value,
+    (isAuthenticated) => {
+      if (isAuthenticated) {
+        void applicationRouter.replace(authenticationRedirectTarget.value)
+      }
+    },
+    {immediate: true},
 )
 </script>
 
