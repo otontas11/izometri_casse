@@ -2,199 +2,153 @@
   <section aria-labelledby="timestamp-page-title" class="timestamp-page">
     <header class="timestamp-page__header">
       <div>
-        <span class="timestamp-page__eyebrow">{{ t('timestamp.page.eyebrow') }}</span>
         <h1 id="timestamp-page-title">{{ t('timestamp.page.title') }}</h1>
         <p>{{ t('timestamp.page.description') }}</p>
       </div>
 
-      <div :class="[
-          'timestamp-page__transaction-summary',
-          {
-            'timestamp-page__transaction-summary--insufficient':
-              !hasAvailableTimestampCredits,
-          },
-        ]"
-      >
-        <span aria-hidden="true">
-          <AppIcon :size="21" name="wallet"/>
-        </span>
-        <div>
-          <small>{{ t('timestamp.page.transactionCost') }}</small>
-          <strong>{{ t('timestamp.page.costPerFile') }}</strong>
-          <small class="timestamp-page__available-credits">
-            {{
-              availableTimestampCredits === null
+      <div class="timestamp-page__header-actions">
+        <div
+          :class="[
+            'timestamp-page__transaction-summary',
+            {
+              'timestamp-page__transaction-summary--insufficient':
+                !hasAvailableTimestampCredits,
+            },
+          ]"
+        >
+          <span aria-hidden="true">
+            <AppIcon name="wallet" :size="21" />
+          </span>
+          <div>
+            <small>{{ t('timestamp.page.transactionCost') }}</small>
+            <strong>{{ t('timestamp.page.costPerFile') }}</strong>
+            <small class="timestamp-page__available-credits">
+              {{
+                availableTimestampCredits === null
                   ? t('timestamp.page.balanceLoading')
                   : availableTimestampCredits > 0
-                      ? t('timestamp.page.availableCredits', {
+                    ? t('timestamp.page.availableCredits', {
                         count: availableTimestampCredits,
                       })
-                      : t('timestamp.page.noAvailableCredits')
-            }}
-          </small>
+                    : t('timestamp.page.noAvailableCredits')
+              }}
+            </small>
+          </div>
         </div>
       </div>
     </header>
 
-    <div class="timestamp-page__workspace">
-      <div class="timestamp-page__upload-workflow">
-        <TimestampFileUploadZone :is-disabled="isTimestampActionInProgress"
-                                 :selected-file="selectedTimestampFileItem"
-                                 @remove-file="handleTimestampFileRemoval"
-                                 @select-file="handleTimestampFileSelection"
-                                 @request-timestamp="handleTimestampConfirmationRequest"
-                                 @request-upload="handleTimestampUploadRequest"
-        />
+    <p
+      v-if="timestampActionErrorMessage"
+      class="timestamp-page__feedback timestamp-page__feedback--error"
+      role="alert"
+    >
+      <span aria-hidden="true">!</span>
+      {{ timestampActionErrorMessage }}
+    </p>
 
-        <p v-if="timestampActionSuccessMessage"
-           class="timestamp-page__feedback timestamp-page__feedback--success"
-           role="status"
-        >
-          <span aria-hidden="true">✓</span>
-          {{ timestampActionSuccessMessage }}
-        </p>
-
-        <p v-else-if=" timestampActionErrorMessage && !isConfirmationModalOpen "
-           class="timestamp-page__feedback timestamp-page__feedback--error"
-           role="alert"
-        >
-          <span aria-hidden="true">!</span>
-          {{ timestampActionErrorMessage }}
-        </p>
-      </div>
-
-      <aside aria-labelledby="timestamp-guide-title" class="timestamp-page__guide">
-        <span aria-hidden="true" class="timestamp-page__guide-icon">
-          <AppIcon :size="24" name="timestamp"/>
-        </span>
-        <p>{{ t('timestamp.page.guideEyebrow') }}</p>
-        <h2 id="timestamp-guide-title">{{ t('timestamp.page.guideTitle') }}</h2>
-
-        <ol>
-          <li>
-            <span>01</span>
-            <div>
-              <strong>{{ t('timestamp.page.selectFile') }}</strong>
-              <small>
-                {{
-                  t('timestamp.page.selectFileDescription', {
-                    maximumSize: maximumTimestampFileSizeLabel,
-                  })
-                }}
-              </small>
-            </div>
-          </li>
-          <li>
-            <span>02</span>
-            <div>
-              <strong>{{ t('timestamp.page.confirmInformation') }}</strong>
-              <small>
-                {{ t('timestamp.page.confirmInformationDescription') }}
-              </small>
-            </div>
-          </li>
-          <li>
-            <span>03</span>
-            <div>
-              <strong>{{ t('timestamp.page.followRecord') }}</strong>
-              <small>{{ t('timestamp.page.followRecordDescription') }}</small>
-            </div>
-          </li>
-        </ol>
-
-        <div class="timestamp-page__guide-note">
-          <span aria-hidden="true">✓</span>
-          <p>{{ t('timestamp.page.guideNote') }}</p>
-        </div>
-      </aside>
-    </div>
-
-    <TimestampHistoryTable :error-message="timestampHistoryErrorMessage"
-                           :is-loading="isTimestampHistoryLoading"
-                           :timestamp-jobs="timestampJobs"
-                           @retry="handleTimestampHistoryRefresh"
+    <TimestampFileWorkspace
+      :can-process="canStartTimestampTransaction"
+      :can-upload="canUploadTimestampFiles"
+      :file-validation-error-message="timestampFileValidationErrorMessage"
+      :is-busy="isTimestampActionInProgress"
+      :timestamp-files="timestampFiles"
+      @add-files="handleTimestampFilesAdded"
+      @remove-file="handleTimestampFileRemoval"
+      @request-timestamp="handleTimestampRequest"
+      @request-upload="handleTimestampUploadRequest"
     />
 
-    <TimestampConfirmationModal :error-message="timestampActionErrorMessage"
-                                :is-open="isConfirmationModalOpen"
-                                :is-submitting="isTimestampSubmitting"
-                                :timestamp-file="selectedTimestampFileItem"
-                                @close="handleConfirmationModalClose"
-                                @confirm="handleTimestampSubmission"
+    <TimestampHistoryTable
+      :error-message="timestampHistoryErrorMessage"
+      :is-loading="isTimestampHistoryLoading"
+      :timestamp-jobs="timestampJobs"
+      @retry="handleTimestampHistoryRefresh"
+    />
+
+    <TimestampVerificationModal
+      :is-open="isTimestampVerificationModalOpen"
+      :is-submitting="isTimestampActionInProgress"
+      @close="handleTimestampVerificationModalClose"
+      @confirm="handleTimestampVerificationConfirm"
+      @resend="handleTimestampVerificationCodeResend"
     />
   </section>
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {storeToRefs} from 'pinia'
-import {useI18n} from 'vue-i18n'
+import { computed, onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
-import {useToast} from '@/composables/useToast'
-import {useDashboardStore} from '@/features/dashboard/stores/dashboard.store'
-import {MAX_DRAFT_FILE_SIZE_BYTES} from '@/features/draft-files/utils/draftFileValidation'
-import TimestampConfirmationModal from '@/features/timestamp/components/TimestampConfirmationModal.vue'
-import TimestampFileUploadZone from '@/features/timestamp/components/TimestampFileUploadZone.vue'
+import { useToast } from '@/composables/useToast'
+import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
+import TimestampFileWorkspace from '@/features/timestamp/components/TimestampFileWorkspace.vue'
 import TimestampHistoryTable from '@/features/timestamp/components/TimestampHistoryTable.vue'
-import {useTimestampStore} from '@/features/timestamp/stores/timestamp.store'
-import {formatFileSize} from '@/utils/formatters'
+import TimestampVerificationModal from '@/features/timestamp/components/TimestampVerificationModal.vue'
+import { useTimestampStore } from '@/features/timestamp/stores/timestamp.store'
 
 const dashboardStore = useDashboardStore()
 const timestampStore = useTimestampStore()
-const {dashboardRequestStatus, dashboardSummary} = storeToRefs(dashboardStore)
+const { dashboardRequestStatus, dashboardSummary } =
+  storeToRefs(dashboardStore)
 const {
+  canProcessTimestampFiles,
+  canUploadTimestampFiles,
   isTimestampActionInProgress,
   isTimestampHistoryLoading,
-  isTimestampSubmitting,
-  selectedTimestampFileItem,
   timestampActionErrorMessage,
   timestampActionSuccessMessage,
+  timestampFiles,
+  timestampFileValidationErrorMessage,
   timestampHistoryErrorMessage,
   timestampJobs,
   timestampJobsLoadStatus,
 } = storeToRefs(timestampStore)
-const {showErrorToast, showSuccessToast, showWarningToast} = useToast()
-const {t} = useI18n({useScope: 'global'})
+const { showErrorToast, showSuccessToast, showWarningToast } = useToast()
+const { t } = useI18n({ useScope: 'global' })
+const isTimestampVerificationModalOpen = ref(false)
 
-const isConfirmationModalOpen = ref(false)
-const maximumTimestampFileSizeLabel = computed(() =>
-    formatFileSize(MAX_DRAFT_FILE_SIZE_BYTES),
-)
 const availableTimestampCredits = computed(
-    () => dashboardSummary.value?.remainingCredits ?? null,
+  () => dashboardSummary.value?.remainingCredits ?? null,
 )
 const hasAvailableTimestampCredits = computed(
-    () =>
-        availableTimestampCredits.value === null ||
-        availableTimestampCredits.value > 0,
+  () =>
+    availableTimestampCredits.value === null ||
+    availableTimestampCredits.value > 0,
+)
+const canStartTimestampTransaction = computed(
+  () =>
+    canProcessTimestampFiles.value && hasAvailableTimestampCredits.value,
 )
 
-const handleTimestampFileSelection = (timestampFile: File) => {
-  timestampStore.selectTimestampFile(timestampFile)
+const handleTimestampFilesAdded = (timestampFiles: File[]) => {
+  timestampStore.addTimestampFiles(timestampFiles)
 }
 
-const handleTimestampFileRemoval = () => {
-  void timestampStore.removeSelectedTimestampFile()
+const handleTimestampFileRemoval = (timestampFileId: string) => {
+  void timestampStore.removeTimestampFile(timestampFileId)
 }
 
 const handleTimestampUploadRequest = async () => {
-  const isTimestampFileUploaded =
-      await timestampStore.uploadSelectedTimestampFile()
+  const areTimestampFilesUploaded = await timestampStore.uploadTimestampFiles()
 
-  if (isTimestampFileUploaded) {
+  if (areTimestampFilesUploaded) {
     showSuccessToast(timestampActionSuccessMessage.value)
     return
   }
 
-  showErrorToast(timestampActionErrorMessage.value)
+  showErrorToast(
+    timestampActionErrorMessage.value ||
+      t('timestamp.feedback.uploadFailure', {
+        failedCount: 1,
+        uploadedCount: 0,
+      }),
+  )
 }
 
-const handleTimestampConfirmationRequest = () => {
-  if (!selectedTimestampFileItem.value?.draftFileId) {
-    return
-  }
-
+const handleTimestampRequest = () => {
   timestampStore.clearTimestampActionFeedback()
 
   if (!hasAvailableTimestampCredits.value) {
@@ -203,26 +157,36 @@ const handleTimestampConfirmationRequest = () => {
     return
   }
 
-  isConfirmationModalOpen.value = true
+  isTimestampVerificationModalOpen.value = true
 }
 
-const handleConfirmationModalClose = () => {
-  if (!isTimestampSubmitting.value) {
-    isConfirmationModalOpen.value = false
+const handleTimestampVerificationModalClose = () => {
+  if (!isTimestampActionInProgress.value) {
+    isTimestampVerificationModalOpen.value = false
   }
 }
 
-const handleTimestampSubmission = async () => {
-  const isTimestampCreated =
-      await timestampStore.submitSelectedTimestampDraft()
+const handleTimestampVerificationConfirm = async () => {
+  if (isTimestampActionInProgress.value) {
+    return
+  }
 
-  if (isTimestampCreated) {
-    isConfirmationModalOpen.value = false
+  const areTimestampsCreated = await timestampStore.processTimestampFiles()
+  isTimestampVerificationModalOpen.value = false
+
+  if (areTimestampsCreated) {
     showSuccessToast(timestampActionSuccessMessage.value)
     return
   }
 
-  showErrorToast(timestampActionErrorMessage.value)
+  showErrorToast(
+    timestampActionErrorMessage.value ||
+      t('timestamp.feedback.transactionFailed'),
+  )
+}
+
+const handleTimestampVerificationCodeResend = () => {
+  showSuccessToast(t('timestamp.verification.codeResent'))
 }
 
 const handleTimestampHistoryRefresh = () => {
@@ -238,7 +202,7 @@ onMounted(() => {
     void timestampStore.fetchTimestampJobs()
   }
 
-  void timestampStore.loadUploadedTimestampFile()
+  void timestampStore.loadUploadedTimestampFiles()
 })
 </script>
 

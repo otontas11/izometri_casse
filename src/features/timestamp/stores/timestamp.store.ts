@@ -5,6 +5,7 @@ import { getApiErrorMessage } from '@/api/apiError'
 import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
 import { useDraftFilesStore } from '@/features/draft-files/stores/draftFiles.store'
 import type { DraftFile } from '@/features/draft-files/types/draftFile.types'
+import { validateDraftFile } from '@/features/draft-files/utils/draftFileValidation'
 import { translate } from '@/locales'
 import type { ApiRequestStatus } from '@/types/api.types'
 
@@ -13,8 +14,6 @@ import type {
   TimestampFileItem,
   TimestampJob,
 } from '../types/timestamp.types'
-
-type TimestampAction = 'deleting' | 'idle' | 'processing' | 'uploading'
 
 const createSelectedTimestampFileItem = (
   selectedFile: File,
@@ -45,30 +44,56 @@ const createUploadedTimestampFileItem = (
 export const useTimestampStore = defineStore('timestamp', () => {
   const dashboardStore = useDashboardStore()
   const draftFilesStore = useDraftFilesStore()
-  const timestampJobs = ref<TimestampJob[]>([])
-  const selectedTimestampFileItem = shallowRef<TimestampFileItem | null>(null)
-  const timestampJobsLoadStatus = ref<ApiRequestStatus>('idle')
-  const timestampAction = ref<TimestampAction>('idle')
-  const timestampHistoryErrorMessage = ref('')
+  const timestampFiles = shallowRef<TimestampFileItem[]>([])
+  const timestampJobs = shallowRef<TimestampJob[]>([])
+  const timestampFileValidationErrorMessage = ref('')
+  const timestampActionStatus = ref<ApiRequestStatus>('idle')
   const timestampActionErrorMessage = ref('')
   const timestampActionSuccessMessage = ref('')
+  const timestampJobsLoadStatus = ref<ApiRequestStatus>('idle')
+  const timestampHistoryErrorMessage = ref('')
 
+  const isTimestampActionInProgress = computed(
+    () => timestampActionStatus.value === 'loading',
+  )
   const isTimestampHistoryLoading = computed(
     () => timestampJobsLoadStatus.value === 'loading',
   )
-  const isTimestampActionInProgress = computed(
-    () => timestampAction.value !== 'idle',
+  const canUploadTimestampFiles = computed(() =>
+    timestampFiles.value.some(
+      ({ status }) => status === 'selected' || status === 'upload-error',
+    ),
   )
-  const isTimestampSubmitting = computed(
-    () => timestampAction.value === 'processing',
+  const canProcessTimestampFiles = computed(() =>
+    timestampFiles.value.some(
+      ({ status }) => status === 'uploaded' || status === 'process-error',
+    ),
   )
 
-  const selectNextUploadedTimestampFile = () => {
-    const nextUploadedDraftFile =
-      draftFilesStore.uploadedDraftFiles.timestamp[0]
-    selectedTimestampFileItem.value = nextUploadedDraftFile
-      ? createUploadedTimestampFileItem(nextUploadedDraftFile)
-      : null
+  const clearTimestampActionFeedback = () => {
+    timestampActionStatus.value = 'idle'
+    timestampActionErrorMessage.value = ''
+    timestampActionSuccessMessage.value = ''
+  }
+
+  const updateTimestampFileItem = (
+    timestampFileId: string,
+    updatedFields: Partial<TimestampFileItem>,
+  ) => {
+    timestampFiles.value = timestampFiles.value.map((timestampFileItem) =>
+      timestampFileItem.id === timestampFileId
+        ? { ...timestampFileItem, ...updatedFields }
+        : timestampFileItem,
+    )
+  }
+
+  const addRecentTimestampJob = (timestampJob: TimestampJob) => {
+    timestampJobs.value = [
+      timestampJob,
+      ...timestampJobs.value.filter(({ id }) => id !== timestampJob.id),
+    ]
+    timestampJobsLoadStatus.value = 'success'
+    timestampHistoryErrorMessage.value = ''
   }
 
   const fetchTimestampJobs = async () => {
@@ -88,140 +113,211 @@ export const useTimestampStore = defineStore('timestamp', () => {
     }
   }
 
-  const loadUploadedTimestampFile = async () => {
-    if (selectedTimestampFileItem.value) {
-      return
-    }
-
+  const loadUploadedTimestampFiles = async () => {
     try {
-      await draftFilesStore.fetchUploadedDraftFiles('timestamp')
+      const uploadedDraftFiles =
+        await draftFilesStore.fetchUploadedDraftFiles('timestamp')
+      const existingDraftFileIds = new Set(
+        timestampFiles.value
+          .map(({ draftFileId }) => draftFileId)
+          .filter((draftFileId): draftFileId is number => draftFileId !== null),
+      )
+      const restoredTimestampFiles = uploadedDraftFiles
+        .filter(({ id }) => !existingDraftFileIds.has(id))
+        .map(createUploadedTimestampFileItem)
 
-      if (!selectedTimestampFileItem.value) {
-        selectNextUploadedTimestampFile()
-      }
+      timestampFiles.value = [
+        ...timestampFiles.value,
+        ...restoredTimestampFiles,
+      ]
     } catch (requestError) {
+      timestampActionStatus.value = 'error'
       timestampActionErrorMessage.value = getApiErrorMessage(requestError)
     }
   }
 
-  const selectTimestampFile = (timestampFile: File) => {
+  const addTimestampFiles = (newTimestampFiles: File[]) => {
     if (isTimestampActionInProgress.value) {
-      return
-    }
-
-    selectedTimestampFileItem.value =
-      createSelectedTimestampFileItem(timestampFile)
-    timestampActionErrorMessage.value = ''
-    timestampActionSuccessMessage.value = ''
-  }
-
-  const removeSelectedTimestampFile = async () => {
-    const selectedFileItem = selectedTimestampFileItem.value
-
-    if (!selectedFileItem || isTimestampActionInProgress.value) {
       return false
     }
 
-    if (selectedFileItem.draftFileId === null) {
-      selectedTimestampFileItem.value = null
-      timestampActionErrorMessage.value = ''
-      timestampActionSuccessMessage.value = ''
+    const validTimestampFiles: File[] = []
+    const validationErrorMessages: string[] = []
+
+    newTimestampFiles.forEach((timestampFile) => {
+      const validationResult = validateDraftFile(timestampFile)
+
+      if (validationResult.isValid) {
+        validTimestampFiles.push(timestampFile)
+        return
+      }
+
+      validationErrorMessages.push(
+        translate('timestamp.validation.fileError', {
+          fileName: timestampFile.name,
+          message: validationResult.errorMessage,
+        }),
+      )
+    })
+
+    if (validTimestampFiles.length > 0) {
+      timestampFiles.value = [
+        ...timestampFiles.value,
+        ...validTimestampFiles.map(createSelectedTimestampFileItem),
+      ]
+      clearTimestampActionFeedback()
+    }
+
+    timestampFileValidationErrorMessage.value =
+      validationErrorMessages.join(' ')
+
+    return validTimestampFiles.length > 0
+  }
+
+  const removeTimestampFile = async (timestampFileId: string) => {
+    if (isTimestampActionInProgress.value) {
+      return false
+    }
+
+    const timestampFileItem = timestampFiles.value.find(
+      ({ id }) => id === timestampFileId,
+    )
+
+    if (!timestampFileItem) {
+      return false
+    }
+
+    if (timestampFileItem.draftFileId === null) {
+      timestampFiles.value = timestampFiles.value.filter(
+        ({ id }) => id !== timestampFileId,
+      )
+      timestampFileValidationErrorMessage.value = ''
+      clearTimestampActionFeedback()
       return true
     }
 
-    timestampAction.value = 'deleting'
-    selectedTimestampFileItem.value = {
-      ...selectedFileItem,
+    timestampActionStatus.value = 'loading'
+    updateTimestampFileItem(timestampFileId, {
       errorMessage: '',
       status: 'deleting',
-    }
+    })
 
     try {
       await draftFilesStore.deleteDraftFile(
-        selectedFileItem.draftFileId,
+        timestampFileItem.draftFileId,
         'timestamp',
       )
-      selectNextUploadedTimestampFile()
+      timestampFiles.value = timestampFiles.value.filter(
+        ({ id }) => id !== timestampFileId,
+      )
+      timestampActionStatus.value = 'success'
       timestampActionSuccessMessage.value = translate(
         'timestamp.feedback.draftDeleted',
       )
-      timestampActionErrorMessage.value = ''
       await dashboardStore.fetchDashboardData()
       return true
     } catch (requestError) {
       const deletionErrorMessage = getApiErrorMessage(requestError)
-      selectedTimestampFileItem.value = {
-        ...selectedFileItem,
+      updateTimestampFileItem(timestampFileId, {
         errorMessage: deletionErrorMessage,
         status: 'uploaded',
-      }
+      })
+      timestampActionStatus.value = 'error'
       timestampActionErrorMessage.value = deletionErrorMessage
       return false
-    } finally {
-      timestampAction.value = 'idle'
     }
   }
 
-  const uploadSelectedTimestampFile = async () => {
-    const selectedFileItem = selectedTimestampFileItem.value
+  const uploadTimestampFiles = async () => {
+    if (isTimestampActionInProgress.value) {
+      return false
+    }
 
-    if (
-      !selectedFileItem?.file ||
-      !['selected', 'upload-error'].includes(selectedFileItem.status) ||
-      isTimestampActionInProgress.value
-    ) {
+    const timestampFilesToUpload = timestampFiles.value.filter(
+      ({ status }) => status === 'selected' || status === 'upload-error',
+    )
+
+    if (timestampFilesToUpload.length === 0) {
+      timestampActionStatus.value = 'error'
       timestampActionErrorMessage.value = translate(
-        'timestamp.feedback.selectFileToUpload',
+        'timestamp.feedback.selectFilesToUpload',
       )
       return false
     }
 
-    timestampAction.value = 'uploading'
+    timestampActionStatus.value = 'loading'
+    timestampFileValidationErrorMessage.value = ''
     timestampActionErrorMessage.value = ''
     timestampActionSuccessMessage.value = ''
-    selectedTimestampFileItem.value = {
-      ...selectedFileItem,
-      errorMessage: '',
-      progressPercentage: 0,
-      status: 'uploading',
+    let uploadedFileCount = 0
+    let failedFileCount = 0
+
+    for (const timestampFileItem of timestampFilesToUpload) {
+      if (!timestampFileItem.file) {
+        continue
+      }
+
+      updateTimestampFileItem(timestampFileItem.id, {
+        errorMessage: '',
+        progressPercentage: 0,
+        status: 'uploading',
+      })
+
+      try {
+        const uploadedDraftFile = await draftFilesStore.uploadDraftFile(
+          timestampFileItem.file,
+          'timestamp',
+          (progressPercentage) => {
+            updateTimestampFileItem(timestampFileItem.id, {
+              progressPercentage,
+            })
+          },
+        )
+
+        updateTimestampFileItem(timestampFileItem.id, {
+          draftFileId: uploadedDraftFile.id,
+          errorMessage: '',
+          file: null,
+          fileName: uploadedDraftFile.fileName,
+          fileSize: uploadedDraftFile.fileSize,
+          progressPercentage: 100,
+          status: 'uploaded',
+        })
+        uploadedFileCount += 1
+      } catch (requestError) {
+        updateTimestampFileItem(timestampFileItem.id, {
+          errorMessage: getApiErrorMessage(requestError),
+          progressPercentage: 0,
+          status: 'upload-error',
+        })
+        failedFileCount += 1
+      }
     }
 
-    try {
-      const uploadedDraftFile = await draftFilesStore.uploadDraftFile(
-        selectedFileItem.file,
-        'timestamp',
-        (progressPercentage) => {
-          if (!selectedTimestampFileItem.value) {
-            return
-          }
+    if (uploadedFileCount > 0) {
+      await dashboardStore.fetchDashboardData()
+    }
 
-          selectedTimestampFileItem.value = {
-            ...selectedTimestampFileItem.value,
-            progressPercentage,
-          }
+    if (failedFileCount > 0) {
+      timestampActionStatus.value = 'error'
+      timestampActionErrorMessage.value = translate(
+        uploadedFileCount > 0
+          ? 'timestamp.feedback.uploadPartialFailure'
+          : 'timestamp.feedback.uploadFailure',
+        {
+          failedCount: failedFileCount,
+          uploadedCount: uploadedFileCount,
         },
       )
-
-      selectedTimestampFileItem.value =
-        createUploadedTimestampFileItem(uploadedDraftFile)
-      timestampActionSuccessMessage.value = translate(
-        'timestamp.feedback.uploadSuccess',
-        { fileName: uploadedDraftFile.fileName },
-      )
-      await dashboardStore.fetchDashboardData()
-      return true
-    } catch (requestError) {
-      const uploadErrorMessage = getApiErrorMessage(requestError)
-      selectedTimestampFileItem.value = {
-        ...selectedFileItem,
-        errorMessage: uploadErrorMessage,
-        status: 'upload-error',
-      }
-      timestampActionErrorMessage.value = uploadErrorMessage
       return false
-    } finally {
-      timestampAction.value = 'idle'
     }
+
+    timestampActionStatus.value = 'success'
+    timestampActionSuccessMessage.value = translate(
+      'timestamp.feedback.uploadSuccess',
+      { count: uploadedFileCount },
+    )
+    return true
   }
 
   const reportInsufficientTimestampCredits = () => {
@@ -229,20 +325,24 @@ export const useTimestampStore = defineStore('timestamp', () => {
       return
     }
 
+    timestampActionStatus.value = 'error'
     timestampActionErrorMessage.value = translate('errors.insufficientCredits')
     timestampActionSuccessMessage.value = ''
   }
 
-  const submitSelectedTimestampDraft = async () => {
-    const selectedFileItem = selectedTimestampFileItem.value
+  const processTimestampFiles = async () => {
+    if (isTimestampActionInProgress.value) {
+      return false
+    }
 
-    if (
-      !selectedFileItem?.draftFileId ||
-      !['uploaded', 'process-error'].includes(selectedFileItem.status) ||
-      isTimestampActionInProgress.value
-    ) {
+    const timestampFilesToProcess = timestampFiles.value.filter(
+      ({ status }) => status === 'uploaded' || status === 'process-error',
+    )
+
+    if (timestampFilesToProcess.length === 0) {
+      timestampActionStatus.value = 'error'
       timestampActionErrorMessage.value = translate(
-        'timestamp.feedback.uploadFileBeforeTimestamping',
+        'timestamp.feedback.uploadFilesBeforeTimestamping',
       )
       return false
     }
@@ -255,74 +355,105 @@ export const useTimestampStore = defineStore('timestamp', () => {
       return false
     }
 
-    timestampAction.value = 'processing'
+    timestampActionStatus.value = 'loading'
     timestampActionErrorMessage.value = ''
     timestampActionSuccessMessage.value = ''
-    selectedTimestampFileItem.value = {
-      ...selectedFileItem,
-      errorMessage: '',
-      status: 'processing',
-    }
+    let completedFileCount = 0
+    let failedFileCount = 0
 
-    try {
-      const timestampTransaction =
-        await timestampApi.createTimestampTransaction(
-          selectedFileItem.draftFileId,
-        )
-
-      dashboardStore.synchronizeDashboardData(
-        timestampTransaction.dashboardSummary,
-        timestampTransaction.recentDocuments,
-      )
-      timestampJobs.value.unshift(timestampTransaction.timestampJob)
-      timestampHistoryErrorMessage.value = ''
-      timestampJobsLoadStatus.value = 'success'
-      draftFilesStore.removeProcessedDraftFile(
-        selectedFileItem.draftFileId,
-        'timestamp',
-      )
-      selectNextUploadedTimestampFile()
-      timestampActionSuccessMessage.value = translate(
-        'timestamp.feedback.success',
-        { fileName: timestampTransaction.timestampJob.fileName },
-      )
-      return true
-    } catch (requestError) {
-      const processingErrorMessage = getApiErrorMessage(requestError)
-      selectedTimestampFileItem.value = {
-        ...selectedFileItem,
-        errorMessage: processingErrorMessage,
-        status: 'process-error',
+    for (const timestampFileItem of timestampFilesToProcess) {
+      if (timestampFileItem.draftFileId === null) {
+        continue
       }
-      timestampActionErrorMessage.value = processingErrorMessage
-      return false
-    } finally {
-      timestampAction.value = 'idle'
-    }
-  }
 
-  const clearTimestampActionFeedback = () => {
-    timestampActionErrorMessage.value = ''
-    timestampActionSuccessMessage.value = ''
+      if (
+        dashboardStore.dashboardSummary &&
+        dashboardStore.dashboardSummary.remainingCredits < 1
+      ) {
+        updateTimestampFileItem(timestampFileItem.id, {
+          errorMessage: translate('errors.insufficientCredits'),
+          status: 'process-error',
+        })
+        failedFileCount += 1
+        continue
+      }
+
+      updateTimestampFileItem(timestampFileItem.id, {
+        errorMessage: '',
+        progressPercentage: 100,
+        status: 'processing',
+      })
+
+      try {
+        const timestampTransaction =
+          await timestampApi.createTimestampTransaction(
+            timestampFileItem.draftFileId,
+          )
+
+        dashboardStore.synchronizeDashboardData(
+          timestampTransaction.dashboardSummary,
+          timestampTransaction.recentDocuments,
+        )
+        addRecentTimestampJob(timestampTransaction.timestampJob)
+        draftFilesStore.removeProcessedDraftFile(
+          timestampFileItem.draftFileId,
+          'timestamp',
+        )
+        timestampFiles.value = timestampFiles.value.filter(
+          ({ id }) => id !== timestampFileItem.id,
+        )
+        completedFileCount += 1
+      } catch (requestError) {
+        updateTimestampFileItem(timestampFileItem.id, {
+          errorMessage: getApiErrorMessage(requestError),
+          status: 'process-error',
+        })
+        failedFileCount += 1
+      }
+    }
+
+    if (failedFileCount > 0) {
+      timestampActionStatus.value = 'error'
+      timestampActionErrorMessage.value =
+        completedFileCount > 0
+          ? translate('timestamp.feedback.partialFailure', {
+              completedCount: completedFileCount,
+              failedCount: failedFileCount,
+            })
+          : translate('timestamp.feedback.batchFailure', {
+              count: failedFileCount,
+            })
+      return false
+    }
+
+    timestampActionStatus.value = 'success'
+    timestampActionSuccessMessage.value = translate(
+      'timestamp.feedback.batchSuccess',
+      { count: completedFileCount },
+    )
+    return true
   }
 
   return {
+    addTimestampFiles,
+    canProcessTimestampFiles,
+    canUploadTimestampFiles,
     clearTimestampActionFeedback,
     fetchTimestampJobs,
     isTimestampActionInProgress,
     isTimestampHistoryLoading,
-    isTimestampSubmitting,
-    loadUploadedTimestampFile,
-    removeSelectedTimestampFile,
+    loadUploadedTimestampFiles,
+    processTimestampFiles,
+    removeTimestampFile,
     reportInsufficientTimestampCredits,
-    selectedTimestampFileItem,
-    selectTimestampFile,
-    submitSelectedTimestampDraft,
     timestampActionErrorMessage,
+    timestampActionStatus,
     timestampActionSuccessMessage,
+    timestampFiles,
+    timestampFileValidationErrorMessage,
     timestampHistoryErrorMessage,
     timestampJobs,
     timestampJobsLoadStatus,
-    uploadSelectedTimestampFile,
+    uploadTimestampFiles,
   }
 })

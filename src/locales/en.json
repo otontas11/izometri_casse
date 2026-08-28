@@ -247,45 +247,28 @@
   },
   "timestamp": {
     "page": {
-      "eyebrow": "Secure verification center",
       "title": "Timestamp",
-      "description": "Create a trusted record that proves your file existed at a specific time in just a few steps.",
+      "description": "Upload your files to the secure area for free, then verify the files you want to timestamp.",
       "transactionCost": "Transaction cost",
       "costPerFile": "1 credit / file",
       "balanceLoading": "Loading balance…",
       "availableCredits": "Available credits: {count}",
-      "noAvailableCredits": "No credits available",
-      "guideEyebrow": "Complete in three steps",
-      "guideTitle": "From your file to a verification record",
-      "selectFile": "Select your file",
-      "selectFileDescription": "Select and upload one file up to {maximumSize} for free.",
-      "confirmInformation": "Confirm the information",
-      "confirmInformationDescription": "Review the file name, size, and credit cost.",
-      "followRecord": "Track the record",
-      "followRecordDescription": "View the completed transaction in your history.",
-      "guideNote": "The result is saved together with the file information and creation date."
+      "noAvailableCredits": "No credits available"
     },
-    "upload": {
-      "fileFallback": "File",
-      "fileExtension": "{extension} file",
-      "multipleFilesError": "You can select only one file at a time.",
-      "inputAriaLabel": "Select a file to timestamp",
-      "eyebrow": "File selection",
-      "title": "Drop your file into the secure area",
-      "description": "Drag and drop your file or select it from your device. You can review the file information before continuing.",
-      "selectAnother": "Select another file",
+    "workspace": {
+      "inputAriaLabel": "Select files to timestamp",
+      "uploadEyebrow": "File selection",
+      "uploadTitle": "Drop your files here",
+      "uploadDescription": "Drag and drop one or more files or select them from your device. Each file is displayed on a separate card.",
       "selectFromDevice": "Select from device",
-      "draftStored": "Draft stored securely",
-      "requirements": "PDF, Word, XML, UBL, and images · Maximum {maximumSize}",
-      "selectedFileAriaLabel": "Selected file",
-      "removeAriaLabel": "Remove {fileName}",
+      "requirements": "PDF, Word, XML, UBL, and images · Maximum {maximumSize} per file",
+      "listEyebrow": "Upload queue",
+      "listTitle": "Selected files",
+      "selectedFileCount": "{count} files",
       "progressAriaLabel": "Upload progress for {fileName}",
-      "uploadCost": "Upload cost",
-      "free": "Free",
-      "uploadFile": "Upload file",
-      "transactionCost": "Transaction cost",
-      "oneCredit": "1 credit",
-      "continue": "Continue to timestamp",
+      "removeAriaLabel": "Remove {fileName}",
+      "uploadFiles": "Upload files",
+      "timestampFiles": "Timestamp files",
       "status": {
         "selected": "Selected",
         "uploading": "Uploading",
@@ -296,17 +279,21 @@
         "deleting": "Deleting"
       }
     },
-    "modal": {
-      "eyebrow": "Final review",
-      "title": "Confirm the timestamp",
-      "closeAriaLabel": "Close confirmation dialog",
-      "description": "A verifiable transaction record will be created for the file below. The record will be added to your transaction history after confirmation.",
-      "operation": "Operation",
-      "operationValue": "Timestamping",
-      "creditCost": "Credit cost",
-      "oneCredit": "1 credit",
-      "creating": "Creating transaction…",
-      "confirm": "Confirm and timestamp"
+    "verification": {
+      "eyebrow": "Secure timestamping",
+      "title": "One-Time Password Verification",
+      "phoneMessage": "Your code was sent to the phone number {phoneNumber}.",
+      "codePrompt": "Enter the 6-digit code",
+      "codeInputAriaLabel": "One-time verification code",
+      "codeDigitAriaLabel": "Verification code digit {position}",
+      "closeAriaLabel": "Close timestamp verification",
+      "demoCode": "Case verification code: {code}",
+      "invalidCode": "The verification code is incorrect. Please try again.",
+      "confirm": "Verify and timestamp",
+      "verifying": "Timestamping…",
+      "resendCountdown": "Resend ({seconds}s)",
+      "resend": "Resend",
+      "codeResent": "The demo verification code was resent."
     },
     "history": {
       "eyebrow": "Transaction history",
@@ -327,12 +314,20 @@
       "emptyTitle": "No timestamp records yet",
       "emptyDescription": "Your verification record will appear here after your first transaction is completed."
     },
+    "validation": {
+      "fileError": "{fileName}: {message}"
+    },
     "feedback": {
       "draftDeleted": "The draft file was deleted from the secure area.",
-      "selectFileToUpload": "Select a file to upload.",
-      "uploadSuccess": "{fileName} was uploaded to the secure area for free.",
-      "uploadFileBeforeTimestamping": "Upload the selected file before timestamping it.",
-      "success": "{fileName} was timestamped successfully. 1 credit was used."
+      "selectFilesToUpload": "Select at least one file to upload.",
+      "uploadSuccess": "{count} files were uploaded to the secure area for free.",
+      "uploadPartialFailure": "{uploadedCount} files were uploaded; {failedCount} files failed to upload.",
+      "uploadFailure": "{failedCount} files could not be uploaded. Review the errors on the file cards.",
+      "uploadFilesBeforeTimestamping": "Upload the selected files before timestamping them.",
+      "batchSuccess": "Timestamp records were created for {count} files. One credit was used for each file.",
+      "partialFailure": "{completedCount} files were timestamped and used {completedCount} credits; {failedCount} files could not be processed.",
+      "batchFailure": "{count} files could not be timestamped. Review the errors on the file cards and try again.",
+      "transactionFailed": "The timestamp transaction could not be completed. Please try again."
     }
   },
   "profile": {

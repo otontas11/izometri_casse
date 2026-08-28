@@ -1,0 +1,279 @@
+.timestamp-verification-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: grid;
+  padding: 1rem;
+  place-items: center;
+  background: color-mix(in srgb, var(--color-brand-950) 58%, transparent);
+  backdrop-filter: blur(5px);
+}
+
+.timestamp-verification-modal__dialog {
+  display: grid;
+  width: min(100%, 39rem);
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  padding: clamp(1.3rem, 4vw, 2.25rem);
+  overflow-y: auto;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 1.35rem;
+  box-shadow: 0 1.5rem 4rem
+    color-mix(in srgb, var(--color-brand-950) 24%, transparent);
+}
+
+.timestamp-verification-modal__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.timestamp-verification-modal__header > span {
+  display: grid;
+  width: 3.1rem;
+  height: 3.1rem;
+  place-items: center;
+  color: var(--color-primary-600);
+  background: var(--color-primary-100);
+  border-radius: var(--radius-sm);
+}
+
+.timestamp-verification-modal__header small,
+.timestamp-verification-modal__header h2,
+.timestamp-verification-modal__phone-message,
+.timestamp-verification-modal__error-message,
+.timestamp-verification-modal__demo-code {
+  margin: 0;
+}
+
+.timestamp-verification-modal__header small {
+  color: var(--color-accent-600);
+  font-size: var(--font-size-small);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.timestamp-verification-modal__header h2 {
+  margin-top: 0.25rem;
+  color: var(--color-brand-950);
+  font-size: clamp(1.15rem, 4vw, 1.55rem);
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+}
+
+.timestamp-verification-modal__header button {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  background: var(--color-surface-subtle);
+  border-radius: 50%;
+}
+
+.timestamp-verification-modal__header button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.timestamp-verification-modal__phone-message {
+  margin-top: 2rem;
+  color: var(--color-brand-950);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.timestamp-verification-modal__form {
+  display: grid;
+  margin-top: 1.75rem;
+}
+
+.timestamp-verification-modal__form fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.timestamp-verification-modal__form legend {
+  width: 100%;
+  padding: 0;
+  color: var(--color-brand-950);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.timestamp-verification-modal__code-inputs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 3.35rem));
+  gap: clamp(0.35rem, 1.5vw, 0.65rem);
+  justify-content: center;
+  margin-top: 0.85rem;
+}
+
+.timestamp-verification-modal__code-inputs input {
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  color: var(--color-brand-950);
+  font: inherit;
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-align: center;
+  background: var(--color-surface-raised);
+  border: 1px solid #bdcbd7;
+  border-radius: 0.7rem;
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.timestamp-verification-modal__code-inputs input:focus {
+  border-color: var(--color-primary-600);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 12%);
+}
+
+.timestamp-verification-modal__code-inputs
+  .timestamp-verification-modal__code-input--invalid {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgb(198 40 58 / 10%);
+}
+
+.timestamp-verification-modal__error-message {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.85rem;
+  color: var(--color-danger);
+  font-size: var(--font-size-small);
+  font-weight: 700;
+}
+
+.timestamp-verification-modal__error-message > span {
+  display: grid;
+  width: 1.3rem;
+  height: 1.3rem;
+  place-items: center;
+  color: #fff;
+  background: var(--color-danger);
+  border-radius: 50%;
+}
+
+.timestamp-verification-modal__demo-code {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  padding: 0.7rem 0.85rem;
+  color: var(--color-primary-700);
+  font-size: var(--font-size-small);
+  font-weight: 700;
+  background: var(--color-primary-100);
+  border-radius: var(--radius-sm);
+}
+
+.timestamp-verification-modal__submit-button {
+  display: inline-flex;
+  gap: 0.55rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3.4rem;
+  margin-top: 1.25rem;
+  padding: 0.8rem 1rem;
+  color: var(--color-text-inverse);
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  background: var(--color-brand-950);
+  border-radius: var(--radius-sm);
+}
+
+.timestamp-verification-modal__submit-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.timestamp-verification-modal__resend-button {
+  justify-self: center;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  color: var(--color-primary-700);
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  background: transparent;
+}
+
+.timestamp-verification-modal__resend-button:disabled {
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.timestamp-verification-modal__spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: timestamp-verification-modal-spin 700ms linear infinite;
+}
+
+.timestamp-verification-modal-enter-active,
+.timestamp-verification-modal-leave-active {
+  transition: opacity var(--transition-fast);
+}
+
+.timestamp-verification-modal-enter-active
+  .timestamp-verification-modal__dialog,
+.timestamp-verification-modal-leave-active
+  .timestamp-verification-modal__dialog {
+  transition: transform var(--transition-fast);
+}
+
+.timestamp-verification-modal-enter-from,
+.timestamp-verification-modal-leave-to {
+  opacity: 0;
+}
+
+.timestamp-verification-modal-enter-from
+  .timestamp-verification-modal__dialog,
+.timestamp-verification-modal-leave-to
+  .timestamp-verification-modal__dialog {
+  transform: translateY(0.75rem) scale(0.985);
+}
+
+@keyframes timestamp-verification-modal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 35rem) {
+  .timestamp-verification-modal__dialog {
+    padding: 1.15rem;
+  }
+
+  .timestamp-verification-modal__header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .timestamp-verification-modal__header > span {
+    display: none;
+  }
+
+  .timestamp-verification-modal__phone-message {
+    margin-top: 1.5rem;
+  }
+}

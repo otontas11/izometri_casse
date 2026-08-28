@@ -247,45 +247,28 @@
   },
   "timestamp": {
     "page": {
-      "eyebrow": "Güvenli doğrulama merkezi",
       "title": "Zaman Damgala",
-      "description": "Dosyanızın belirli bir tarihte var olduğunu doğrulayan güvenilir işlem kaydını birkaç adımda oluşturun.",
+      "description": "Dosyalarınızı önce ücretsiz olarak güvenli alana yükleyin, ardından zaman damgalamak istediklerinizi doğrulayın.",
       "transactionCost": "İşlem maliyeti",
       "costPerFile": "1 kontör / dosya",
       "balanceLoading": "Bakiye yükleniyor…",
       "availableCredits": "Kullanılabilir kontör: {count}",
-      "noAvailableCredits": "Kullanılabilir kontör yok",
-      "guideEyebrow": "Üç adımda tamamlayın",
-      "guideTitle": "Dosyanızdan doğrulama kaydına",
-      "selectFile": "Dosyanızı seçin",
-      "selectFileDescription": "En fazla {maximumSize} boyutunda tek dosya seçip ücretsiz yükleyin.",
-      "confirmInformation": "Bilgileri onaylayın",
-      "confirmInformationDescription": "Dosya adı, boyutu ve kontör maliyetini kontrol edin.",
-      "followRecord": "Kaydı takip edin",
-      "followRecordDescription": "Tamamlanan işlemi geçmiş listenizde görüntüleyin.",
-      "guideNote": "İşlem sonucu, dosya bilgileri ve oluşturulma tarihiyle birlikte kaydedilir."
+      "noAvailableCredits": "Kullanılabilir kontör yok"
     },
-    "upload": {
-      "fileFallback": "Dosya",
-      "fileExtension": "{extension} dosyası",
-      "multipleFilesError": "Tek seferde yalnızca bir dosya seçebilirsiniz.",
-      "inputAriaLabel": "Zaman damgalanacak dosyayı seçin",
-      "eyebrow": "Dosya seçimi",
-      "title": "Dosyanızı güvenli alana bırakın",
-      "description": "Sürükleyip bırakabilir veya cihazınızdan seçebilirsiniz. İşlem öncesinde dosya bilgilerini tekrar kontrol edebilirsiniz.",
-      "selectAnother": "Başka dosya seç",
+    "workspace": {
+      "inputAriaLabel": "Zaman damgalanacak dosyaları seçin",
+      "uploadEyebrow": "Dosya seçimi",
+      "uploadTitle": "Dosyalarınızı buraya bırakın",
+      "uploadDescription": "Bir veya daha fazla dosyayı sürükleyip bırakın ya da cihazınızdan seçin. Dosyalar ayrı kartlar halinde gösterilir.",
       "selectFromDevice": "Cihazdan dosya seç",
-      "draftStored": "Taslak güvenli alanda",
-      "requirements": "PDF, Word, XML, UBL ve görsel · En fazla {maximumSize}",
-      "selectedFileAriaLabel": "Seçilen dosya",
-      "removeAriaLabel": "{fileName} dosyasını kaldır",
+      "requirements": "PDF, Word, XML, UBL ve görsel · Dosya başına en fazla {maximumSize}",
+      "listEyebrow": "Yükleme sırası",
+      "listTitle": "Seçilen dosyalar",
+      "selectedFileCount": "{count} dosya",
       "progressAriaLabel": "{fileName} yükleme ilerlemesi",
-      "uploadCost": "Yükleme maliyeti",
-      "free": "Ücretsiz",
-      "uploadFile": "Dosyayı yükle",
-      "transactionCost": "İşlem maliyeti",
-      "oneCredit": "1 kontör",
-      "continue": "Zaman damgalamaya devam et",
+      "removeAriaLabel": "{fileName} dosyasını kaldır",
+      "uploadFiles": "Dosyaları yükle",
+      "timestampFiles": "Dosyaları zaman damgala",
       "status": {
         "selected": "Seçildi",
         "uploading": "Yükleniyor",
@@ -296,17 +279,21 @@
         "deleting": "Siliniyor"
       }
     },
-    "modal": {
-      "eyebrow": "Son kontrol",
-      "title": "Zaman damgasını onaylayın",
-      "closeAriaLabel": "Onay penceresini kapat",
-      "description": "Aşağıdaki dosya için doğrulanabilir bir işlem kaydı oluşturulacak. Onaydan sonra kayıt işlem geçmişinize eklenir.",
-      "operation": "İşlem",
-      "operationValue": "Zaman damgalama",
-      "creditCost": "Kontör maliyeti",
-      "oneCredit": "1 kontör",
-      "creating": "İşlem oluşturuluyor…",
-      "confirm": "Onayla ve zaman damgala"
+    "verification": {
+      "eyebrow": "Güvenli zaman damgalama",
+      "title": "Tek Kullanımlık Şifre Doğrulama",
+      "phoneMessage": "Kodunuz {phoneNumber} numaralı telefona gönderildi.",
+      "codePrompt": "6 haneli kodu girin",
+      "codeInputAriaLabel": "Tek kullanımlık doğrulama kodu",
+      "codeDigitAriaLabel": "Doğrulama kodunun {position}. hanesi",
+      "closeAriaLabel": "Zaman damgası doğrulamasını kapat",
+      "demoCode": "Case doğrulama kodu: {code}",
+      "invalidCode": "Doğrulama kodu hatalı. Lütfen tekrar deneyin.",
+      "confirm": "Doğrula ve zaman damgala",
+      "verifying": "Zaman damgalanıyor…",
+      "resendCountdown": "Tekrar gönder ({seconds} sn)",
+      "resend": "Tekrar gönder",
+      "codeResent": "Demo doğrulama kodu yeniden gönderildi."
     },
     "history": {
       "eyebrow": "İşlem geçmişi",
@@ -327,12 +314,20 @@
       "emptyTitle": "Henüz zaman damgası kaydınız yok",
       "emptyDescription": "İlk işleminiz tamamlandığında doğrulama kaydı burada görünecek."
     },
+    "validation": {
+      "fileError": "{fileName}: {message}"
+    },
     "feedback": {
       "draftDeleted": "Taslak dosya güvenli alandan silindi.",
-      "selectFileToUpload": "Yüklemek için bir dosya seçin.",
-      "uploadSuccess": "{fileName} ücretsiz olarak güvenli alana yüklendi.",
-      "uploadFileBeforeTimestamping": "Zaman damgalamadan önce seçtiğiniz dosyayı yükleyin.",
-      "success": "{fileName} başarıyla zaman damgalandı. 1 kontör kullanıldı."
+      "selectFilesToUpload": "Yüklemek için en az bir dosya seçin.",
+      "uploadSuccess": "{count} dosya ücretsiz olarak güvenli alana yüklendi.",
+      "uploadPartialFailure": "{uploadedCount} dosya yüklendi; {failedCount} dosya yüklenemedi.",
+      "uploadFailure": "{failedCount} dosya yüklenemedi. Dosya kartlarındaki hataları kontrol edin.",
+      "uploadFilesBeforeTimestamping": "Zaman damgalamadan önce seçtiğiniz dosyaları yükleyin.",
+      "batchSuccess": "{count} dosyanın zaman damgası kaydı oluşturuldu. Her dosya için 1 kontör kullanıldı.",
+      "partialFailure": "{completedCount} dosya zaman damgalandı ve {completedCount} kontör kullanıldı; {failedCount} dosya işlenemedi.",
+      "batchFailure": "{count} dosya zaman damgalanamadı. Dosya kartlarındaki hataları kontrol edip tekrar deneyin.",
+      "transactionFailed": "Zaman damgalama işlemi tamamlanamadı. Lütfen tekrar deneyin."
     }
   },
   "profile": {
