@@ -1,20 +1,3 @@
-<script setup lang="ts">
-import { storeToRefs } from 'pinia'
-import { useI18n } from 'vue-i18n'
-
-import { useNotificationStore } from '@/stores/notification.store'
-
-const notificationStore = useNotificationStore()
-const { activeNotifications } = storeToRefs(notificationStore)
-const { t } = useI18n({ useScope: 'global' })
-
-const notificationSymbols = {
-  error: '!',
-  success: '✓',
-  warning: '!',
-} as const
-</script>
-
 <template>
   <TransitionGroup
     name="toast-notification"
@@ -46,6 +29,23 @@ const notificationSymbols = {
     </article>
   </TransitionGroup>
 </template>
+
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
+
+import { useNotificationStore } from '@/stores/notification.store'
+
+const notificationStore = useNotificationStore()
+const { activeNotifications } = storeToRefs(notificationStore)
+const { t } = useI18n({ useScope: 'global' })
+
+const notificationSymbols = {
+  error: '!',
+  success: '✓',
+  warning: '!',
+} as const
+</script>
 
 <style scoped>
 .toast-notification {

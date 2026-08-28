@@ -1,3 +1,57 @@
+<template>
+  <nav
+    v-if="totalItems > 0"
+    class="document-history-pagination"
+    :aria-label="t('documentHistory.pagination.ariaLabel')"
+  >
+    <p>
+      {{
+        t('documentHistory.pagination.summary', {
+          firstRecord: firstVisibleRecordNumber,
+          lastRecord: lastVisibleRecordNumber,
+          totalRecords: totalItems,
+        })
+      }}
+    </p>
+
+    <div class="document-history-pagination__controls">
+      <button
+        type="button"
+        :disabled="isLoading || currentPage <= 1"
+        @click="handlePageChange(currentPage - 1)"
+      >
+        {{ t('documentHistory.pagination.previous') }}
+      </button>
+
+      <button
+        v-for="pageNumber in visiblePageNumbers"
+        :key="pageNumber"
+        type="button"
+        :class="{
+          'document-history-pagination__page-button--active':
+            pageNumber === currentPage,
+        }"
+        :aria-current="pageNumber === currentPage ? 'page' : undefined"
+        :aria-label="
+          t('documentHistory.pagination.pageAriaLabel', { page: pageNumber })
+        "
+        :disabled="isLoading"
+        @click="handlePageChange(pageNumber)"
+      >
+        {{ pageNumber }}
+      </button>
+
+      <button
+        type="button"
+        :disabled="isLoading || currentPage >= totalPages"
+        @click="handlePageChange(currentPage + 1)"
+      >
+        {{ t('documentHistory.pagination.next') }}
+      </button>
+    </div>
+  </nav>
+</template>
+
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -59,59 +113,5 @@ const handlePageChange = (pageNumber: number) => {
   emit('change', pageNumber)
 }
 </script>
-
-<template>
-  <nav
-    v-if="totalItems > 0"
-    class="document-history-pagination"
-    :aria-label="t('documentHistory.pagination.ariaLabel')"
-  >
-    <p>
-      {{
-        t('documentHistory.pagination.summary', {
-          firstRecord: firstVisibleRecordNumber,
-          lastRecord: lastVisibleRecordNumber,
-          totalRecords: totalItems,
-        })
-      }}
-    </p>
-
-    <div class="document-history-pagination__controls">
-      <button
-        type="button"
-        :disabled="isLoading || currentPage <= 1"
-        @click="handlePageChange(currentPage - 1)"
-      >
-        {{ t('documentHistory.pagination.previous') }}
-      </button>
-
-      <button
-        v-for="pageNumber in visiblePageNumbers"
-        :key="pageNumber"
-        type="button"
-        :class="{
-          'document-history-pagination__page-button--active':
-            pageNumber === currentPage,
-        }"
-        :aria-current="pageNumber === currentPage ? 'page' : undefined"
-        :aria-label="
-          t('documentHistory.pagination.pageAriaLabel', { page: pageNumber })
-        "
-        :disabled="isLoading"
-        @click="handlePageChange(pageNumber)"
-      >
-        {{ pageNumber }}
-      </button>
-
-      <button
-        type="button"
-        :disabled="isLoading || currentPage >= totalPages"
-        @click="handlePageChange(currentPage + 1)"
-      >
-        {{ t('documentHistory.pagination.next') }}
-      </button>
-    </div>
-  </nav>
-</template>
 
 <style scoped src="./DocumentHistoryPagination.css"></style>

@@ -1,29 +1,3 @@
-<script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-
-const props = defineProps<{
-  avatarUrl: string
-  displayName: string
-  emailAddress: string
-  initials: string
-  isEmailVerified: boolean
-}>()
-
-const { t } = useI18n({ useScope: 'global' })
-const hasAvatarImageError = ref(false)
-const shouldDisplayAvatarImage = computed(
-  () => Boolean(props.avatarUrl) && !hasAvatarImageError.value,
-)
-
-watch(
-  () => props.avatarUrl,
-  () => {
-    hasAvatarImageError.value = false
-  },
-)
-</script>
-
 <template>
   <section class="profile-identity-card" aria-labelledby="profile-identity-title">
     <div class="profile-identity-card__avatar" aria-hidden="true">
@@ -61,6 +35,32 @@ watch(
 
   </section>
 </template>
+
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const props = defineProps<{
+  avatarUrl: string
+  displayName: string
+  emailAddress: string
+  initials: string
+  isEmailVerified: boolean
+}>()
+
+const { t } = useI18n({ useScope: 'global' })
+const hasAvatarImageError = ref(false)
+const shouldDisplayAvatarImage = computed(
+  () => Boolean(props.avatarUrl) && !hasAvatarImageError.value,
+)
+
+watch(
+  () => props.avatarUrl,
+  () => {
+    hasAvatarImageError.value = false
+  },
+)
+</script>
 
 <style scoped>
 .profile-identity-card {

@@ -1,3 +1,88 @@
+<template>
+  <div
+    ref="languageSwitcherElement"
+    class="language-switcher"
+    @focusout="handleLanguageSwitcherFocusOut"
+    @keydown.esc.stop.prevent="closeLanguageMenuAndRestoreTriggerFocus"
+  >
+    <button
+      ref="languageMenuTriggerElement"
+      class="language-switcher__trigger"
+      type="button"
+      aria-haspopup="menu"
+      aria-controls="application-language-menu"
+      :aria-expanded="isLanguageMenuOpen"
+      :aria-label="
+        isLanguageMenuOpen
+          ? t('language.closeMenu')
+          : t('language.openMenu')
+      "
+      @click="handleLanguageMenuTriggerClick"
+      @keydown="handleLanguageMenuTriggerKeydown"
+    >
+      <span class="language-switcher__current-code">
+        {{ selectedLanguageOption.code }}
+      </span>
+      <span class="language-switcher__current-name">
+        {{ getLanguageName(selectedLanguageOption.locale) }}
+      </span>
+      <span
+        :class="[
+          'language-switcher__chevron',
+          {
+            'language-switcher__chevron--open': isLanguageMenuOpen,
+          },
+        ]"
+        aria-hidden="true"
+      ></span>
+    </button>
+
+    <div
+      v-if="isLanguageMenuOpen"
+      id="application-language-menu"
+      ref="languageMenuElement"
+      class="language-switcher__menu"
+      role="menu"
+      :aria-label="t('language.selectorLabel')"
+    >
+      <button
+        v-for="languageOption in languageOptions"
+        :key="languageOption.locale"
+        type="button"
+        role="menuitemradio"
+        :class="[
+          'language-switcher__option',
+          {
+            'language-switcher__option--active':
+              locale === languageOption.locale,
+          },
+        ]"
+        :aria-checked="locale === languageOption.locale"
+        :aria-label="
+          t('language.switchTo', {
+            language: getLanguageName(languageOption.locale),
+          })
+        "
+        @click="handleLanguageSelection(languageOption.locale)"
+        @keydown="handleLanguageOptionKeydown"
+      >
+        <span class="language-switcher__option-code">
+          {{ languageOption.code }}
+        </span>
+        <span class="language-switcher__option-name">
+          {{ getLanguageName(languageOption.locale) }}
+        </span>
+        <span
+          class="language-switcher__option-check"
+          aria-hidden="true"
+        >
+          {{ locale === languageOption.locale ? '✓' : '' }}
+        </span>
+      </button>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import {
   computed,
@@ -166,91 +251,6 @@ onBeforeUnmount(() =>
   document.removeEventListener('pointerdown', handleOutsidePointerDown),
 )
 </script>
-
-<template>
-  <div
-    ref="languageSwitcherElement"
-    class="language-switcher"
-    @focusout="handleLanguageSwitcherFocusOut"
-    @keydown.esc.stop.prevent="closeLanguageMenuAndRestoreTriggerFocus"
-  >
-    <button
-      ref="languageMenuTriggerElement"
-      class="language-switcher__trigger"
-      type="button"
-      aria-haspopup="menu"
-      aria-controls="application-language-menu"
-      :aria-expanded="isLanguageMenuOpen"
-      :aria-label="
-        isLanguageMenuOpen
-          ? t('language.closeMenu')
-          : t('language.openMenu')
-      "
-      @click="handleLanguageMenuTriggerClick"
-      @keydown="handleLanguageMenuTriggerKeydown"
-    >
-      <span class="language-switcher__current-code">
-        {{ selectedLanguageOption.code }}
-      </span>
-      <span class="language-switcher__current-name">
-        {{ getLanguageName(selectedLanguageOption.locale) }}
-      </span>
-      <span
-        :class="[
-          'language-switcher__chevron',
-          {
-            'language-switcher__chevron--open': isLanguageMenuOpen,
-          },
-        ]"
-        aria-hidden="true"
-      ></span>
-    </button>
-
-    <div
-      v-if="isLanguageMenuOpen"
-      id="application-language-menu"
-      ref="languageMenuElement"
-      class="language-switcher__menu"
-      role="menu"
-      :aria-label="t('language.selectorLabel')"
-    >
-      <button
-        v-for="languageOption in languageOptions"
-        :key="languageOption.locale"
-        type="button"
-        role="menuitemradio"
-        :class="[
-          'language-switcher__option',
-          {
-            'language-switcher__option--active':
-              locale === languageOption.locale,
-          },
-        ]"
-        :aria-checked="locale === languageOption.locale"
-        :aria-label="
-          t('language.switchTo', {
-            language: getLanguageName(languageOption.locale),
-          })
-        "
-        @click="handleLanguageSelection(languageOption.locale)"
-        @keydown="handleLanguageOptionKeydown"
-      >
-        <span class="language-switcher__option-code">
-          {{ languageOption.code }}
-        </span>
-        <span class="language-switcher__option-name">
-          {{ getLanguageName(languageOption.locale) }}
-        </span>
-        <span
-          class="language-switcher__option-check"
-          aria-hidden="true"
-        >
-          {{ locale === languageOption.locale ? '✓' : '' }}
-        </span>
-      </button>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .language-switcher {

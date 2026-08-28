@@ -1,3 +1,72 @@
+<template>
+  <section
+    class="document-history-page"
+    aria-labelledby="document-history-page-title"
+  >
+    <header class="document-history-page__header">
+      <div>
+        <p>{{ t('documentHistory.page.eyebrow') }}</p>
+        <h1 id="document-history-page-title">
+          {{ t('documentHistory.page.title') }}
+        </h1>
+        <span>{{ t('documentHistory.page.description') }}</span>
+      </div>
+    </header>
+
+    <DocumentHistoryFilters
+      :filters="selectedFilters"
+      @change="handleFiltersChange"
+      @reset="handleFiltersReset"
+    />
+
+    <DocumentHistoryTable
+      :archived-documents="archivedDocuments"
+      :deleting-document-id="deletingDocumentId"
+      :downloading-document-id="downloadingDocumentId"
+      :error-message="documentHistoryErrorMessage"
+      :has-active-filters="hasActiveFilters"
+      :is-loading="isDocumentHistoryLoading"
+      :previewing-document-id="previewingDocumentId"
+      :total-document-count="documentHistoryPagination.totalItems"
+      @delete="handleDocumentDeleteRequest"
+      @download="handleDocumentDownload"
+      @preview="handleDocumentPreview"
+      @retry="handleDocumentHistoryRetry"
+      @send-email="handleDocumentEmailSend"
+    />
+
+    <DocumentHistoryPagination
+      v-if="!documentHistoryErrorMessage"
+      :current-page="documentHistoryPagination.currentPage"
+      :is-loading="isDocumentHistoryLoading"
+      :page-size="documentHistoryPagination.pageSize"
+      :total-items="documentHistoryPagination.totalItems"
+      :total-pages="documentHistoryPagination.totalPages"
+      @change="handlePageChange"
+    />
+
+    <ArchivedDocumentPreviewDrawer
+      :archived-document="selectedDocumentForPreview"
+      :document-content="previewDocumentContent"
+      :error-message="documentPreviewErrorMessage"
+      :is-loading="isSelectedDocumentPreviewLoading"
+      :is-open="isDocumentPreviewDrawerOpen"
+      @close="handleDocumentPreviewDrawerClose"
+      @download="handleDocumentDownload"
+      @retry="handleDocumentPreview"
+    />
+
+    <ArchivedDocumentDeleteModal
+      :archived-document="documentPendingDeletion"
+      :error-message="documentDeleteErrorMessage"
+      :is-deleting="isSelectedDocumentDeleting"
+      :is-open="isDocumentDeleteModalOpen"
+      @close="handleDocumentDeleteModalClose"
+      @confirm="handleDocumentDeleteConfirm"
+    />
+  </section>
+</template>
+
 <script lang="ts" setup>
 import { computed, ref, shallowRef, watch } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
@@ -393,74 +462,5 @@ watch(
   { immediate: true },
 )
 </script>
-
-<template>
-  <section
-    class="document-history-page"
-    aria-labelledby="document-history-page-title"
-  >
-    <header class="document-history-page__header">
-      <div>
-        <p>{{ t('documentHistory.page.eyebrow') }}</p>
-        <h1 id="document-history-page-title">
-          {{ t('documentHistory.page.title') }}
-        </h1>
-        <span>{{ t('documentHistory.page.description') }}</span>
-      </div>
-    </header>
-
-    <DocumentHistoryFilters
-      :filters="selectedFilters"
-      @change="handleFiltersChange"
-      @reset="handleFiltersReset"
-    />
-
-    <DocumentHistoryTable
-      :archived-documents="archivedDocuments"
-      :deleting-document-id="deletingDocumentId"
-      :downloading-document-id="downloadingDocumentId"
-      :error-message="documentHistoryErrorMessage"
-      :has-active-filters="hasActiveFilters"
-      :is-loading="isDocumentHistoryLoading"
-      :previewing-document-id="previewingDocumentId"
-      :total-document-count="documentHistoryPagination.totalItems"
-      @delete="handleDocumentDeleteRequest"
-      @download="handleDocumentDownload"
-      @preview="handleDocumentPreview"
-      @retry="handleDocumentHistoryRetry"
-      @send-email="handleDocumentEmailSend"
-    />
-
-    <DocumentHistoryPagination
-      v-if="!documentHistoryErrorMessage"
-      :current-page="documentHistoryPagination.currentPage"
-      :is-loading="isDocumentHistoryLoading"
-      :page-size="documentHistoryPagination.pageSize"
-      :total-items="documentHistoryPagination.totalItems"
-      :total-pages="documentHistoryPagination.totalPages"
-      @change="handlePageChange"
-    />
-
-    <ArchivedDocumentPreviewDrawer
-      :archived-document="selectedDocumentForPreview"
-      :document-content="previewDocumentContent"
-      :error-message="documentPreviewErrorMessage"
-      :is-loading="isSelectedDocumentPreviewLoading"
-      :is-open="isDocumentPreviewDrawerOpen"
-      @close="handleDocumentPreviewDrawerClose"
-      @download="handleDocumentDownload"
-      @retry="handleDocumentPreview"
-    />
-
-    <ArchivedDocumentDeleteModal
-      :archived-document="documentPendingDeletion"
-      :error-message="documentDeleteErrorMessage"
-      :is-deleting="isSelectedDocumentDeleting"
-      :is-open="isDocumentDeleteModalOpen"
-      @close="handleDocumentDeleteModalClose"
-      @confirm="handleDocumentDeleteConfirm"
-    />
-  </section>
-</template>
 
 <style scoped src="./DocumentHistoryPage.css"></style>

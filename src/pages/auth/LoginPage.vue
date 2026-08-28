@@ -1,86 +1,3 @@
-<script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useAuth0 } from '@auth0/auth0-vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-
-import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
-import {
-  auth0Config,
-  isAuth0Configured,
-} from '@/config/auth0.config'
-
-type AuthMode = 'login' | 'signup'
-
-const currentRoute = useRoute()
-const applicationRouter = useRouter()
-const auth0Client = isAuth0Configured ? useAuth0() : null
-const { locale, t } = useI18n({ useScope: 'global' })
-const isAuthenticationSubmitting = ref(false)
-const localAuthenticationError = ref('')
-
-const authenticationRedirectTarget = computed(() => {
-  const requestedRedirectPath = currentRoute.query.redirect
-
-  if (
-    typeof requestedRedirectPath !== 'string' ||
-    !requestedRedirectPath.startsWith('/') ||
-    requestedRedirectPath.startsWith('//') ||
-    requestedRedirectPath.startsWith('/login') ||
-    requestedRedirectPath.startsWith('/auth/callback')
-  ) {
-    return '/'
-  }
-
-  return requestedRedirectPath
-})
-
-const isAuth0Loading = computed(() => auth0Client?.isLoading.value ?? false)
-const authenticationErrorMessage = computed(
-  () =>
-    localAuthenticationError.value ||
-    (auth0Client?.error.value
-      ? t('auth.login.authenticationErrorDescription')
-      : ''),
-)
-const hasAuth0ConfigurationError = computed(
-  () =>
-    !isAuth0Configured || currentRoute.query.reason === 'configuration',
-)
-
-const handleAuthenticationStart = async (authenticationMode: AuthMode) => {
-  if (!auth0Client) {
-    return
-  }
-
-  localAuthenticationError.value = ''
-  isAuthenticationSubmitting.value = true
-
-  try {
-    await auth0Client.loginWithRedirect({
-      appState: { target: authenticationRedirectTarget.value },
-      authorizationParams: {
-        ui_locales: locale.value,
-        ...(authenticationMode === 'signup' ? { screen_hint: 'signup' } : {}),
-      },
-    })
-  } catch {
-    localAuthenticationError.value = t('auth.login.startError')
-    isAuthenticationSubmitting.value = false
-  }
-}
-
-watch(
-  () => auth0Client?.isAuthenticated.value,
-  (isAuthenticated) => {
-    if (isAuthenticated) {
-      void applicationRouter.replace(authenticationRedirectTarget.value)
-    }
-  },
-  { immediate: true },
-)
-</script>
-
 <template>
   <main class="login-page">
     <section class="login-page__story" aria-labelledby="login-story-title">
@@ -209,5 +126,88 @@ watch(
     </section>
   </main>
 </template>
+
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+import { useAuth0 } from '@auth0/auth0-vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
+import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
+import {
+  auth0Config,
+  isAuth0Configured,
+} from '@/config/auth0.config'
+
+type AuthMode = 'login' | 'signup'
+
+const currentRoute = useRoute()
+const applicationRouter = useRouter()
+const auth0Client = isAuth0Configured ? useAuth0() : null
+const { locale, t } = useI18n({ useScope: 'global' })
+const isAuthenticationSubmitting = ref(false)
+const localAuthenticationError = ref('')
+
+const authenticationRedirectTarget = computed(() => {
+  const requestedRedirectPath = currentRoute.query.redirect
+
+  if (
+    typeof requestedRedirectPath !== 'string' ||
+    !requestedRedirectPath.startsWith('/') ||
+    requestedRedirectPath.startsWith('//') ||
+    requestedRedirectPath.startsWith('/login') ||
+    requestedRedirectPath.startsWith('/auth/callback')
+  ) {
+    return '/'
+  }
+
+  return requestedRedirectPath
+})
+
+const isAuth0Loading = computed(() => auth0Client?.isLoading.value ?? false)
+const authenticationErrorMessage = computed(
+  () =>
+    localAuthenticationError.value ||
+    (auth0Client?.error.value
+      ? t('auth.login.authenticationErrorDescription')
+      : ''),
+)
+const hasAuth0ConfigurationError = computed(
+  () =>
+    !isAuth0Configured || currentRoute.query.reason === 'configuration',
+)
+
+const handleAuthenticationStart = async (authenticationMode: AuthMode) => {
+  if (!auth0Client) {
+    return
+  }
+
+  localAuthenticationError.value = ''
+  isAuthenticationSubmitting.value = true
+
+  try {
+    await auth0Client.loginWithRedirect({
+      appState: { target: authenticationRedirectTarget.value },
+      authorizationParams: {
+        ui_locales: locale.value,
+        ...(authenticationMode === 'signup' ? { screen_hint: 'signup' } : {}),
+      },
+    })
+  } catch {
+    localAuthenticationError.value = t('auth.login.startError')
+    isAuthenticationSubmitting.value = false
+  }
+}
+
+watch(
+  () => auth0Client?.isAuthenticated.value,
+  (isAuthenticated) => {
+    if (isAuthenticated) {
+      void applicationRouter.replace(authenticationRedirectTarget.value)
+    }
+  },
+  { immediate: true },
+)
+</script>
 
 <style scoped src="./LoginPage.css"></style>

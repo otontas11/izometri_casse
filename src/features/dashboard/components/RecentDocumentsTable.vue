@@ -1,94 +1,3 @@
-<script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { RouterLink } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-
-import AppIcon from '@/components/common/AppIcon.vue'
-import type {
-  ArchivedDocument,
-  DocumentOperation,
-} from '@/features/dashboard/types/dashboard.types'
-import { formatDateTime, formatFileSize } from '@/utils/formatters'
-
-defineProps<{
-  archivedDocuments: ArchivedDocument[]
-  deletingDocumentId: number | null
-  downloadingDocumentId: number | null
-  previewingDocumentId: number | null
-}>()
-
-const emit = defineEmits<{
-  delete: [archivedDocument: ArchivedDocument]
-  download: [archivedDocument: ArchivedDocument]
-  preview: [archivedDocument: ArchivedDocument]
-  'send-email': [archivedDocument: ArchivedDocument]
-}>()
-
-const { t } = useI18n({ useScope: 'global' })
-const openDocumentMenuId = ref<number | null>(null)
-
-const documentOperationTranslationKeys: Record<DocumentOperation, string> = {
-  signature: 'dashboard.recentDocuments.electronicSignature',
-  timestamp: 'dashboard.recentDocuments.timestamp',
-}
-
-const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
-  emit('download', archivedDocument)
-}
-
-const getDocumentMenuElementId = (documentId: number) =>
-  `archived-document-menu-${documentId}`
-
-const handleDocumentMenuToggle = (documentId: number) => {
-  openDocumentMenuId.value =
-    openDocumentMenuId.value === documentId ? null : documentId
-}
-
-const handleDocumentPreview = (archivedDocument: ArchivedDocument) => {
-  emit('preview', archivedDocument)
-}
-
-const handleDocumentEmailSend = (archivedDocument: ArchivedDocument) => {
-  openDocumentMenuId.value = null
-  emit('send-email', archivedDocument)
-}
-
-const handleDocumentDelete = (archivedDocument: ArchivedDocument) => {
-  openDocumentMenuId.value = null
-  emit('delete', archivedDocument)
-}
-
-const handleDocumentMenuOutsidePointerDown = (pointerEvent: PointerEvent) => {
-  const pointerTarget = pointerEvent.target
-
-  if (
-    pointerTarget instanceof Element &&
-    !pointerTarget.closest('[data-document-menu]')
-  ) {
-    openDocumentMenuId.value = null
-  }
-}
-
-const handleDocumentMenuKeydown = (keyboardEvent: KeyboardEvent) => {
-  if (keyboardEvent.key === 'Escape') {
-    openDocumentMenuId.value = null
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('pointerdown', handleDocumentMenuOutsidePointerDown)
-  document.addEventListener('keydown', handleDocumentMenuKeydown)
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener(
-    'pointerdown',
-    handleDocumentMenuOutsidePointerDown,
-  )
-  document.removeEventListener('keydown', handleDocumentMenuKeydown)
-})
-</script>
-
 <template>
   <section
     class="recent-documents-table"
@@ -284,6 +193,97 @@ onBeforeUnmount(() => {
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
+import AppIcon from '@/components/common/AppIcon.vue'
+import type {
+  ArchivedDocument,
+  DocumentOperation,
+} from '@/features/dashboard/types/dashboard.types'
+import { formatDateTime, formatFileSize } from '@/utils/formatters'
+
+defineProps<{
+  archivedDocuments: ArchivedDocument[]
+  deletingDocumentId: number | null
+  downloadingDocumentId: number | null
+  previewingDocumentId: number | null
+}>()
+
+const emit = defineEmits<{
+  delete: [archivedDocument: ArchivedDocument]
+  download: [archivedDocument: ArchivedDocument]
+  preview: [archivedDocument: ArchivedDocument]
+  'send-email': [archivedDocument: ArchivedDocument]
+}>()
+
+const { t } = useI18n({ useScope: 'global' })
+const openDocumentMenuId = ref<number | null>(null)
+
+const documentOperationTranslationKeys: Record<DocumentOperation, string> = {
+  signature: 'dashboard.recentDocuments.electronicSignature',
+  timestamp: 'dashboard.recentDocuments.timestamp',
+}
+
+const handleDocumentDownload = (archivedDocument: ArchivedDocument) => {
+  emit('download', archivedDocument)
+}
+
+const getDocumentMenuElementId = (documentId: number) =>
+  `archived-document-menu-${documentId}`
+
+const handleDocumentMenuToggle = (documentId: number) => {
+  openDocumentMenuId.value =
+    openDocumentMenuId.value === documentId ? null : documentId
+}
+
+const handleDocumentPreview = (archivedDocument: ArchivedDocument) => {
+  emit('preview', archivedDocument)
+}
+
+const handleDocumentEmailSend = (archivedDocument: ArchivedDocument) => {
+  openDocumentMenuId.value = null
+  emit('send-email', archivedDocument)
+}
+
+const handleDocumentDelete = (archivedDocument: ArchivedDocument) => {
+  openDocumentMenuId.value = null
+  emit('delete', archivedDocument)
+}
+
+const handleDocumentMenuOutsidePointerDown = (pointerEvent: PointerEvent) => {
+  const pointerTarget = pointerEvent.target
+
+  if (
+    pointerTarget instanceof Element &&
+    !pointerTarget.closest('[data-document-menu]')
+  ) {
+    openDocumentMenuId.value = null
+  }
+}
+
+const handleDocumentMenuKeydown = (keyboardEvent: KeyboardEvent) => {
+  if (keyboardEvent.key === 'Escape') {
+    openDocumentMenuId.value = null
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('pointerdown', handleDocumentMenuOutsidePointerDown)
+  document.addEventListener('keydown', handleDocumentMenuKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener(
+    'pointerdown',
+    handleDocumentMenuOutsidePointerDown,
+  )
+  document.removeEventListener('keydown', handleDocumentMenuKeydown)
+})
+</script>
 
 <style scoped>
 .recent-documents-table {

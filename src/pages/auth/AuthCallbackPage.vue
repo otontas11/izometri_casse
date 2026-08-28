@@ -1,19 +1,3 @@
-<script setup lang="ts">
-import { computed } from 'vue'
-import { useAuth0 } from '@auth0/auth0-vue'
-import { RouterLink } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-
-import { isAuth0Configured } from '@/config/auth0.config'
-
-const auth0Client = isAuth0Configured ? useAuth0() : null
-const { t } = useI18n({ useScope: 'global' })
-const authenticationCallbackErrorMessage = computed(
-  () =>
-    auth0Client?.error.value ? t('auth.callback.authenticationError') : '',
-)
-</script>
-
 <template>
   <main class="auth-callback-page">
     <section class="auth-callback-page__card" aria-live="polite">
@@ -41,5 +25,21 @@ const authenticationCallbackErrorMessage = computed(
     </section>
   </main>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useAuth0 } from '@auth0/auth0-vue'
+import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
+import { isAuth0Configured } from '@/config/auth0.config'
+
+const auth0Client = isAuth0Configured ? useAuth0() : null
+const { t } = useI18n({ useScope: 'global' })
+const authenticationCallbackErrorMessage = computed(
+  () =>
+    auth0Client?.error.value ? t('auth.callback.authenticationError') : '',
+)
+</script>
 
 <style scoped src="./AuthCallbackPage.css"></style>

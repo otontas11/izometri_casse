@@ -1,3 +1,124 @@
+<template>
+  <form
+    class="profile-form"
+    novalidate
+    aria-labelledby="profile-form-title"
+    @submit.prevent="handleProfileFormSubmit"
+  >
+    <header class="profile-form__header">
+      <div>
+        <small>{{ t('profile.form.eyebrow') }}</small>
+        <h2 id="profile-form-title">{{ t('profile.form.title') }}</h2>
+      </div>
+      <button
+        class="profile-form__edit-button"
+        type="button"
+        :disabled="isEditing"
+        @click="emit('edit')"
+      >
+        <AppIcon name="profile" :size="18" />
+        {{
+          isEditing
+            ? t('profile.identity.editing')
+            : t('profile.identity.edit')
+        }}
+      </button>
+    </header>
+
+    <p class="profile-form__description">
+      {{ t('profile.form.description') }}
+    </p>
+
+    <div class="profile-form__fields">
+      <BaseInput
+        id="profile-first-name"
+        v-model="profileFormValues.firstName"
+        name="firstName"
+        :label="t('profile.form.firstName')"
+        autocomplete="given-name"
+        :maximum-length="50"
+        :readonly="!isEditing"
+        :disabled="isSaving"
+        :required="isEditing"
+        :error-message="isEditing ? profileFormErrors.firstName : ''"
+        @blur="validateProfileField('firstName')"
+      />
+
+      <BaseInput
+        id="profile-last-name"
+        v-model="profileFormValues.lastName"
+        name="lastName"
+        :label="t('profile.form.lastName')"
+        autocomplete="family-name"
+        :maximum-length="50"
+        :readonly="!isEditing"
+        :disabled="isSaving"
+        :required="isEditing"
+        :error-message="isEditing ? profileFormErrors.lastName : ''"
+        @blur="validateProfileField('lastName')"
+      />
+
+      <BaseInput
+        id="profile-phone"
+        v-model="profileFormValues.phone"
+        name="phone"
+        type="tel"
+        input-mode="tel"
+        :label="t('profile.form.phone')"
+        autocomplete="tel"
+        placeholder="+90 555 123 45 67"
+        :maximum-length="24"
+        :readonly="!isEditing"
+        :disabled="isSaving"
+        :required="isEditing"
+        :error-message="isEditing ? profileFormErrors.phone : ''"
+        @blur="validateProfileField('phone')"
+      />
+
+      <BaseInput
+        id="profile-email"
+        :model-value="emailAddress"
+        name="email"
+        type="email"
+        input-mode="email"
+        :label="t('profile.form.email')"
+        autocomplete="email"
+        readonly
+      />
+    </div>
+
+    <p
+      v-if="saveErrorMessage"
+      class="profile-form__save-error"
+      role="alert"
+    >
+      <span aria-hidden="true">!</span>
+      {{ saveErrorMessage }}
+    </p>
+
+    <footer v-if="isEditing" class="profile-form__actions">
+      <p>{{ t('profile.form.saveNote') }}</p>
+      <div>
+        <button
+          type="button"
+          :disabled="isSaving"
+          @click="handleProfileFormCancel"
+        >
+          {{ t('common.cancel') }}
+        </button>
+        <button type="submit" :disabled="isSaving || !isProfileFormDirty">
+          <span
+            v-if="isSaving"
+            class="profile-form__spinner"
+            aria-hidden="true"
+          ></span>
+          {{ isSaving ? t('profile.form.saving') : t('profile.form.save') }}
+        </button>
+      </div>
+    </footer>
+  </form>
+</template>
+
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -161,127 +282,6 @@ watch(locale, () => {
   }
 })
 </script>
-
-<template>
-  <form
-    class="profile-form"
-    novalidate
-    aria-labelledby="profile-form-title"
-    @submit.prevent="handleProfileFormSubmit"
-  >
-    <header class="profile-form__header">
-      <div>
-        <small>{{ t('profile.form.eyebrow') }}</small>
-        <h2 id="profile-form-title">{{ t('profile.form.title') }}</h2>
-      </div>
-      <button
-        class="profile-form__edit-button"
-        type="button"
-        :disabled="isEditing"
-        @click="emit('edit')"
-      >
-        <AppIcon name="profile" :size="18" />
-        {{
-          isEditing
-            ? t('profile.identity.editing')
-            : t('profile.identity.edit')
-        }}
-      </button>
-    </header>
-
-    <p class="profile-form__description">
-      {{ t('profile.form.description') }}
-    </p>
-
-    <div class="profile-form__fields">
-      <BaseInput
-        id="profile-first-name"
-        v-model="profileFormValues.firstName"
-        name="firstName"
-        :label="t('profile.form.firstName')"
-        autocomplete="given-name"
-        :maximum-length="50"
-        :readonly="!isEditing"
-        :disabled="isSaving"
-        :required="isEditing"
-        :error-message="isEditing ? profileFormErrors.firstName : ''"
-        @blur="validateProfileField('firstName')"
-      />
-
-      <BaseInput
-        id="profile-last-name"
-        v-model="profileFormValues.lastName"
-        name="lastName"
-        :label="t('profile.form.lastName')"
-        autocomplete="family-name"
-        :maximum-length="50"
-        :readonly="!isEditing"
-        :disabled="isSaving"
-        :required="isEditing"
-        :error-message="isEditing ? profileFormErrors.lastName : ''"
-        @blur="validateProfileField('lastName')"
-      />
-
-      <BaseInput
-        id="profile-phone"
-        v-model="profileFormValues.phone"
-        name="phone"
-        type="tel"
-        input-mode="tel"
-        :label="t('profile.form.phone')"
-        autocomplete="tel"
-        placeholder="+90 555 123 45 67"
-        :maximum-length="24"
-        :readonly="!isEditing"
-        :disabled="isSaving"
-        :required="isEditing"
-        :error-message="isEditing ? profileFormErrors.phone : ''"
-        @blur="validateProfileField('phone')"
-      />
-
-      <BaseInput
-        id="profile-email"
-        :model-value="emailAddress"
-        name="email"
-        type="email"
-        input-mode="email"
-        :label="t('profile.form.email')"
-        autocomplete="email"
-        readonly
-      />
-    </div>
-
-    <p
-      v-if="saveErrorMessage"
-      class="profile-form__save-error"
-      role="alert"
-    >
-      <span aria-hidden="true">!</span>
-      {{ saveErrorMessage }}
-    </p>
-
-    <footer v-if="isEditing" class="profile-form__actions">
-      <p>{{ t('profile.form.saveNote') }}</p>
-      <div>
-        <button
-          type="button"
-          :disabled="isSaving"
-          @click="handleProfileFormCancel"
-        >
-          {{ t('common.cancel') }}
-        </button>
-        <button type="submit" :disabled="isSaving || !isProfileFormDirty">
-          <span
-            v-if="isSaving"
-            class="profile-form__spinner"
-            aria-hidden="true"
-          ></span>
-          {{ isSaving ? t('profile.form.saving') : t('profile.form.save') }}
-        </button>
-      </div>
-    </footer>
-  </form>
-</template>
 
 <style scoped>
 .profile-form {

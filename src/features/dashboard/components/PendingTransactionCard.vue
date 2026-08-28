@@ -1,3 +1,31 @@
+<template>
+  <RouterLink
+    class="pending-transaction-card"
+    :aria-label="pendingTransactionAriaLabel"
+    :to="{ name: draftFile.intendedOperation }"
+  >
+    <span class="pending-transaction-card__icon" aria-hidden="true">
+      <AppIcon :name="draftFile.intendedOperation" :size="20" />
+    </span>
+
+    <span class="pending-transaction-card__content">
+      <small>{{ t('dashboard.pendingTransaction.title') }}</small>
+      <strong :title="draftFile.fileName">{{ draftFile.fileName }}</strong>
+      <span class="pending-transaction-card__details">
+        <span>{{ operationLabel }}</span>
+        <time :datetime="draftFile.createdAt">
+          {{ formatDateTime(draftFile.createdAt) }}
+        </time>
+      </span>
+    </span>
+
+    <span class="pending-transaction-card__continue" aria-hidden="true">
+      <small>{{ t('dashboard.pendingTransaction.continue') }}</small>
+      <AppIcon name="arrow-right" :size="16" />
+    </span>
+  </RouterLink>
+</template>
+
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -26,33 +54,5 @@ const pendingTransactionAriaLabel = computed(() =>
   }),
 )
 </script>
-
-<template>
-  <RouterLink
-    class="pending-transaction-card"
-    :aria-label="pendingTransactionAriaLabel"
-    :to="{ name: draftFile.intendedOperation }"
-  >
-    <span class="pending-transaction-card__icon" aria-hidden="true">
-      <AppIcon :name="draftFile.intendedOperation" :size="20" />
-    </span>
-
-    <span class="pending-transaction-card__content">
-      <small>{{ t('dashboard.pendingTransaction.title') }}</small>
-      <strong :title="draftFile.fileName">{{ draftFile.fileName }}</strong>
-      <span class="pending-transaction-card__details">
-        <span>{{ operationLabel }}</span>
-        <time :datetime="draftFile.createdAt">
-          {{ formatDateTime(draftFile.createdAt) }}
-        </time>
-      </span>
-    </span>
-
-    <span class="pending-transaction-card__continue" aria-hidden="true">
-      <small>{{ t('dashboard.pendingTransaction.continue') }}</small>
-      <AppIcon name="arrow-right" :size="16" />
-    </span>
-  </RouterLink>
-</template>
 
 <style scoped src="./PendingTransactionCard.css"></style>

@@ -1,3 +1,139 @@
+<template>
+  <Teleport to="body">
+    <Transition name="archived-document-preview-drawer">
+      <div
+        v-if="isOpen && archivedDocument"
+        class="archived-document-preview-drawer"
+        @click.self="requestDrawerClose"
+      >
+        <aside
+          ref="drawerPanelElement"
+          class="archived-document-preview-drawer__panel"
+          role="dialog"
+          aria-modal="true"
+          :aria-busy="isLoading"
+          aria-labelledby="archived-document-preview-drawer-title"
+        >
+          <header class="archived-document-preview-drawer__header">
+            <span aria-hidden="true">
+              <AppIcon name="eye" :size="22" />
+            </span>
+            <div>
+              <small>{{ t('dashboard.recentDocuments.previewEyebrow') }}</small>
+              <h2 id="archived-document-preview-drawer-title">
+                {{ archivedDocument.name }}
+              </h2>
+            </div>
+            <button
+              ref="closeButtonElement"
+              type="button"
+              :aria-label="t('dashboard.recentDocuments.previewCloseAriaLabel')"
+              @click="requestDrawerClose"
+            >
+              <AppIcon name="close" :size="19" />
+            </button>
+          </header>
+
+          <dl class="archived-document-preview-drawer__details">
+            <div>
+              <dt>{{ t('dashboard.recentDocuments.operation') }}</dt>
+              <dd>
+                {{
+                  t(
+                    documentOperationTranslationKeys[
+                      archivedDocument.operation
+                    ],
+                  )
+                }}
+              </dd>
+            </div>
+            <div>
+              <dt>{{ t('dashboard.recentDocuments.date') }}</dt>
+              <dd>{{ formatDateTime(archivedDocument.createdAt) }}</dd>
+            </div>
+            <div>
+              <dt>{{ t('dashboard.recentDocuments.size') }}</dt>
+              <dd>{{ formatFileSize(archivedDocument.sizeBytes) }}</dd>
+            </div>
+          </dl>
+
+          <div class="archived-document-preview-drawer__content">
+            <div
+              v-if="isLoading"
+              class="archived-document-preview-drawer__loading-state"
+              role="status"
+            >
+              <span aria-hidden="true"></span>
+              <p>{{ t('dashboard.recentDocuments.previewLoading') }}</p>
+            </div>
+
+            <div
+              v-else-if="displayedPreviewErrorMessage"
+              class="archived-document-preview-drawer__error-state"
+              role="alert"
+            >
+              <span aria-hidden="true">!</span>
+              <h3>{{ t('dashboard.recentDocuments.previewErrorTitle') }}</h3>
+              <p>{{ displayedPreviewErrorMessage }}</p>
+              <button type="button" @click="handlePreviewRetry">
+                <AppIcon name="refresh" :size="17" />
+                {{ t('common.retry') }}
+              </button>
+            </div>
+
+            <div
+              v-else-if="documentPreviewMode === 'image' && documentObjectUrl"
+              class="archived-document-preview-drawer__image-preview"
+            >
+              <img :src="documentObjectUrl" :alt="archivedDocument.name" />
+            </div>
+
+            <iframe
+              v-else-if="documentPreviewMode === 'pdf' && documentObjectUrl"
+              class="archived-document-preview-drawer__pdf-preview"
+              :src="documentObjectUrl"
+              :title="
+                t('dashboard.recentDocuments.previewFrameTitle', {
+                  fileName: archivedDocument.name,
+                })
+              "
+            ></iframe>
+
+            <div
+              v-else-if="documentPreviewMode === 'text'"
+              class="archived-document-preview-drawer__text-preview"
+            >
+              <p v-if="isTextPreviewTruncated">
+                {{ t('dashboard.recentDocuments.previewTruncated') }}
+              </p>
+              <pre>{{ documentTextContent }}</pre>
+            </div>
+
+            <div
+              v-else
+              class="archived-document-preview-drawer__unsupported-state"
+            >
+              <span aria-hidden="true">
+                <AppIcon name="document" :size="28" />
+              </span>
+              <h3>{{ t('dashboard.recentDocuments.previewUnsupportedTitle') }}</h3>
+              <p>
+                {{
+                  t('dashboard.recentDocuments.previewUnsupportedDescription')
+                }}
+              </p>
+              <button type="button" @click="handleDocumentDownload">
+                <AppIcon name="download" :size="17" />
+                {{ t('dashboard.recentDocuments.downloadTitle') }}
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </Transition>
+  </Teleport>
+</template>
+
 <script setup lang="ts">
 import {
   computed,
@@ -278,142 +414,6 @@ onBeforeUnmount(() => {
   }
 })
 </script>
-
-<template>
-  <Teleport to="body">
-    <Transition name="archived-document-preview-drawer">
-      <div
-        v-if="isOpen && archivedDocument"
-        class="archived-document-preview-drawer"
-        @click.self="requestDrawerClose"
-      >
-        <aside
-          ref="drawerPanelElement"
-          class="archived-document-preview-drawer__panel"
-          role="dialog"
-          aria-modal="true"
-          :aria-busy="isLoading"
-          aria-labelledby="archived-document-preview-drawer-title"
-        >
-          <header class="archived-document-preview-drawer__header">
-            <span aria-hidden="true">
-              <AppIcon name="eye" :size="22" />
-            </span>
-            <div>
-              <small>{{ t('dashboard.recentDocuments.previewEyebrow') }}</small>
-              <h2 id="archived-document-preview-drawer-title">
-                {{ archivedDocument.name }}
-              </h2>
-            </div>
-            <button
-              ref="closeButtonElement"
-              type="button"
-              :aria-label="t('dashboard.recentDocuments.previewCloseAriaLabel')"
-              @click="requestDrawerClose"
-            >
-              <AppIcon name="close" :size="19" />
-            </button>
-          </header>
-
-          <dl class="archived-document-preview-drawer__details">
-            <div>
-              <dt>{{ t('dashboard.recentDocuments.operation') }}</dt>
-              <dd>
-                {{
-                  t(
-                    documentOperationTranslationKeys[
-                      archivedDocument.operation
-                    ],
-                  )
-                }}
-              </dd>
-            </div>
-            <div>
-              <dt>{{ t('dashboard.recentDocuments.date') }}</dt>
-              <dd>{{ formatDateTime(archivedDocument.createdAt) }}</dd>
-            </div>
-            <div>
-              <dt>{{ t('dashboard.recentDocuments.size') }}</dt>
-              <dd>{{ formatFileSize(archivedDocument.sizeBytes) }}</dd>
-            </div>
-          </dl>
-
-          <div class="archived-document-preview-drawer__content">
-            <div
-              v-if="isLoading"
-              class="archived-document-preview-drawer__loading-state"
-              role="status"
-            >
-              <span aria-hidden="true"></span>
-              <p>{{ t('dashboard.recentDocuments.previewLoading') }}</p>
-            </div>
-
-            <div
-              v-else-if="displayedPreviewErrorMessage"
-              class="archived-document-preview-drawer__error-state"
-              role="alert"
-            >
-              <span aria-hidden="true">!</span>
-              <h3>{{ t('dashboard.recentDocuments.previewErrorTitle') }}</h3>
-              <p>{{ displayedPreviewErrorMessage }}</p>
-              <button type="button" @click="handlePreviewRetry">
-                <AppIcon name="refresh" :size="17" />
-                {{ t('common.retry') }}
-              </button>
-            </div>
-
-            <div
-              v-else-if="documentPreviewMode === 'image' && documentObjectUrl"
-              class="archived-document-preview-drawer__image-preview"
-            >
-              <img :src="documentObjectUrl" :alt="archivedDocument.name" />
-            </div>
-
-            <iframe
-              v-else-if="documentPreviewMode === 'pdf' && documentObjectUrl"
-              class="archived-document-preview-drawer__pdf-preview"
-              :src="documentObjectUrl"
-              :title="
-                t('dashboard.recentDocuments.previewFrameTitle', {
-                  fileName: archivedDocument.name,
-                })
-              "
-            ></iframe>
-
-            <div
-              v-else-if="documentPreviewMode === 'text'"
-              class="archived-document-preview-drawer__text-preview"
-            >
-              <p v-if="isTextPreviewTruncated">
-                {{ t('dashboard.recentDocuments.previewTruncated') }}
-              </p>
-              <pre>{{ documentTextContent }}</pre>
-            </div>
-
-            <div
-              v-else
-              class="archived-document-preview-drawer__unsupported-state"
-            >
-              <span aria-hidden="true">
-                <AppIcon name="document" :size="28" />
-              </span>
-              <h3>{{ t('dashboard.recentDocuments.previewUnsupportedTitle') }}</h3>
-              <p>
-                {{
-                  t('dashboard.recentDocuments.previewUnsupportedDescription')
-                }}
-              </p>
-              <button type="button" @click="handleDocumentDownload">
-                <AppIcon name="download" :size="17" />
-                {{ t('dashboard.recentDocuments.downloadTitle') }}
-              </button>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </Transition>
-  </Teleport>
-</template>
 
 <style scoped>
 .archived-document-preview-drawer {

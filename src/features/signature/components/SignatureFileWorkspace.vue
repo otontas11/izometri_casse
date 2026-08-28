@@ -1,93 +1,3 @@
-<script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-
-import AppIcon from '@/components/common/AppIcon.vue'
-import {
-  DRAFT_FILE_INPUT_ACCEPT,
-  MAX_DRAFT_FILE_SIZE_BYTES,
-} from '@/features/draft-files/utils/draftFileValidation'
-import type {
-  SignatureFileItem,
-  SignatureFileStatus,
-} from '@/features/signature/types/signature.types'
-import { formatFileSize } from '@/utils/formatters'
-
-const props = defineProps<{
-  canProcess: boolean
-  canUpload: boolean
-  fileValidationErrorMessage: string
-  isBusy: boolean
-  signatureFiles: SignatureFileItem[]
-}>()
-
-const emit = defineEmits<{
-  'add-files': [signatureFiles: File[]]
-  'remove-file': [signatureFileId: string]
-  'request-signature': []
-  'request-upload': []
-}>()
-
-const { t } = useI18n({ useScope: 'global' })
-const fileInputElement = ref<HTMLInputElement | null>(null)
-const isFileDraggedOver = ref(false)
-
-const maximumFileSizeLabel = computed(() =>
-  formatFileSize(MAX_DRAFT_FILE_SIZE_BYTES),
-)
-const signatureFileInputDescriptionIds = computed(() =>
-  [
-    'signature-file-workspace-requirements',
-    props.fileValidationErrorMessage
-      ? 'signature-file-workspace-validation-error'
-      : '',
-  ]
-    .filter(Boolean)
-    .join(' '),
-)
-
-const openFilePicker = () => {
-  if (!props.isBusy) {
-    fileInputElement.value?.click()
-  }
-}
-
-const addSignatureFiles = (signatureFiles: FileList | null) => {
-  if (!signatureFiles?.length) {
-    return
-  }
-
-  emit('add-files', Array.from(signatureFiles))
-}
-
-const handleFileInputChange = (inputEvent: Event) => {
-  const fileInput = inputEvent.target as HTMLInputElement
-  addSignatureFiles(fileInput.files)
-  fileInput.value = ''
-}
-
-const handleFileDragOver = () => {
-  if (!props.isBusy) {
-    isFileDraggedOver.value = true
-  }
-}
-
-const handleFileDragLeave = () => {
-  isFileDraggedOver.value = false
-}
-
-const handleFileDrop = (dropEvent: DragEvent) => {
-  isFileDraggedOver.value = false
-
-  if (!props.isBusy) {
-    addSignatureFiles(dropEvent.dataTransfer?.files ?? null)
-  }
-}
-
-const getSignatureFileStatusLabel = (fileStatus: SignatureFileStatus) =>
-  t(`signature.workspace.status.${fileStatus}`)
-</script>
-
 <template>
   <section
     class="signature-file-workspace"
@@ -291,5 +201,95 @@ const getSignatureFileStatusLabel = (fileStatus: SignatureFileStatus) =>
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+import AppIcon from '@/components/common/AppIcon.vue'
+import {
+  DRAFT_FILE_INPUT_ACCEPT,
+  MAX_DRAFT_FILE_SIZE_BYTES,
+} from '@/features/draft-files/utils/draftFileValidation'
+import type {
+  SignatureFileItem,
+  SignatureFileStatus,
+} from '@/features/signature/types/signature.types'
+import { formatFileSize } from '@/utils/formatters'
+
+const props = defineProps<{
+  canProcess: boolean
+  canUpload: boolean
+  fileValidationErrorMessage: string
+  isBusy: boolean
+  signatureFiles: SignatureFileItem[]
+}>()
+
+const emit = defineEmits<{
+  'add-files': [signatureFiles: File[]]
+  'remove-file': [signatureFileId: string]
+  'request-signature': []
+  'request-upload': []
+}>()
+
+const { t } = useI18n({ useScope: 'global' })
+const fileInputElement = ref<HTMLInputElement | null>(null)
+const isFileDraggedOver = ref(false)
+
+const maximumFileSizeLabel = computed(() =>
+  formatFileSize(MAX_DRAFT_FILE_SIZE_BYTES),
+)
+const signatureFileInputDescriptionIds = computed(() =>
+  [
+    'signature-file-workspace-requirements',
+    props.fileValidationErrorMessage
+      ? 'signature-file-workspace-validation-error'
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' '),
+)
+
+const openFilePicker = () => {
+  if (!props.isBusy) {
+    fileInputElement.value?.click()
+  }
+}
+
+const addSignatureFiles = (signatureFiles: FileList | null) => {
+  if (!signatureFiles?.length) {
+    return
+  }
+
+  emit('add-files', Array.from(signatureFiles))
+}
+
+const handleFileInputChange = (inputEvent: Event) => {
+  const fileInput = inputEvent.target as HTMLInputElement
+  addSignatureFiles(fileInput.files)
+  fileInput.value = ''
+}
+
+const handleFileDragOver = () => {
+  if (!props.isBusy) {
+    isFileDraggedOver.value = true
+  }
+}
+
+const handleFileDragLeave = () => {
+  isFileDraggedOver.value = false
+}
+
+const handleFileDrop = (dropEvent: DragEvent) => {
+  isFileDraggedOver.value = false
+
+  if (!props.isBusy) {
+    addSignatureFiles(dropEvent.dataTransfer?.files ?? null)
+  }
+}
+
+const getSignatureFileStatusLabel = (fileStatus: SignatureFileStatus) =>
+  t(`signature.workspace.status.${fileStatus}`)
+</script>
 
 <style scoped src="./SignatureFileWorkspace.css"></style>

@@ -1,3 +1,50 @@
+<template>
+  <div
+    :class="[
+      'base-input',
+      {
+        'base-input--error': errorMessage,
+        'base-input--readonly': readonly,
+      },
+    ]"
+  >
+    <label :for="id">
+      {{ label }}
+      <span v-if="required" aria-hidden="true">*</span>
+    </label>
+
+    <input
+      :id="id"
+      :name="name"
+      :type="type"
+      :value="modelValue"
+      :placeholder="placeholder"
+      :autocomplete="autocomplete"
+      :inputmode="inputMode"
+      :maxlength="maximumLength"
+      :disabled="disabled"
+      :readonly="readonly"
+      :required="required"
+      :aria-invalid="errorMessage ? 'true' : undefined"
+      :aria-describedby="inputDescriptionIds"
+      @input="handleInput"
+      @blur="emit('blur')"
+    />
+
+    <small v-if="hint" :id="`${id}-hint`" class="base-input__hint">
+      {{ hint }}
+    </small>
+    <small
+      v-if="errorMessage"
+      :id="`${id}-error`"
+      class="base-input__error-message"
+      role="alert"
+    >
+      {{ errorMessage }}
+    </small>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { computed } from 'vue'
 
@@ -60,53 +107,6 @@ const handleInput = (inputEvent: Event) => {
   emit('update:modelValue', inputElement.value)
 }
 </script>
-
-<template>
-  <div
-    :class="[
-      'base-input',
-      {
-        'base-input--error': errorMessage,
-        'base-input--readonly': readonly,
-      },
-    ]"
-  >
-    <label :for="id">
-      {{ label }}
-      <span v-if="required" aria-hidden="true">*</span>
-    </label>
-
-    <input
-      :id="id"
-      :name="name"
-      :type="type"
-      :value="modelValue"
-      :placeholder="placeholder"
-      :autocomplete="autocomplete"
-      :inputmode="inputMode"
-      :maxlength="maximumLength"
-      :disabled="disabled"
-      :readonly="readonly"
-      :required="required"
-      :aria-invalid="errorMessage ? 'true' : undefined"
-      :aria-describedby="inputDescriptionIds"
-      @input="handleInput"
-      @blur="emit('blur')"
-    />
-
-    <small v-if="hint" :id="`${id}-hint`" class="base-input__hint">
-      {{ hint }}
-    </small>
-    <small
-      v-if="errorMessage"
-      :id="`${id}-error`"
-      class="base-input__error-message"
-      role="alert"
-    >
-      {{ errorMessage }}
-    </small>
-  </div>
-</template>
 
 <style scoped>
 .base-input {

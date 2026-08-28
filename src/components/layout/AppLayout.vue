@@ -1,3 +1,32 @@
+<template>
+  <div class="app-layout">
+    <AppSidebar
+      :is-open="isSidebarOpen"
+      @close="handleSidebarClose"
+      @navigate="handleSidebarNavigation"
+    />
+
+    <div
+      v-if="isSidebarOpen"
+      class="app-layout__overlay"
+      aria-hidden="true"
+      @click="handleSidebarClose()"
+    ></div>
+
+    <div class="app-layout__workspace" :inert="isSidebarOpen">
+      <AppTopbar
+        ref="appTopbarComponent"
+        :is-sidebar-open="isSidebarOpen"
+        @toggle-sidebar="handleSidebarToggle"
+      />
+
+      <main class="app-layout__main">
+        <RouterView />
+      </main>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
@@ -104,35 +133,6 @@ onBeforeUnmount(() => {
   unlockBodyScrollForSidebar()
 })
 </script>
-
-<template>
-  <div class="app-layout">
-    <AppSidebar
-      :is-open="isSidebarOpen"
-      @close="handleSidebarClose"
-      @navigate="handleSidebarNavigation"
-    />
-
-    <div
-      v-if="isSidebarOpen"
-      class="app-layout__overlay"
-      aria-hidden="true"
-      @click="handleSidebarClose()"
-    ></div>
-
-    <div class="app-layout__workspace" :inert="isSidebarOpen">
-      <AppTopbar
-        ref="appTopbarComponent"
-        :is-sidebar-open="isSidebarOpen"
-        @toggle-sidebar="handleSidebarToggle"
-      />
-
-      <main class="app-layout__main">
-        <RouterView />
-      </main>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .app-layout {

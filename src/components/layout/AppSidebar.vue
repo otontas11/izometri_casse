@@ -1,3 +1,63 @@
+<template>
+  <aside
+    id="application-navigation"
+    ref="sidebarElement"
+    :class="['app-sidebar', { 'app-sidebar--open': isOpen }]"
+    :aria-label="t('layout.sidebar.ariaLabel')"
+    @keydown="handleSidebarKeydown"
+  >
+    <div class="app-sidebar__brand-row">
+      <RouterLink
+        class="app-sidebar__brand"
+        :to="{ name: 'dashboard' }"
+        :aria-label="t('layout.sidebar.homeAriaLabel')"
+        @click="emit('navigate')"
+      >
+        iz<span>imza</span>
+      </RouterLink>
+
+      <button
+        ref="sidebarCloseButtonElement"
+        class="app-sidebar__close"
+        type="button"
+        :aria-label="t('layout.sidebar.closeAriaLabel')"
+        @click="emit('close')"
+      >
+        <AppIcon name="close" :size="22" />
+      </button>
+    </div>
+
+    <div class="app-sidebar__context">
+      <span aria-hidden="true"></span>
+      {{ t('layout.sidebar.context') }}
+    </div>
+
+    <nav
+      class="app-sidebar__navigation"
+      :aria-label="t('layout.sidebar.navigationAriaLabel')"
+    >
+      <RouterLink
+        v-for="navigationItem in sidebarNavigationItems"
+        :key="navigationItem.routeName"
+        class="app-sidebar__link"
+        :to="{ name: navigationItem.routeName }"
+        @click="emit('navigate')"
+      >
+        <AppIcon :name="navigationItem.icon" :size="21" />
+        <span>{{ navigationItem.label }}</span>
+      </RouterLink>
+    </nav>
+
+    <footer class="app-sidebar__footer">
+      <span class="app-sidebar__footer-mark" aria-hidden="true">✓</span>
+      <span>
+        <strong>{{ t('layout.sidebar.secureSession') }}</strong>
+        <small>{{ t('layout.sidebar.protectedConnection') }}</small>
+      </span>
+    </footer>
+  </aside>
+</template>
+
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
@@ -109,66 +169,6 @@ watch(
   },
 )
 </script>
-
-<template>
-  <aside
-    id="application-navigation"
-    ref="sidebarElement"
-    :class="['app-sidebar', { 'app-sidebar--open': isOpen }]"
-    :aria-label="t('layout.sidebar.ariaLabel')"
-    @keydown="handleSidebarKeydown"
-  >
-    <div class="app-sidebar__brand-row">
-      <RouterLink
-        class="app-sidebar__brand"
-        :to="{ name: 'dashboard' }"
-        :aria-label="t('layout.sidebar.homeAriaLabel')"
-        @click="emit('navigate')"
-      >
-        iz<span>imza</span>
-      </RouterLink>
-
-      <button
-        ref="sidebarCloseButtonElement"
-        class="app-sidebar__close"
-        type="button"
-        :aria-label="t('layout.sidebar.closeAriaLabel')"
-        @click="emit('close')"
-      >
-        <AppIcon name="close" :size="22" />
-      </button>
-    </div>
-
-    <div class="app-sidebar__context">
-      <span aria-hidden="true"></span>
-      {{ t('layout.sidebar.context') }}
-    </div>
-
-    <nav
-      class="app-sidebar__navigation"
-      :aria-label="t('layout.sidebar.navigationAriaLabel')"
-    >
-      <RouterLink
-        v-for="navigationItem in sidebarNavigationItems"
-        :key="navigationItem.routeName"
-        class="app-sidebar__link"
-        :to="{ name: navigationItem.routeName }"
-        @click="emit('navigate')"
-      >
-        <AppIcon :name="navigationItem.icon" :size="21" />
-        <span>{{ navigationItem.label }}</span>
-      </RouterLink>
-    </nav>
-
-    <footer class="app-sidebar__footer">
-      <span class="app-sidebar__footer-mark" aria-hidden="true">✓</span>
-      <span>
-        <strong>{{ t('layout.sidebar.secureSession') }}</strong>
-        <small>{{ t('layout.sidebar.protectedConnection') }}</small>
-      </span>
-    </footer>
-  </aside>
-</template>
 
 <style scoped>
 .app-sidebar {

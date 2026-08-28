@@ -1,3 +1,125 @@
+<template>
+  <div
+    ref="datePickerElement"
+    :class="[
+      'base-date-picker',
+      { 'base-date-picker--open': isCalendarOpen },
+    ]"
+    @keydown.esc.stop.prevent="closeCalendarAndRestoreTriggerFocus"
+  >
+    <span :id="labelElementId" class="base-date-picker__label">
+      {{ label }}
+    </span>
+
+    <button
+      :id="id"
+      ref="triggerElement"
+      class="base-date-picker__trigger"
+      type="button"
+      aria-haspopup="dialog"
+      :aria-controls="calendarPanelId"
+      :aria-expanded="isCalendarOpen"
+      :aria-labelledby="`${labelElementId} ${selectedDateSummaryId}`"
+      @click="handleTriggerClick"
+      @keydown="handleTriggerKeydown"
+    >
+      <AppIcon class="base-date-picker__calendar-icon" name="calendar" :size="17" />
+      <span
+        :id="selectedDateSummaryId"
+        :class="[
+          'base-date-picker__summary',
+          {
+            'base-date-picker__summary--placeholder': !modelValue,
+          },
+        ]"
+      >
+        {{ selectedDateLabel }}
+      </span>
+      <AppIcon
+        class="base-date-picker__chevron"
+        name="chevron-down"
+        :size="17"
+      />
+    </button>
+
+    <section
+      v-if="isCalendarOpen"
+      :id="calendarPanelId"
+      ref="calendarPanelElement"
+      class="base-date-picker__panel"
+      role="dialog"
+      :aria-label="calendarAriaLabel"
+    >
+      <header class="base-date-picker__calendar-header">
+        <button
+          type="button"
+          :aria-label="previousMonthText"
+          @click="changeDisplayedMonth(-1)"
+        >
+          <span aria-hidden="true">‹</span>
+        </button>
+        <strong aria-live="polite">{{ displayedMonthLabel }}</strong>
+        <button
+          type="button"
+          :aria-label="nextMonthText"
+          @click="changeDisplayedMonth(1)"
+        >
+          <span aria-hidden="true">›</span>
+        </button>
+      </header>
+
+      <div class="base-date-picker__weekdays" aria-hidden="true">
+        <span
+          v-for="weekdayLabel in weekdayLabels"
+          :key="weekdayLabel"
+        >
+          {{ weekdayLabel }}
+        </span>
+      </div>
+
+      <div class="base-date-picker__days">
+        <template
+          v-for="(calendarDay, calendarDayIndex) in calendarDays"
+          :key="calendarDay?.dateValue ?? `empty-${calendarDayIndex}`"
+        >
+          <span v-if="!calendarDay" aria-hidden="true"></span>
+          <button
+            v-else
+            type="button"
+            :class="[
+              'base-date-picker__day',
+              {
+                'base-date-picker__day--selected': calendarDay.isSelected,
+                'base-date-picker__day--today': calendarDay.isToday,
+              },
+            ]"
+            :aria-label="calendarDay.fullDateLabel"
+            :aria-pressed="calendarDay.isSelected"
+            :data-date-value="calendarDay.dateValue"
+            @click="selectDate(calendarDay.dateValue)"
+            @keydown="handleCalendarDayKeydown($event, calendarDay.dateValue)"
+          >
+            {{ calendarDay.dayNumber }}
+          </button>
+        </template>
+      </div>
+
+      <footer class="base-date-picker__footer">
+        <button type="button" @click="handleTodaySelection">
+          {{ todayText }}
+        </button>
+        <button
+          v-if="modelValue"
+          type="button"
+          @click="handleDateClear"
+        >
+          {{ clearText }}
+        </button>
+      </footer>
+    </section>
+  </div>
+</template>
+
 <script lang="ts" setup>
 import {
   computed,
@@ -301,127 +423,5 @@ onBeforeUnmount(() => {
   document.removeEventListener('focusin', handleDocumentFocusIn)
 })
 </script>
-
-<template>
-  <div
-    ref="datePickerElement"
-    :class="[
-      'base-date-picker',
-      { 'base-date-picker--open': isCalendarOpen },
-    ]"
-    @keydown.esc.stop.prevent="closeCalendarAndRestoreTriggerFocus"
-  >
-    <span :id="labelElementId" class="base-date-picker__label">
-      {{ label }}
-    </span>
-
-    <button
-      :id="id"
-      ref="triggerElement"
-      class="base-date-picker__trigger"
-      type="button"
-      aria-haspopup="dialog"
-      :aria-controls="calendarPanelId"
-      :aria-expanded="isCalendarOpen"
-      :aria-labelledby="`${labelElementId} ${selectedDateSummaryId}`"
-      @click="handleTriggerClick"
-      @keydown="handleTriggerKeydown"
-    >
-      <AppIcon class="base-date-picker__calendar-icon" name="calendar" :size="17" />
-      <span
-        :id="selectedDateSummaryId"
-        :class="[
-          'base-date-picker__summary',
-          {
-            'base-date-picker__summary--placeholder': !modelValue,
-          },
-        ]"
-      >
-        {{ selectedDateLabel }}
-      </span>
-      <AppIcon
-        class="base-date-picker__chevron"
-        name="chevron-down"
-        :size="17"
-      />
-    </button>
-
-    <section
-      v-if="isCalendarOpen"
-      :id="calendarPanelId"
-      ref="calendarPanelElement"
-      class="base-date-picker__panel"
-      role="dialog"
-      :aria-label="calendarAriaLabel"
-    >
-      <header class="base-date-picker__calendar-header">
-        <button
-          type="button"
-          :aria-label="previousMonthText"
-          @click="changeDisplayedMonth(-1)"
-        >
-          <span aria-hidden="true">‹</span>
-        </button>
-        <strong aria-live="polite">{{ displayedMonthLabel }}</strong>
-        <button
-          type="button"
-          :aria-label="nextMonthText"
-          @click="changeDisplayedMonth(1)"
-        >
-          <span aria-hidden="true">›</span>
-        </button>
-      </header>
-
-      <div class="base-date-picker__weekdays" aria-hidden="true">
-        <span
-          v-for="weekdayLabel in weekdayLabels"
-          :key="weekdayLabel"
-        >
-          {{ weekdayLabel }}
-        </span>
-      </div>
-
-      <div class="base-date-picker__days">
-        <template
-          v-for="(calendarDay, calendarDayIndex) in calendarDays"
-          :key="calendarDay?.dateValue ?? `empty-${calendarDayIndex}`"
-        >
-          <span v-if="!calendarDay" aria-hidden="true"></span>
-          <button
-            v-else
-            type="button"
-            :class="[
-              'base-date-picker__day',
-              {
-                'base-date-picker__day--selected': calendarDay.isSelected,
-                'base-date-picker__day--today': calendarDay.isToday,
-              },
-            ]"
-            :aria-label="calendarDay.fullDateLabel"
-            :aria-pressed="calendarDay.isSelected"
-            :data-date-value="calendarDay.dateValue"
-            @click="selectDate(calendarDay.dateValue)"
-            @keydown="handleCalendarDayKeydown($event, calendarDay.dateValue)"
-          >
-            {{ calendarDay.dayNumber }}
-          </button>
-        </template>
-      </div>
-
-      <footer class="base-date-picker__footer">
-        <button type="button" @click="handleTodaySelection">
-          {{ todayText }}
-        </button>
-        <button
-          v-if="modelValue"
-          type="button"
-          @click="handleDateClear"
-        >
-          {{ clearText }}
-        </button>
-      </footer>
-    </section>
-  </div>
-</template>
 
 <style scoped src="./BaseDatePicker.css"></style>

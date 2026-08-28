@@ -1,32 +1,3 @@
-<script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-import { RouterLink } from 'vue-router'
-
-import AppIcon from '@/components/common/AppIcon.vue'
-import type {
-  TimestampJob,
-  TimestampJobStatus,
-} from '@/features/timestamp/types/timestamp.types'
-import { formatDateTime, formatFileSize } from '@/utils/formatters'
-
-defineProps<{
-  errorMessage: string
-  isLoading: boolean
-  timestampJobs: TimestampJob[]
-}>()
-
-const emit = defineEmits<{
-  retry: []
-}>()
-
-const { t } = useI18n({ useScope: 'global' })
-const timestampJobStatusTranslationKeys: Record<TimestampJobStatus, string> = {
-  completed: 'timestamp.history.completed',
-  failed: 'timestamp.history.failed',
-  processing: 'timestamp.history.processing',
-}
-</script>
-
 <template>
   <section
     class="timestamp-history-table"
@@ -160,6 +131,35 @@ const timestampJobStatusTranslationKeys: Record<TimestampJobStatus, string> = {
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { RouterLink } from 'vue-router'
+
+import AppIcon from '@/components/common/AppIcon.vue'
+import type {
+  TimestampJob,
+  TimestampJobStatus,
+} from '@/features/timestamp/types/timestamp.types'
+import { formatDateTime, formatFileSize } from '@/utils/formatters'
+
+defineProps<{
+  errorMessage: string
+  isLoading: boolean
+  timestampJobs: TimestampJob[]
+}>()
+
+const emit = defineEmits<{
+  retry: []
+}>()
+
+const { t } = useI18n({ useScope: 'global' })
+const timestampJobStatusTranslationKeys: Record<TimestampJobStatus, string> = {
+  completed: 'timestamp.history.completed',
+  failed: 'timestamp.history.failed',
+  processing: 'timestamp.history.processing',
+}
+</script>
 
 <style scoped>
 .timestamp-history-table {

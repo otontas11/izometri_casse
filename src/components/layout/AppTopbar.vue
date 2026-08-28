@@ -1,3 +1,37 @@
+<template>
+  <header class="app-topbar">
+    <button
+      ref="sidebarToggleButtonElement"
+      class="app-topbar__menu"
+      type="button"
+      aria-controls="application-navigation"
+      :aria-expanded="isSidebarOpen"
+      :aria-label="
+        isSidebarOpen
+          ? t('layout.topbar.closeNavigation')
+          : t('layout.topbar.openNavigation')
+      "
+      @click="emit('toggleSidebar')"
+    >
+      <AppIcon name="menu" :size="23" />
+    </button>
+
+    <div class="app-topbar__context">
+      <strong>İzİmza</strong>
+      <span>{{ t('layout.topbar.context') }}</span>
+    </div>
+
+    <div class="app-topbar__actions">
+      <span class="app-topbar__quota" aria-live="polite">
+        <small>{{ t('layout.topbar.remainingCredits') }}</small>
+        <strong>{{ dashboardSummary?.remainingCredits ?? '—' }}</strong>
+      </span>
+      <LanguageSwitcher class="app-topbar__language-switcher" />
+      <AuthUserMenu />
+    </div>
+  </header>
+</template>
+
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -34,40 +68,6 @@ onMounted(() => {
   }
 })
 </script>
-
-<template>
-  <header class="app-topbar">
-    <button
-      ref="sidebarToggleButtonElement"
-      class="app-topbar__menu"
-      type="button"
-      aria-controls="application-navigation"
-      :aria-expanded="isSidebarOpen"
-      :aria-label="
-        isSidebarOpen
-          ? t('layout.topbar.closeNavigation')
-          : t('layout.topbar.openNavigation')
-      "
-      @click="emit('toggleSidebar')"
-    >
-      <AppIcon name="menu" :size="23" />
-    </button>
-
-    <div class="app-topbar__context">
-      <strong>İzİmza</strong>
-      <span>{{ t('layout.topbar.context') }}</span>
-    </div>
-
-    <div class="app-topbar__actions">
-      <span class="app-topbar__quota" aria-live="polite">
-        <small>{{ t('layout.topbar.remainingCredits') }}</small>
-        <strong>{{ dashboardSummary?.remainingCredits ?? '—' }}</strong>
-      </span>
-      <LanguageSwitcher class="app-topbar__language-switcher" />
-      <AuthUserMenu />
-    </div>
-  </header>
-</template>
 
 <style scoped>
 .app-topbar {

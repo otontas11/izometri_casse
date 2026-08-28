@@ -1,3 +1,81 @@
+<template>
+  <section
+    class="dashboard-quick-actions-panel"
+    :aria-label="t('dashboard.quickActions.ariaLabel')"
+  >
+    <div
+      :class="[
+        'dashboard-quick-actions-panel__drop-area',
+        {
+          'dashboard-quick-actions-panel__drop-area--dragging':
+            isFileDraggedOver,
+          'dashboard-quick-actions-panel__drop-area--disabled':
+            isSignatureActionInProgress,
+        },
+      ]"
+      role="button"
+      :tabindex="isSignatureActionInProgress ? -1 : 0"
+      :aria-disabled="isSignatureActionInProgress"
+      :aria-describedby="dashboardDropAreaDescriptionIds"
+      @click="handleFilePickerOpen"
+      @keydown.enter.prevent="handleFilePickerOpen"
+      @keydown.space.prevent="handleFilePickerOpen"
+      @dragenter.prevent="handleFileDragOver"
+      @dragover.prevent="handleFileDragOver"
+      @dragleave.prevent="handleFileDragLeave"
+      @drop.prevent="handleFileDrop"
+    >
+      <input
+        id="dashboard-quick-actions-panel-input"
+        ref="dashboardFileInputElement"
+        class="visually-hidden"
+        type="file"
+        multiple
+        tabindex="-1"
+        :accept="DRAFT_FILE_INPUT_ACCEPT"
+        :disabled="isSignatureActionInProgress"
+        :aria-label="t('signature.workspace.inputAriaLabel')"
+        :aria-describedby="dashboardDropAreaDescriptionIds"
+        :aria-invalid="shouldShowValidationMessage ? 'true' : undefined"
+        @change="handleFileInputChange"
+      />
+
+      <span
+        class="dashboard-quick-actions-panel__upload-icon"
+        aria-hidden="true"
+      >
+        <AppIcon name="upload" :size="30" />
+      </span>
+      <span class="dashboard-quick-actions-panel__eyebrow">
+        {{ t('dashboard.quickActions.fastestAction') }}
+      </span>
+      <h2>{{ t('dashboard.quickActions.title') }}</h2>
+      <p>{{ t('dashboard.quickActions.description') }}</p>
+      <span class="dashboard-quick-actions-panel__select-action">
+        <AppIcon name="document" :size="18" />
+        {{ t('signature.workspace.selectFromDevice') }}
+      </span>
+      <small id="dashboard-quick-actions-panel-requirements">
+        {{
+          t('signature.workspace.requirements', {
+            maximumSize: maximumFileSizeLabel,
+          })
+        }}
+      </small>
+    </div>
+
+    <p
+      v-if="shouldShowValidationMessage"
+      id="dashboard-quick-actions-panel-validation-error"
+      class="dashboard-quick-actions-panel__validation-message"
+      role="alert"
+    >
+      <span aria-hidden="true">!</span>
+      {{ signatureFileValidationErrorMessage }}
+    </p>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -98,84 +176,6 @@ const handleFileDrop = (dropEvent: DragEvent) => {
   }
 }
 </script>
-
-<template>
-  <section
-    class="dashboard-quick-actions-panel"
-    :aria-label="t('dashboard.quickActions.ariaLabel')"
-  >
-    <div
-      :class="[
-        'dashboard-quick-actions-panel__drop-area',
-        {
-          'dashboard-quick-actions-panel__drop-area--dragging':
-            isFileDraggedOver,
-          'dashboard-quick-actions-panel__drop-area--disabled':
-            isSignatureActionInProgress,
-        },
-      ]"
-      role="button"
-      :tabindex="isSignatureActionInProgress ? -1 : 0"
-      :aria-disabled="isSignatureActionInProgress"
-      :aria-describedby="dashboardDropAreaDescriptionIds"
-      @click="handleFilePickerOpen"
-      @keydown.enter.prevent="handleFilePickerOpen"
-      @keydown.space.prevent="handleFilePickerOpen"
-      @dragenter.prevent="handleFileDragOver"
-      @dragover.prevent="handleFileDragOver"
-      @dragleave.prevent="handleFileDragLeave"
-      @drop.prevent="handleFileDrop"
-    >
-      <input
-        id="dashboard-quick-actions-panel-input"
-        ref="dashboardFileInputElement"
-        class="visually-hidden"
-        type="file"
-        multiple
-        tabindex="-1"
-        :accept="DRAFT_FILE_INPUT_ACCEPT"
-        :disabled="isSignatureActionInProgress"
-        :aria-label="t('signature.workspace.inputAriaLabel')"
-        :aria-describedby="dashboardDropAreaDescriptionIds"
-        :aria-invalid="shouldShowValidationMessage ? 'true' : undefined"
-        @change="handleFileInputChange"
-      />
-
-      <span
-        class="dashboard-quick-actions-panel__upload-icon"
-        aria-hidden="true"
-      >
-        <AppIcon name="upload" :size="30" />
-      </span>
-      <span class="dashboard-quick-actions-panel__eyebrow">
-        {{ t('dashboard.quickActions.fastestAction') }}
-      </span>
-      <h2>{{ t('dashboard.quickActions.title') }}</h2>
-      <p>{{ t('dashboard.quickActions.description') }}</p>
-      <span class="dashboard-quick-actions-panel__select-action">
-        <AppIcon name="document" :size="18" />
-        {{ t('signature.workspace.selectFromDevice') }}
-      </span>
-      <small id="dashboard-quick-actions-panel-requirements">
-        {{
-          t('signature.workspace.requirements', {
-            maximumSize: maximumFileSizeLabel,
-          })
-        }}
-      </small>
-    </div>
-
-    <p
-      v-if="shouldShowValidationMessage"
-      id="dashboard-quick-actions-panel-validation-error"
-      class="dashboard-quick-actions-panel__validation-message"
-      role="alert"
-    >
-      <span aria-hidden="true">!</span>
-      {{ signatureFileValidationErrorMessage }}
-    </p>
-  </section>
-</template>
 
 <style scoped>
 .dashboard-quick-actions-panel {

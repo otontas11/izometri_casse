@@ -1,3 +1,58 @@
+<template>
+  <div
+    ref="userMenuElement"
+    class="auth-user-menu"
+    @focusout="handleUserMenuFocusOut"
+    @keydown.esc.stop.prevent="closeUserMenuAndRestoreTriggerFocus"
+  >
+    <button
+      ref="userMenuTriggerElement"
+      class="auth-user-menu__trigger"
+      type="button"
+      :aria-expanded="isUserMenuOpen"
+      aria-controls="authenticated-user-popover"
+      :aria-label="
+        isUserMenuOpen
+          ? t('auth.userMenu.closeAriaLabel')
+          : t('auth.userMenu.openAriaLabel')
+      "
+      @click="isUserMenuOpen = !isUserMenuOpen"
+      @keydown="handleUserMenuTriggerKeydown"
+    >
+      <img
+        v-if="shouldDisplayAuthenticatedUserPicture"
+        :src="authenticatedUserPicture"
+        alt=""
+        referrerpolicy="no-referrer"
+        @error="hasAuthenticatedUserPictureError = true"
+      />
+      <span v-else>{{ authenticatedUserInitials }}</span>
+    </button>
+
+    <div
+      v-if="isUserMenuOpen"
+      id="authenticated-user-popover"
+      ref="userMenuPopoverElement"
+      class="auth-user-menu__popover"
+    >
+      <div class="auth-user-menu__identity">
+        <strong>{{ authenticatedUserDisplayName }}</strong>
+        <small v-if="authenticatedUserEmail">{{ authenticatedUserEmail }}</small>
+      </div>
+
+      <RouterLink
+        :to="{ name: 'profile' }"
+        @click="closeUserMenu"
+      >
+        {{ t('auth.userMenu.profile') }}
+      </RouterLink>
+      <button type="button" @click="handleLogout">
+        {{ t('auth.userMenu.logout') }}
+      </button>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
@@ -118,61 +173,6 @@ onBeforeUnmount(() =>
   document.removeEventListener('pointerdown', handleOutsidePointerDown),
 )
 </script>
-
-<template>
-  <div
-    ref="userMenuElement"
-    class="auth-user-menu"
-    @focusout="handleUserMenuFocusOut"
-    @keydown.esc.stop.prevent="closeUserMenuAndRestoreTriggerFocus"
-  >
-    <button
-      ref="userMenuTriggerElement"
-      class="auth-user-menu__trigger"
-      type="button"
-      :aria-expanded="isUserMenuOpen"
-      aria-controls="authenticated-user-popover"
-      :aria-label="
-        isUserMenuOpen
-          ? t('auth.userMenu.closeAriaLabel')
-          : t('auth.userMenu.openAriaLabel')
-      "
-      @click="isUserMenuOpen = !isUserMenuOpen"
-      @keydown="handleUserMenuTriggerKeydown"
-    >
-      <img
-        v-if="shouldDisplayAuthenticatedUserPicture"
-        :src="authenticatedUserPicture"
-        alt=""
-        referrerpolicy="no-referrer"
-        @error="hasAuthenticatedUserPictureError = true"
-      />
-      <span v-else>{{ authenticatedUserInitials }}</span>
-    </button>
-
-    <div
-      v-if="isUserMenuOpen"
-      id="authenticated-user-popover"
-      ref="userMenuPopoverElement"
-      class="auth-user-menu__popover"
-    >
-      <div class="auth-user-menu__identity">
-        <strong>{{ authenticatedUserDisplayName }}</strong>
-        <small v-if="authenticatedUserEmail">{{ authenticatedUserEmail }}</small>
-      </div>
-
-      <RouterLink
-        :to="{ name: 'profile' }"
-        @click="closeUserMenu"
-      >
-        {{ t('auth.userMenu.profile') }}
-      </RouterLink>
-      <button type="button" @click="handleLogout">
-        {{ t('auth.userMenu.logout') }}
-      </button>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .auth-user-menu {

@@ -1,27 +1,3 @@
-<script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-
-import AppIcon from '@/components/common/AppIcon.vue'
-import type { AppIconName } from '@/types/icon'
-
-withDefaults(
-  defineProps<{
-    detail?: string
-    icon: AppIconName
-    label: string
-    metricValue: string
-    progress?: number
-    tone: 'blue' | 'green' | 'navy' | 'violet'
-  }>(),
-  {
-    detail: '',
-    progress: undefined,
-  },
-)
-
-const { t } = useI18n({ useScope: 'global' })
-</script>
-
 <template>
   <article :class="['dashboard-metric-card', `dashboard-metric-card--${tone}`]">
     <span class="dashboard-metric-card__icon" aria-hidden="true">
@@ -49,6 +25,30 @@ const { t } = useI18n({ useScope: 'global' })
     </div>
   </article>
 </template>
+
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+import AppIcon from '@/components/common/AppIcon.vue'
+import type { AppIconName } from '@/types/icon'
+
+withDefaults(
+  defineProps<{
+    detail?: string
+    icon: AppIconName
+    label: string
+    metricValue: string
+    progress?: number
+    tone: 'blue' | 'green' | 'navy' | 'violet'
+  }>(),
+  {
+    detail: '',
+    progress: undefined,
+  },
+)
+
+const { t } = useI18n({ useScope: 'global' })
+</script>
 
 <style scoped>
 .dashboard-metric-card {

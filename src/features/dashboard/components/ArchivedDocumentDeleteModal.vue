@@ -1,3 +1,103 @@
+<template>
+  <Teleport to="body">
+    <Transition name="archived-document-delete-modal">
+      <div
+        v-if="isOpen && archivedDocument"
+        class="archived-document-delete-modal"
+        @click.self="requestModalClose"
+      >
+        <section
+          ref="modalDialogElement"
+          class="archived-document-delete-modal__dialog"
+          role="dialog"
+          aria-modal="true"
+          :aria-busy="isDeleting"
+          aria-labelledby="archived-document-delete-modal-title"
+          aria-describedby="archived-document-delete-modal-description"
+        >
+          <header class="archived-document-delete-modal__header">
+            <span aria-hidden="true">
+              <AppIcon name="trash" :size="23" />
+            </span>
+            <div>
+              <small>
+                {{ t('dashboard.recentDocuments.deleteModalEyebrow') }}
+              </small>
+              <h2 id="archived-document-delete-modal-title">
+                {{ t('dashboard.recentDocuments.deleteModalTitle') }}
+              </h2>
+            </div>
+            <button
+              type="button"
+              :disabled="isDeleting"
+              :aria-label="
+                t('dashboard.recentDocuments.deleteModalCloseAriaLabel')
+              "
+              @click="requestModalClose"
+            >
+              <AppIcon name="close" :size="19" />
+            </button>
+          </header>
+
+          <p id="archived-document-delete-modal-description">
+            {{
+              t('dashboard.recentDocuments.deleteConfirmation', {
+                fileName: archivedDocument.name,
+              })
+            }}
+          </p>
+
+          <div class="archived-document-delete-modal__file-summary">
+            <span aria-hidden="true">
+              <AppIcon name="document" :size="22" />
+            </span>
+            <div>
+              <strong>{{ archivedDocument.name }}</strong>
+              <small>{{ formatFileSize(archivedDocument.sizeBytes) }}</small>
+            </div>
+          </div>
+
+          <p
+            v-if="errorMessage"
+            class="archived-document-delete-modal__error-message"
+            role="alert"
+          >
+            <span aria-hidden="true">!</span>
+            {{ errorMessage }}
+          </p>
+
+          <footer class="archived-document-delete-modal__actions">
+            <button
+              ref="cancelButtonElement"
+              type="button"
+              :disabled="isDeleting"
+              @click="requestModalClose"
+            >
+              {{ t('common.cancel') }}
+            </button>
+            <button
+              type="button"
+              :disabled="isDeleting"
+              @click="emit('confirm')"
+            >
+              <span
+                v-if="isDeleting"
+                class="archived-document-delete-modal__spinner"
+                aria-hidden="true"
+              ></span>
+              {{
+                isDeleting
+                  ? t('dashboard.recentDocuments.deleteModalDeleting')
+                  : t('dashboard.recentDocuments.deleteModalConfirm')
+              }}
+            </button>
+          </footer>
+        </section>
+      </div>
+    </Transition>
+  </Teleport>
+</template>
+
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -116,106 +216,6 @@ onBeforeUnmount(() => {
   }
 })
 </script>
-
-<template>
-  <Teleport to="body">
-    <Transition name="archived-document-delete-modal">
-      <div
-        v-if="isOpen && archivedDocument"
-        class="archived-document-delete-modal"
-        @click.self="requestModalClose"
-      >
-        <section
-          ref="modalDialogElement"
-          class="archived-document-delete-modal__dialog"
-          role="dialog"
-          aria-modal="true"
-          :aria-busy="isDeleting"
-          aria-labelledby="archived-document-delete-modal-title"
-          aria-describedby="archived-document-delete-modal-description"
-        >
-          <header class="archived-document-delete-modal__header">
-            <span aria-hidden="true">
-              <AppIcon name="trash" :size="23" />
-            </span>
-            <div>
-              <small>
-                {{ t('dashboard.recentDocuments.deleteModalEyebrow') }}
-              </small>
-              <h2 id="archived-document-delete-modal-title">
-                {{ t('dashboard.recentDocuments.deleteModalTitle') }}
-              </h2>
-            </div>
-            <button
-              type="button"
-              :disabled="isDeleting"
-              :aria-label="
-                t('dashboard.recentDocuments.deleteModalCloseAriaLabel')
-              "
-              @click="requestModalClose"
-            >
-              <AppIcon name="close" :size="19" />
-            </button>
-          </header>
-
-          <p id="archived-document-delete-modal-description">
-            {{
-              t('dashboard.recentDocuments.deleteConfirmation', {
-                fileName: archivedDocument.name,
-              })
-            }}
-          </p>
-
-          <div class="archived-document-delete-modal__file-summary">
-            <span aria-hidden="true">
-              <AppIcon name="document" :size="22" />
-            </span>
-            <div>
-              <strong>{{ archivedDocument.name }}</strong>
-              <small>{{ formatFileSize(archivedDocument.sizeBytes) }}</small>
-            </div>
-          </div>
-
-          <p
-            v-if="errorMessage"
-            class="archived-document-delete-modal__error-message"
-            role="alert"
-          >
-            <span aria-hidden="true">!</span>
-            {{ errorMessage }}
-          </p>
-
-          <footer class="archived-document-delete-modal__actions">
-            <button
-              ref="cancelButtonElement"
-              type="button"
-              :disabled="isDeleting"
-              @click="requestModalClose"
-            >
-              {{ t('common.cancel') }}
-            </button>
-            <button
-              type="button"
-              :disabled="isDeleting"
-              @click="emit('confirm')"
-            >
-              <span
-                v-if="isDeleting"
-                class="archived-document-delete-modal__spinner"
-                aria-hidden="true"
-              ></span>
-              {{
-                isDeleting
-                  ? t('dashboard.recentDocuments.deleteModalDeleting')
-                  : t('dashboard.recentDocuments.deleteModalConfirm')
-              }}
-            </button>
-          </footer>
-        </section>
-      </div>
-    </Transition>
-  </Teleport>
-</template>
 
 <style scoped>
 .archived-document-delete-modal {

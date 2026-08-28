@@ -1,3 +1,97 @@
+<template>
+  <section class="profile-page" aria-labelledby="profile-page-title">
+    <header class="profile-page__header">
+      <div>
+        <span class="profile-page__eyebrow">{{ t('profile.page.eyebrow') }}</span>
+        <h1 id="profile-page-title">{{ t('profile.page.title') }}</h1>
+        <p>{{ t('profile.page.description') }}</p>
+      </div>
+    </header>
+
+    <div
+      v-if="!userProfile && profileLoadStatus !== 'error'"
+      class="profile-page__loading-state"
+      role="status"
+      aria-live="polite"
+    >
+      <span class="profile-page__loading-spinner" aria-hidden="true"></span>
+      <div>
+        <strong>{{ t('profile.page.preparing') }}</strong>
+        <p>{{ t('profile.page.loadingDescription') }}</p>
+      </div>
+    </div>
+
+    <div
+      v-else-if="!userProfile"
+      class="profile-page__error-state"
+      role="alert"
+    >
+      <span aria-hidden="true">!</span>
+      <div>
+        <strong>{{ t('profile.page.loadErrorTitle') }}</strong>
+        <p>{{ profileLoadErrorMessage }}</p>
+      </div>
+      <button type="button" :disabled="isProfileLoading" @click="handleProfileRetry">
+        <AppIcon name="refresh" :size="17" />
+        {{
+          isProfileLoading
+            ? t('profile.page.loading')
+            : t('profile.page.retry')
+        }}
+      </button>
+    </div>
+
+    <template v-else>
+      <ProfileIdentityCard
+        :avatar-url="profileAvatarUrl"
+        :display-name="profileDisplayName"
+        :email-address="profileEmailAddress"
+        :initials="profileInitials"
+        :is-email-verified="isProfileEmailVerified"
+      />
+
+      <p
+        v-if="profileSaveSuccessMessage"
+        class="profile-page__feedback profile-page__feedback--success"
+        role="status"
+      >
+        <span aria-hidden="true">✓</span>
+        {{ profileSaveSuccessMessage }}
+      </p>
+
+      <p
+        v-if="profileLoadErrorMessage"
+        class="profile-page__feedback profile-page__feedback--error"
+        role="alert"
+      >
+        <span aria-hidden="true">!</span>
+        {{ profileLoadErrorMessage }}
+        <button type="button" @click="handleProfileRetry">
+          {{ t('profile.page.refresh') }}
+        </button>
+      </p>
+
+      <ProfileForm
+        :email-address="profileEmailAddress"
+        :is-editing="isProfileEditing"
+        :is-saving="isProfileSaving"
+        :save-error-message="profileSaveErrorMessage"
+        :user-profile="userProfile"
+        @cancel="handleProfileEditCancel"
+        @edit="handleProfileEditRequest"
+        @submit="handleProfileUpdate"
+      />
+
+      <ProfilePasswordResetPanel
+        v-if="canRequestPasswordResetEmail"
+        :email-address="passwordResetEmailAddress"
+        :is-requesting="isPasswordResetEmailRequestInProgress"
+        @request="handlePasswordResetEmailRequest"
+      />
+    </template>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
@@ -142,99 +236,5 @@ onMounted(() => {
   }
 })
 </script>
-
-<template>
-  <section class="profile-page" aria-labelledby="profile-page-title">
-    <header class="profile-page__header">
-      <div>
-        <span class="profile-page__eyebrow">{{ t('profile.page.eyebrow') }}</span>
-        <h1 id="profile-page-title">{{ t('profile.page.title') }}</h1>
-        <p>{{ t('profile.page.description') }}</p>
-      </div>
-    </header>
-
-    <div
-      v-if="!userProfile && profileLoadStatus !== 'error'"
-      class="profile-page__loading-state"
-      role="status"
-      aria-live="polite"
-    >
-      <span class="profile-page__loading-spinner" aria-hidden="true"></span>
-      <div>
-        <strong>{{ t('profile.page.preparing') }}</strong>
-        <p>{{ t('profile.page.loadingDescription') }}</p>
-      </div>
-    </div>
-
-    <div
-      v-else-if="!userProfile"
-      class="profile-page__error-state"
-      role="alert"
-    >
-      <span aria-hidden="true">!</span>
-      <div>
-        <strong>{{ t('profile.page.loadErrorTitle') }}</strong>
-        <p>{{ profileLoadErrorMessage }}</p>
-      </div>
-      <button type="button" :disabled="isProfileLoading" @click="handleProfileRetry">
-        <AppIcon name="refresh" :size="17" />
-        {{
-          isProfileLoading
-            ? t('profile.page.loading')
-            : t('profile.page.retry')
-        }}
-      </button>
-    </div>
-
-    <template v-else>
-      <ProfileIdentityCard
-        :avatar-url="profileAvatarUrl"
-        :display-name="profileDisplayName"
-        :email-address="profileEmailAddress"
-        :initials="profileInitials"
-        :is-email-verified="isProfileEmailVerified"
-      />
-
-      <p
-        v-if="profileSaveSuccessMessage"
-        class="profile-page__feedback profile-page__feedback--success"
-        role="status"
-      >
-        <span aria-hidden="true">✓</span>
-        {{ profileSaveSuccessMessage }}
-      </p>
-
-      <p
-        v-if="profileLoadErrorMessage"
-        class="profile-page__feedback profile-page__feedback--error"
-        role="alert"
-      >
-        <span aria-hidden="true">!</span>
-        {{ profileLoadErrorMessage }}
-        <button type="button" @click="handleProfileRetry">
-          {{ t('profile.page.refresh') }}
-        </button>
-      </p>
-
-      <ProfileForm
-        :email-address="profileEmailAddress"
-        :is-editing="isProfileEditing"
-        :is-saving="isProfileSaving"
-        :save-error-message="profileSaveErrorMessage"
-        :user-profile="userProfile"
-        @cancel="handleProfileEditCancel"
-        @edit="handleProfileEditRequest"
-        @submit="handleProfileUpdate"
-      />
-
-      <ProfilePasswordResetPanel
-        v-if="canRequestPasswordResetEmail"
-        :email-address="passwordResetEmailAddress"
-        :is-requesting="isPasswordResetEmailRequestInProgress"
-        @request="handlePasswordResetEmailRequest"
-      />
-    </template>
-  </section>
-</template>
 
 <style scoped src="./ProfilePage.css"></style>
