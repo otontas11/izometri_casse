@@ -95,6 +95,8 @@
 @media (max-width: 47.99rem) {
   .pending-transaction-card {
     width: 100%;
+    min-width: 0;
+    justify-self: stretch;
   }
 }
 

@@ -136,4 +136,33 @@ const { t } = useI18n({ useScope: 'global' })
   background: var(--metric-color);
   border-radius: inherit;
 }
+
+@media (max-width: 47.99rem) {
+  .dashboard-metric-card {
+    width: 100%;
+    min-width: 0;
+    min-height: 5.5rem;
+    gap: 0.6rem;
+    padding: 0.7rem;
+  }
+
+  .dashboard-metric-card__icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.65rem;
+  }
+
+  .dashboard-metric-card__label {
+    font-size: 0.62rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-metric-card__value {
+    font-size: clamp(0.88rem, 4vw, 1.1rem);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+}
 </style>

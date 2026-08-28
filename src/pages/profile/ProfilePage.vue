@@ -14,11 +14,55 @@
          class="profile-page__loading-state"
          role="status"
          aria-live="polite"
+         aria-busy="true"
+         :aria-label="t('profile.page.loadingDescription')"
     >
-      <span class="profile-page__loading-spinner" aria-hidden="true"></span>
-      <div>
-        <strong>{{ t('profile.page.preparing') }}</strong>
-        <p>{{ t('profile.page.loadingDescription') }}</p>
+      <div class="profile-page__identity-skeleton" aria-hidden="true">
+        <span class="profile-page__identity-skeleton-avatar profile-page__skeleton-shape"></span>
+        <div class="profile-page__identity-skeleton-details">
+          <span class="profile-page__identity-skeleton-eyebrow profile-page__skeleton-shape"></span>
+          <span class="profile-page__identity-skeleton-name profile-page__skeleton-shape"></span>
+          <span class="profile-page__identity-skeleton-email profile-page__skeleton-shape"></span>
+          <span class="profile-page__identity-skeleton-status profile-page__skeleton-shape"></span>
+          <span v-if="!isProfileEmailVerified"
+                class="profile-page__identity-skeleton-verification-description profile-page__skeleton-shape"
+          ></span>
+        </div>
+      </div>
+
+      <div class="profile-page__form-skeleton" aria-hidden="true">
+        <div class="profile-page__form-skeleton-header">
+          <div>
+            <span class="profile-page__form-skeleton-eyebrow profile-page__skeleton-shape"></span>
+            <span class="profile-page__form-skeleton-title profile-page__skeleton-shape"></span>
+          </div>
+          <span class="profile-page__form-skeleton-edit-button profile-page__skeleton-shape"></span>
+        </div>
+
+        <span class="profile-page__form-skeleton-description profile-page__skeleton-shape"></span>
+
+        <div class="profile-page__form-skeleton-fields">
+          <div v-for="profileFieldSkeletonIndex in 4"
+               :key="profileFieldSkeletonIndex"
+               class="profile-page__form-field-skeleton"
+          >
+            <span class="profile-page__form-field-skeleton-label profile-page__skeleton-shape"></span>
+            <span class="profile-page__form-field-skeleton-input profile-page__skeleton-shape"></span>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="canRequestPasswordResetEmail"
+           class="profile-page__password-reset-skeleton"
+           aria-hidden="true"
+      >
+        <span class="profile-page__password-reset-skeleton-icon profile-page__skeleton-shape"></span>
+        <div class="profile-page__password-reset-skeleton-content">
+          <span class="profile-page__password-reset-skeleton-eyebrow profile-page__skeleton-shape"></span>
+          <span class="profile-page__password-reset-skeleton-title profile-page__skeleton-shape"></span>
+          <span class="profile-page__password-reset-skeleton-description profile-page__skeleton-shape"></span>
+        </div>
+        <span class="profile-page__password-reset-skeleton-button profile-page__skeleton-shape"></span>
       </div>
     </div>
 

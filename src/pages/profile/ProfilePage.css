@@ -11,7 +11,6 @@
 
 .profile-page__header h1,
 .profile-page__header p,
-.profile-page__loading-state p,
 .profile-page__error-state p,
 .profile-page__feedback {
   margin: 0;
@@ -41,7 +40,223 @@
   line-height: 1.65;
 }
 
-.profile-page__loading-state,
+.profile-page__loading-state {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.profile-page__identity-skeleton {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: center;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--color-accent-600) 38%, transparent), transparent 38%), var(--color-brand-950);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.profile-page__identity-skeleton::after {
+  position: absolute;
+  right: -3rem;
+  bottom: -5rem;
+  width: 12rem;
+  height: 12rem;
+  content: '';
+  border: 1px solid color-mix(in srgb, var(--color-text-inverse) 9%, transparent);
+  border-radius: 50%;
+}
+
+.profile-page__skeleton-shape {
+  display: block;
+  background-size: 200% 100%;
+  animation: profile-page-skeleton-shimmer 1.3s infinite linear;
+}
+
+.profile-page__identity-skeleton .profile-page__skeleton-shape {
+  background-image: linear-gradient(100deg, rgb(255 255 255 / 10%) 25%, rgb(255 255 255 / 21%) 40%, rgb(255 255 255 / 10%) 58%);
+}
+
+.profile-page__form-skeleton .profile-page__skeleton-shape,
+.profile-page__password-reset-skeleton .profile-page__skeleton-shape {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-surface-subtle) 25%,
+    var(--color-surface-raised) 40%,
+    var(--color-surface-subtle) 58%
+  );
+}
+
+.profile-page__identity-skeleton-avatar {
+  position: relative;
+  z-index: 1;
+  width: clamp(4.5rem, 8vw, 5.5rem);
+  height: clamp(4.5rem, 8vw, 5.5rem);
+  border: 3px solid rgb(255 255 255 / 14%);
+  border-radius: 1.25rem;
+}
+
+.profile-page__identity-skeleton-details {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.profile-page__identity-skeleton-eyebrow {
+  width: 5.25rem;
+  height: 0.55rem;
+  border-radius: 999px;
+}
+
+.profile-page__identity-skeleton-name {
+  width: min(22rem, 70%);
+  height: 1.65rem;
+  margin-top: 0.55rem;
+  border-radius: 0.5rem;
+}
+
+.profile-page__identity-skeleton-email {
+  width: min(17rem, 55%);
+  height: 0.65rem;
+  margin-top: 0.45rem;
+  border-radius: 999px;
+}
+
+.profile-page__identity-skeleton-status {
+  width: 8rem;
+  height: 1.85rem;
+  margin-top: 0.85rem;
+  border-radius: 999px;
+}
+
+.profile-page__identity-skeleton-verification-description {
+  width: min(35rem, 82%);
+  height: 0.6rem;
+  margin-top: 0.65rem;
+  border-radius: 999px;
+}
+
+.profile-page__form-skeleton {
+  display: grid;
+  min-width: 0;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-page__form-skeleton-header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profile-page__form-skeleton-eyebrow {
+  width: 5.25rem;
+  height: 0.55rem;
+  border-radius: 999px;
+}
+
+.profile-page__form-skeleton-title {
+  width: 12rem;
+  height: 1.2rem;
+  margin-top: 0.45rem;
+  border-radius: 0.45rem;
+}
+
+.profile-page__form-skeleton-edit-button {
+  width: 6.5rem;
+  height: 2.65rem;
+  flex: 0 0 auto;
+  border-radius: var(--radius-sm);
+}
+
+.profile-page__form-skeleton-description {
+  width: min(38rem, 72%);
+  height: 0.65rem;
+  margin-top: 0.85rem;
+  border-radius: 999px;
+}
+
+.profile-page__form-skeleton-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+  margin-top: 1.5rem;
+}
+
+.profile-page__form-field-skeleton {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.profile-page__form-field-skeleton-label {
+  width: 5rem;
+  height: 0.6rem;
+  border-radius: 999px;
+}
+
+.profile-page__form-field-skeleton-input {
+  width: 100%;
+  height: 3rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.profile-page__password-reset-skeleton {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: clamp(1.15rem, 3vw, 1.5rem);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-page__password-reset-skeleton-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-sm);
+}
+
+.profile-page__password-reset-skeleton-content {
+  min-width: 0;
+}
+
+.profile-page__password-reset-skeleton-eyebrow {
+  width: 5.5rem;
+  height: 0.55rem;
+  border-radius: 999px;
+}
+
+.profile-page__password-reset-skeleton-title {
+  width: min(15rem, 70%);
+  height: 0.9rem;
+  margin-top: 0.4rem;
+  border-radius: 0.4rem;
+}
+
+.profile-page__password-reset-skeleton-description {
+  width: min(32rem, 88%);
+  height: 0.6rem;
+  margin-top: 0.5rem;
+  border-radius: 999px;
+}
+
+.profile-page__password-reset-skeleton-button {
+  width: 8.75rem;
+  height: 2.8rem;
+  border-radius: var(--radius-sm);
+}
+
 .profile-page__error-state {
   display: flex;
   gap: 1rem;
@@ -54,28 +269,16 @@
   box-shadow: var(--shadow-sm);
 }
 
-.profile-page__loading-state strong,
 .profile-page__error-state strong {
   color: var(--color-brand-950);
   font-size: 0.9rem;
 }
 
-.profile-page__loading-state p,
 .profile-page__error-state p {
   margin-top: 0.3rem;
   color: var(--color-text-secondary);
   font-size: var(--font-size-small);
   line-height: 1.55;
-}
-
-.profile-page__loading-spinner {
-  width: 2.5rem;
-  height: 2.5rem;
-  flex: 0 0 auto;
-  border: 3px solid var(--color-primary-100);
-  border-top-color: var(--color-primary-600);
-  border-radius: 50%;
-  animation: profile-page-spin 800ms linear infinite;
 }
 
 .profile-page__error-state > span {
@@ -162,9 +365,25 @@
   background: color-mix(in srgb, var(--color-danger) 9%, transparent);
 }
 
-@keyframes profile-page-spin {
+@keyframes profile-page-skeleton-shimmer {
   to {
-    transform: rotate(360deg);
+    background-position-x: -200%;
+  }
+}
+
+@media (max-width: 700px) {
+  .profile-page__form-skeleton-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-page__password-reset-skeleton {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .profile-page__password-reset-skeleton-button {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 }
 
@@ -175,6 +394,26 @@
   }
 
   .profile-page__error-state button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 440px) {
+  .profile-page__identity-skeleton {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-page__identity-skeleton-avatar,
+  .profile-page__identity-skeleton-details .profile-page__skeleton-shape {
+    margin-inline: auto;
+  }
+
+  .profile-page__form-skeleton-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .profile-page__form-skeleton-edit-button {
     width: 100%;
   }
 }

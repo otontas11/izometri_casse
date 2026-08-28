@@ -43,9 +43,33 @@
          class="recent-signatures-list__loading-state"
          role="status"
          aria-busy="true"
+         :aria-label="t('signature.recentSignatures.loading')"
     >
-      <span aria-hidden="true"></span>
-      <p>{{ t('signature.recentSignatures.loading') }}</p>
+      <ul class="recent-signatures-list__documents" aria-hidden="true">
+        <li v-for="signatureSkeletonRowIndex in 3"
+            :key="signatureSkeletonRowIndex"
+            class="recent-signatures-list__document"
+        >
+          <span class="recent-signatures-list__document-icon recent-signatures-list__skeleton-shape"></span>
+
+          <div class="recent-signatures-list__document-information">
+            <span class="recent-signatures-list__skeleton-document-name recent-signatures-list__skeleton-shape"></span>
+            <span class="recent-signatures-list__skeleton-document-number recent-signatures-list__skeleton-shape"></span>
+          </div>
+
+          <div class="recent-signatures-list__document-detail">
+            <span class="recent-signatures-list__skeleton-detail-label recent-signatures-list__skeleton-shape"></span>
+            <span class="recent-signatures-list__skeleton-detail-value recent-signatures-list__skeleton-shape"></span>
+          </div>
+
+          <div class="recent-signatures-list__document-detail">
+            <span class="recent-signatures-list__skeleton-detail-label recent-signatures-list__skeleton-shape"></span>
+            <span class="recent-signatures-list__skeleton-detail-value recent-signatures-list__skeleton-shape"></span>
+          </div>
+
+          <span class="recent-signatures-list__status recent-signatures-list__skeleton-status recent-signatures-list__skeleton-shape"></span>
+        </li>
+      </ul>
     </div>
 
     <div v-else-if="errorMessage && signedDocuments.length === 0"

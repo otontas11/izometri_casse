@@ -420,7 +420,6 @@
       "eyebrow": "Account center",
       "title": "My Profile",
       "description": "Manage the personal information used in your transaction records and account communications.",
-      "preparing": "Preparing your profile",
       "loadingDescription": "Your account information is being loaded securely.",
       "loadErrorTitle": "Profile information could not be loaded",
       "loading": "Loading…",
