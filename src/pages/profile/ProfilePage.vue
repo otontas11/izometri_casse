@@ -2,17 +2,18 @@
   <section class="profile-page" aria-labelledby="profile-page-title">
     <header class="profile-page__header">
       <div>
-        <span class="profile-page__eyebrow">{{ t('profile.page.eyebrow') }}</span>
+        <span class="profile-page__eyebrow">{{
+          t('profile.page.eyebrow')
+        }}</span>
         <h1 id="profile-page-title">{{ t('profile.page.title') }}</h1>
         <p>{{ t('profile.page.description') }}</p>
       </div>
     </header>
 
-    <div
-      v-if="!userProfile && profileLoadStatus !== 'error'"
-      class="profile-page__loading-state"
-      role="status"
-      aria-live="polite"
+    <div v-if="!userProfile && profileLoadStatus !== 'error'"
+         class="profile-page__loading-state"
+         role="status"
+         aria-live="polite"
     >
       <span class="profile-page__loading-spinner" aria-hidden="true"></span>
       <div>
@@ -21,48 +22,45 @@
       </div>
     </div>
 
-    <div
-      v-else-if="!userProfile"
-      class="profile-page__error-state"
-      role="alert"
+    <div v-else-if="!userProfile"
+         class="profile-page__error-state"
+         role="alert"
     >
       <span aria-hidden="true">!</span>
       <div>
         <strong>{{ t('profile.page.loadErrorTitle') }}</strong>
         <p>{{ profileLoadErrorMessage }}</p>
       </div>
-      <button type="button" :disabled="isProfileLoading" @click="handleProfileRetry">
+      <button type="button"
+              :disabled="isProfileLoading"
+              @click="handleProfileRetry"
+      >
         <AppIcon name="refresh" :size="17" />
         {{
-          isProfileLoading
-            ? t('profile.page.loading')
-            : t('profile.page.retry')
+          isProfileLoading ? t('profile.page.loading') : t('profile.page.retry')
         }}
       </button>
     </div>
 
     <template v-else>
-      <ProfileIdentityCard
-        :avatar-url="profileAvatarUrl"
-        :display-name="profileDisplayName"
-        :email-address="profileEmailAddress"
-        :initials="profileInitials"
-        :is-email-verified="isProfileEmailVerified"
+      <ProfileIdentityCard :avatar-url="profileAvatarUrl"
+                           :display-name="profileDisplayName"
+                           :email-address="profileEmailAddress"
+                           :initials="profileInitials"
+                           :is-email-verified="isProfileEmailVerified"
       />
 
-      <p
-        v-if="profileSaveSuccessMessage"
-        class="profile-page__feedback profile-page__feedback--success"
-        role="status"
+      <p v-if="profileSaveSuccessMessage"
+         class="profile-page__feedback profile-page__feedback--success"
+         role="status"
       >
         <span aria-hidden="true">✓</span>
         {{ profileSaveSuccessMessage }}
       </p>
 
-      <p
-        v-if="profileLoadErrorMessage"
-        class="profile-page__feedback profile-page__feedback--error"
-        role="alert"
+      <p v-if="profileLoadErrorMessage"
+         class="profile-page__feedback profile-page__feedback--error"
+         role="alert"
       >
         <span aria-hidden="true">!</span>
         {{ profileLoadErrorMessage }}
@@ -71,22 +69,20 @@
         </button>
       </p>
 
-      <ProfileForm
-        :email-address="profileEmailAddress"
-        :is-editing="isProfileEditing"
-        :is-saving="isProfileSaving"
-        :save-error-message="profileSaveErrorMessage"
-        :user-profile="userProfile"
-        @cancel="handleProfileEditCancel"
-        @edit="handleProfileEditRequest"
-        @submit="handleProfileUpdate"
+      <ProfileForm :email-address="profileEmailAddress"
+                   :is-editing="isProfileEditing"
+                   :is-saving="isProfileSaving"
+                   :save-error-message="profileSaveErrorMessage"
+                   :user-profile="userProfile"
+                   @cancel="handleProfileEditCancel"
+                   @edit="handleProfileEditRequest"
+                   @submit="handleProfileUpdate"
       />
 
-      <ProfilePasswordResetPanel
-        v-if="canRequestPasswordResetEmail"
-        :email-address="passwordResetEmailAddress"
-        :is-requesting="isPasswordResetEmailRequestInProgress"
-        @request="handlePasswordResetEmailRequest"
+      <ProfilePasswordResetPanel v-if="canRequestPasswordResetEmail"
+                                 :email-address="passwordResetEmailAddress"
+                                 :is-requesting="isPasswordResetEmailRequestInProgress"
+                                 @request="handlePasswordResetEmailRequest"
       />
     </template>
   </section>
@@ -132,9 +128,7 @@ const profileDisplayName = computed(() => {
     return profileFullName.value
   }
 
-  return (
-    authenticatedUser.value?.name?.trim() || t('profile.page.userFallback')
-  )
+  return authenticatedUser.value?.name?.trim() || t('profile.page.userFallback')
 })
 
 const profileEmailAddress = computed(
@@ -199,9 +193,7 @@ const handleProfileUpdate = async (profileUpdates: UpdateProfilePayload) => {
     return
   }
 
-  showErrorToast(
-    profileSaveErrorMessage.value || t('profile.page.updateError'),
-  )
+  showErrorToast(profileSaveErrorMessage.value || t('profile.page.updateError'))
 }
 
 const handleProfileRetry = () => {

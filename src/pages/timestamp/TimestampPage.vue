@@ -7,14 +7,13 @@
       </div>
 
       <div class="timestamp-page__header-actions">
-        <div
-          :class="[
-            'timestamp-page__transaction-summary',
-            {
-              'timestamp-page__transaction-summary--insufficient':
-                !hasAvailableTimestampCredits,
-            },
-          ]"
+        <div :class="[
+          'timestamp-page__transaction-summary',
+          {
+            'timestamp-page__transaction-summary--insufficient':
+              !hasAvailableTimestampCredits,
+          },
+        ]"
         >
           <span aria-hidden="true">
             <AppIcon name="wallet" :size="21" />
@@ -28,8 +27,8 @@
                   ? t('timestamp.page.balanceLoading')
                   : availableTimestampCredits > 0
                     ? t('timestamp.page.availableCredits', {
-                        count: availableTimestampCredits,
-                      })
+                      count: availableTimestampCredits,
+                    })
                     : t('timestamp.page.noAvailableCredits')
               }}
             </small>
@@ -38,39 +37,35 @@
       </div>
     </header>
 
-    <p
-      v-if="timestampActionErrorMessage"
-      class="timestamp-page__feedback timestamp-page__feedback--error"
-      role="alert"
+    <p v-if="timestampActionErrorMessage"
+       class="timestamp-page__feedback timestamp-page__feedback--error"
+       role="alert"
     >
       <span aria-hidden="true">!</span>
       {{ timestampActionErrorMessage }}
     </p>
 
-    <TimestampFileWorkspace
-      :can-process="canStartTimestampTransaction"
-      :file-validation-error-message="timestampFileValidationErrorMessage"
-      :is-busy="isTimestampActionInProgress"
-      :timestamp-files="timestampFiles"
-      @add-files="handleTimestampFilesAdded"
-      @remove-file="handleTimestampFileRemoval"
-      @request-timestamp="handleTimestampRequest"
-      @request-upload="handleTimestampUploadRequest"
+    <TimestampFileWorkspace :can-process="canStartTimestampTransaction"
+                            :file-validation-error-message="timestampFileValidationErrorMessage"
+                            :is-busy="isTimestampActionInProgress"
+                            :timestamp-files="timestampFiles"
+                            @add-files="handleTimestampFilesAdded"
+                            @remove-file="handleTimestampFileRemoval"
+                            @request-timestamp="handleTimestampRequest"
+                            @request-upload="handleTimestampUploadRequest"
     />
 
-    <TimestampHistoryTable
-      :error-message="timestampHistoryErrorMessage"
-      :is-loading="isTimestampHistoryLoading"
-      :timestamp-jobs="timestampJobs"
-      @retry="handleTimestampHistoryRefresh"
+    <TimestampHistoryTable :error-message="timestampHistoryErrorMessage"
+                           :is-loading="isTimestampHistoryLoading"
+                           :timestamp-jobs="timestampJobs"
+                           @retry="handleTimestampHistoryRefresh"
     />
 
-    <TimestampVerificationModal
-      :is-open="isTimestampVerificationModalOpen"
-      :is-submitting="isTimestampActionInProgress"
-      @close="handleTimestampVerificationModalClose"
-      @confirm="handleTimestampVerificationConfirm"
-      @resend="handleTimestampVerificationCodeResend"
+    <TimestampVerificationModal :is-open="isTimestampVerificationModalOpen"
+                                :is-submitting="isTimestampActionInProgress"
+                                @close="handleTimestampVerificationModalClose"
+                                @confirm="handleTimestampVerificationConfirm"
+                                @resend="handleTimestampVerificationCodeResend"
     />
   </section>
 </template>
@@ -90,8 +85,7 @@ import { useTimestampStore } from '@/features/timestamp/stores/timestamp.store'
 
 const dashboardStore = useDashboardStore()
 const timestampStore = useTimestampStore()
-const { dashboardRequestStatus, dashboardSummary } =
-  storeToRefs(dashboardStore)
+const { dashboardRequestStatus, dashboardSummary } = storeToRefs(dashboardStore)
 const {
   canProcessTimestampFiles,
   isTimestampActionInProgress,
@@ -117,13 +111,13 @@ const hasAvailableTimestampCredits = computed(
     availableTimestampCredits.value > 0,
 )
 const canStartTimestampTransaction = computed(
-  () =>
-    canProcessTimestampFiles.value && hasAvailableTimestampCredits.value,
+  () => canProcessTimestampFiles.value && hasAvailableTimestampCredits.value,
 )
 
 const handleTimestampFilesAdded = async (selectedTimestampFiles: File[]) => {
-  const wereTimestampFilesAdded =
-    timestampStore.addTimestampFiles(selectedTimestampFiles)
+  const wereTimestampFilesAdded = timestampStore.addTimestampFiles(
+    selectedTimestampFiles,
+  )
 
   if (!wereTimestampFilesAdded) {
     return

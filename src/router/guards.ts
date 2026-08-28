@@ -11,23 +11,18 @@ const waitForAuth0Initialization = async () => {
     return
   }
 
-  await new Promise<void>((resolveInitialization) => {
-    const stopWatchingAuth0Loading = watch(
-      configuredAuth0Plugin.isLoading,
-      (isAuth0Loading) => {
-        if (!isAuth0Loading) {
-          stopWatchingAuth0Loading()
-          resolveInitialization()
-        }
-      },
-    )
+  await new Promise<void>(resolveInitialization => {
+    const stopWatchingAuth0Loading = watch(configuredAuth0Plugin.isLoading, isAuth0Loading => {
+      if (!isAuth0Loading) {
+        stopWatchingAuth0Loading()
+        resolveInitialization()
+      }
+    })
   })
 }
 
-const requireAuthenticatedRoute: NavigationGuard = async (targetRoute) => {
-  const requiresAuthentication = targetRoute.matched.some(
-    (matchedRoute) => matchedRoute.meta.requiresAuth,
-  )
+const requireAuthenticatedRoute: NavigationGuard = async targetRoute => {
+  const requiresAuthentication = targetRoute.matched.some(matchedRoute => matchedRoute.meta.requiresAuth)
 
   if (!requiresAuthentication) {
     return true
@@ -65,11 +60,7 @@ export const registerRouterGuards = (applicationRouter: Router) => {
     document.title = `${translate(titleTranslationKey)} · ${translate('common.appName')}`
   }
 
-  applicationRouter.afterEach((targetRoute) =>
-    updateDocumentTitle(targetRoute.meta.titleKey),
-  )
+  applicationRouter.afterEach(targetRoute => updateDocumentTitle(targetRoute.meta.titleKey))
 
-  watch(i18n.global.locale, () =>
-    updateDocumentTitle(applicationRouter.currentRoute.value.meta.titleKey),
-  )
+  watch(i18n.global.locale, () => updateDocumentTitle(applicationRouter.currentRoute.value.meta.titleKey))
 }

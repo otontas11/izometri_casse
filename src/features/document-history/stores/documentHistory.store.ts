@@ -6,10 +6,7 @@ import type { ArchivedDocument } from '@/features/dashboard/types/dashboard.type
 import type { ApiRequestStatus } from '@/types/api.types'
 
 import { documentHistoryApi } from '../api/documentHistory.api'
-import type {
-  DocumentHistoryPagination,
-  DocumentHistoryRequest,
-} from '../types/documentHistory.types'
+import type { DocumentHistoryPagination, DocumentHistoryRequest } from '../types/documentHistory.types'
 
 const defaultDocumentHistoryPagination: DocumentHistoryPagination = {
   currentPage: 1,
@@ -27,26 +24,18 @@ export const useDocumentHistoryStore = defineStore('document-history', () => {
   const documentHistoryErrorMessage = ref('')
   let latestDocumentHistoryRequestId = 0
 
-  const isDocumentHistoryLoading = computed(
-    () => documentHistoryRequestStatus.value === 'loading',
-  )
+  const isDocumentHistoryLoading = computed(() => documentHistoryRequestStatus.value === 'loading')
 
-  const fetchDocumentHistory = async (
-    documentHistoryRequest: DocumentHistoryRequest,
-  ) => {
-    const currentDocumentHistoryRequestId =
-      ++latestDocumentHistoryRequestId
+  const fetchDocumentHistory = async (documentHistoryRequest: DocumentHistoryRequest) => {
+    const currentDocumentHistoryRequestId = ++latestDocumentHistoryRequestId
 
     documentHistoryRequestStatus.value = 'loading'
     documentHistoryErrorMessage.value = ''
 
     try {
-      const documentHistoryResponse =
-        await documentHistoryApi.fetchDocumentHistory(documentHistoryRequest)
+      const documentHistoryResponse = await documentHistoryApi.fetchDocumentHistory(documentHistoryRequest)
 
-      if (
-        currentDocumentHistoryRequestId !== latestDocumentHistoryRequestId
-      ) {
+      if (currentDocumentHistoryRequestId !== latestDocumentHistoryRequestId) {
         return
       }
 
@@ -54,9 +43,7 @@ export const useDocumentHistoryStore = defineStore('document-history', () => {
       documentHistoryPagination.value = documentHistoryResponse.pagination
       documentHistoryRequestStatus.value = 'success'
     } catch (requestError) {
-      if (
-        currentDocumentHistoryRequestId !== latestDocumentHistoryRequestId
-      ) {
+      if (currentDocumentHistoryRequestId !== latestDocumentHistoryRequestId) {
         return
       }
 

@@ -28,19 +28,14 @@ const apiErrorTranslationKeys: Record<string, string> = {
   SIGNATURE_TRANSACTION_FAILED: 'errors.signatureTransactionFailed',
   TIMESTAMP_TRANSACTION_FAILED: 'errors.timestampTransactionFailed',
   UNSUPPORTED_DRAFT_FILE_TYPE: 'errors.unsupportedDraftFileType',
-  UNSUPPORTED_SIGNATURE_FILE_TYPE:
-    'errors.unsupportedSignatureFileType',
+  UNSUPPORTED_SIGNATURE_FILE_TYPE: 'errors.unsupportedSignatureFileType',
 }
 
 class ApiRequestError extends Error {
   readonly statusCode: number | null
   readonly errorCode: string | null
 
-  constructor(
-    message: string,
-    statusCode: number | null,
-    errorCode: string | null,
-  ) {
+  constructor(message: string, statusCode: number | null, errorCode: string | null) {
     super(message)
     this.name = 'ApiRequestError'
     this.statusCode = statusCode
@@ -75,9 +70,7 @@ const getLocalizedApiErrorMessage = (responsePayload: unknown) => {
   const apiErrorCode = extractApiErrorCode(responsePayload)
   const apiErrorTranslationKey = apiErrorTranslationKeys[apiErrorCode]
 
-  return apiErrorTranslationKey
-    ? translate(apiErrorTranslationKey)
-    : extractApiErrorMessage(responsePayload)
+  return apiErrorTranslationKey ? translate(apiErrorTranslationKey) : extractApiErrorMessage(responsePayload)
 }
 
 const getDefaultHttpStatusMessage = (statusCode?: number) => {
@@ -95,9 +88,7 @@ const getDefaultHttpStatusMessage = (statusCode?: number) => {
     case 422:
       return translate('errors.unprocessable')
     default:
-      return statusCode && statusCode >= 500
-        ? translate('errors.serviceUnavailable')
-        : translate('errors.fallback')
+      return statusCode && statusCode >= 500 ? translate('errors.serviceUnavailable') : translate('errors.fallback')
   }
 }
 
@@ -107,41 +98,25 @@ export const toApiRequestError = (requestError: unknown) => {
   }
 
   if (!axios.isAxiosError(requestError)) {
-    return new ApiRequestError(
-      translate('errors.unexpected'),
-      null,
-      null,
-    )
+    return new ApiRequestError(translate('errors.unexpected'), null, null)
   }
 
   if (requestError.code === 'ECONNABORTED') {
-    return new ApiRequestError(
-      translate('errors.timeout'),
-      requestError.response?.status ?? null,
-      requestError.code,
-    )
+    return new ApiRequestError(translate('errors.timeout'), requestError.response?.status ?? null, requestError.code)
   }
 
   if (!requestError.response) {
-    return new ApiRequestError(
-      translate('errors.apiUnavailable'),
-      null,
-      requestError.code ?? null,
-    )
+    return new ApiRequestError(translate('errors.apiUnavailable'), null, requestError.code ?? null)
   }
 
   return new ApiRequestError(
-    getLocalizedApiErrorMessage(requestError.response.data) ||
-      getDefaultHttpStatusMessage(requestError.response.status),
+    getLocalizedApiErrorMessage(requestError.response.data) || getDefaultHttpStatusMessage(requestError.response.status),
     requestError.response.status,
-    extractApiErrorCode(requestError.response.data) || requestError.code || null,
+    extractApiErrorCode(requestError.response.data) || requestError.code || null
   )
 }
 
-export const getApiErrorMessage = (
-  requestError: unknown,
-  fallbackMessage = translate('errors.fallback'),
-) => {
+export const getApiErrorMessage = (requestError: unknown, fallbackMessage = translate('errors.fallback')) => {
   const normalizedApiError = toApiRequestError(requestError)
 
   return normalizedApiError.message || fallbackMessage

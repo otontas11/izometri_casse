@@ -12,24 +12,14 @@ export class WorkerApiError extends Error {
 
 const getConfiguredAllowedOrigins = (environment: Env) =>
   environment.ALLOWED_ORIGINS.split(',')
-    .map((allowedOrigin) => allowedOrigin.trim())
+    .map(allowedOrigin => allowedOrigin.trim())
     .filter(Boolean)
 
-export const assertRequestOriginIsAllowed = (
-  request: Request,
-  environment: Env,
-) => {
+export const assertRequestOriginIsAllowed = (request: Request, environment: Env) => {
   const requestOrigin = request.headers.get('Origin')
 
-  if (
-    requestOrigin &&
-    !getConfiguredAllowedOrigins(environment).includes(requestOrigin)
-  ) {
-    throw new WorkerApiError(
-      403,
-      'ORIGIN_NOT_ALLOWED',
-      'Bu kaynaktan API erişimine izin verilmiyor.',
-    )
+  if (requestOrigin && !getConfiguredAllowedOrigins(environment).includes(requestOrigin)) {
+    throw new WorkerApiError(403, 'ORIGIN_NOT_ALLOWED', 'Bu kaynaktan API erişimine izin verilmiyor.')
   }
 }
 
@@ -37,27 +27,17 @@ export const createCorsHeaders = (request: Request, environment: Env) => {
   const corsHeaders = new Headers({ Vary: 'Origin' })
   const requestOrigin = request.headers.get('Origin')
 
-  if (
-    requestOrigin &&
-    getConfiguredAllowedOrigins(environment).includes(requestOrigin)
-  ) {
+  if (requestOrigin && getConfiguredAllowedOrigins(environment).includes(requestOrigin)) {
     corsHeaders.set('Access-Control-Allow-Origin', requestOrigin)
     corsHeaders.set('Access-Control-Allow-Headers', 'Authorization, Content-Type')
-    corsHeaders.set(
-      'Access-Control-Allow-Methods',
-      'DELETE, GET, HEAD, PATCH, POST, OPTIONS',
-    )
+    corsHeaders.set('Access-Control-Allow-Methods', 'DELETE, GET, HEAD, PATCH, POST, OPTIONS')
     corsHeaders.set('Access-Control-Max-Age', '86400')
   }
 
   return corsHeaders
 }
 
-export const createJsonResponse = (
-  responsePayload: unknown,
-  statusCode: number,
-  corsHeaders: Headers,
-) => {
+export const createJsonResponse = (responsePayload: unknown, statusCode: number, corsHeaders: Headers) => {
   const responseHeaders = new Headers(corsHeaders)
   responseHeaders.set('Content-Type', 'application/json; charset=utf-8')
   responseHeaders.set('Cache-Control', 'no-store')
@@ -68,15 +48,10 @@ export const createJsonResponse = (
   })
 }
 
-export const createEmptyResponse = (
-  statusCode: number,
-  corsHeaders: Headers,
-) => new Response(null, { status: statusCode, headers: corsHeaders })
+export const createEmptyResponse = (statusCode: number, corsHeaders: Headers) =>
+  new Response(null, { status: statusCode, headers: corsHeaders })
 
-export const createErrorResponse = (
-  requestError: unknown,
-  corsHeaders: Headers,
-) => {
+export const createErrorResponse = (requestError: unknown, corsHeaders: Headers) => {
   if (requestError instanceof WorkerApiError) {
     return createJsonResponse(
       {
@@ -84,18 +59,15 @@ export const createErrorResponse = (
         message: requestError.message,
       },
       requestError.statusCode,
-      corsHeaders,
+      corsHeaders
     )
   }
 
   console.error(
     JSON.stringify({
-      error:
-        requestError instanceof Error
-          ? requestError.message
-          : String(requestError),
+      error: requestError instanceof Error ? requestError.message : String(requestError),
       message: 'Cloudflare Worker isteği tamamlanamadı.',
-    }),
+    })
   )
 
   return createJsonResponse(
@@ -104,6 +76,6 @@ export const createErrorResponse = (
       message: 'İşlem şu anda tamamlanamıyor. Lütfen tekrar deneyin.',
     },
     500,
-    corsHeaders,
+    corsHeaders
   )
 }

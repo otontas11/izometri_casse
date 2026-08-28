@@ -7,17 +7,16 @@
       </div>
 
       <div class="signature-page__header-actions">
-        <div
-            :class="[
-            'signature-page__transaction-summary',
-            {
-              'signature-page__transaction-summary--insufficient':
-                !hasAvailableSignatureCredits,
-            },
-          ]"
+        <div :class="[
+          'signature-page__transaction-summary',
+          {
+            'signature-page__transaction-summary--insufficient':
+              !hasAvailableSignatureCredits,
+          },
+        ]"
         >
           <span aria-hidden="true">
-            <AppIcon :size="21" name="wallet"/>
+            <AppIcon :size="21" name="wallet" />
           </span>
           <div>
             <small>{{ t('signature.page.transactionCost') }}</small>
@@ -25,12 +24,12 @@
             <small class="signature-page__available-credits">
               {{
                 availableSignatureCredits === null
-                    ? t('signature.page.balanceLoading')
-                    : availableSignatureCredits > 0
-                        ? t('signature.page.availableCredits', {
-                          count: availableSignatureCredits,
-                        })
-                        : t('signature.page.noAvailableCredits')
+                  ? t('signature.page.balanceLoading')
+                  : availableSignatureCredits > 0
+                    ? t('signature.page.availableCredits', {
+                      count: availableSignatureCredits,
+                    })
+                    : t('signature.page.noAvailableCredits')
               }}
             </small>
           </div>
@@ -40,7 +39,8 @@
 
     <p v-if="signatureActionErrorMessage"
        class="signature-page__feedback signature-page__feedback--error"
-       role="alert">
+       role="alert"
+    >
       <span aria-hidden="true">!</span>
       {{ signatureActionErrorMessage }}
     </p>
@@ -71,22 +71,21 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {storeToRefs} from 'pinia'
-import {useI18n} from 'vue-i18n'
+import { computed, onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
-import {useToast} from '@/composables/useToast'
-import {useDashboardStore} from '@/features/dashboard/stores/dashboard.store'
+import { useToast } from '@/composables/useToast'
+import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
 import RecentSignaturesList from '@/features/signature/components/RecentSignaturesList.vue'
 import SignatureFileWorkspace from '@/features/signature/components/SignatureFileWorkspace.vue'
 import SignatureVerificationModal from '@/features/signature/components/SignatureVerificationModal.vue'
-import {useSignatureStore} from '@/features/signature/stores/signature.store'
+import { useSignatureStore } from '@/features/signature/stores/signature.store'
 
 const dashboardStore = useDashboardStore()
 const signatureStore = useSignatureStore()
-const {dashboardRequestStatus, dashboardSummary} =
-    storeToRefs(dashboardStore)
+const { dashboardRequestStatus, dashboardSummary } = storeToRefs(dashboardStore)
 const {
   canProcessSignatureFiles,
   isRecentSignaturesLoading,
@@ -98,22 +97,20 @@ const {
   signatureFiles,
   signatureFileValidationErrorMessage,
 } = storeToRefs(signatureStore)
-const {showErrorToast, showSuccessToast, showWarningToast} = useToast()
-const {t} = useI18n({useScope: 'global'})
+const { showErrorToast, showSuccessToast, showWarningToast } = useToast()
+const { t } = useI18n({ useScope: 'global' })
 const isSignatureVerificationModalOpen = ref(false)
 
 const availableSignatureCredits = computed(
-    () => dashboardSummary.value?.remainingCredits ?? null,
+  () => dashboardSummary.value?.remainingCredits ?? null,
 )
 const hasAvailableSignatureCredits = computed(
-    () =>
-        availableSignatureCredits.value === null ||
-        availableSignatureCredits.value > 0,
+  () =>
+    availableSignatureCredits.value === null ||
+    availableSignatureCredits.value > 0,
 )
 const canStartSignatureTransaction = computed(
-    () =>
-        canProcessSignatureFiles.value &&
-        hasAvailableSignatureCredits.value,
+  () => canProcessSignatureFiles.value && hasAvailableSignatureCredits.value,
 )
 
 const handleSignatureFilesAdded = async (selectedSignatureFiles: File[]) => {
@@ -141,7 +138,7 @@ const handleSignatureUploadRequest = async () => {
   }
 
   showErrorToast(
-      signatureActionErrorMessage.value ||
+    signatureActionErrorMessage.value ||
       t('signature.feedback.uploadFailure', {
         failedCount: 1,
         uploadedCount: 0,
@@ -179,7 +176,7 @@ const handleSignatureVerificationConfirm = async () => {
   }
 
   showErrorToast(
-      signatureActionErrorMessage.value ||
+    signatureActionErrorMessage.value ||
       t('signature.feedback.transactionFailed'),
   )
 }

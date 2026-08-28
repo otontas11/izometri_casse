@@ -14,12 +14,8 @@ export const axiosInstance = axios.create({
 })
 
 axiosInstance.interceptors.request.use(
-  async (requestConfig) => {
-    const canRequestApiAccessToken = Boolean(
-      auth0Plugin &&
-        environmentConfig.auth0Audience &&
-        auth0Plugin.isAuthenticated.value,
-    )
+  async requestConfig => {
+    const canRequestApiAccessToken = Boolean(auth0Plugin && environmentConfig.auth0Audience && auth0Plugin.isAuthenticated.value)
 
     if (!canRequestApiAccessToken || !auth0Plugin) {
       return requestConfig
@@ -30,10 +26,10 @@ axiosInstance.interceptors.request.use(
 
     return requestConfig
   },
-  (requestError: unknown) => Promise.reject(toApiRequestError(requestError)),
+  (requestError: unknown) => Promise.reject(toApiRequestError(requestError))
 )
 
 axiosInstance.interceptors.response.use(
-  (axiosResponse) => axiosResponse,
-  (requestError: unknown) => Promise.reject(toApiRequestError(requestError)),
+  axiosResponse => axiosResponse,
+  (requestError: unknown) => Promise.reject(toApiRequestError(requestError))
 )

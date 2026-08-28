@@ -1,7 +1,4 @@
-import type {
-  ArchivedDocument,
-  DashboardSummary,
-} from '@/features/dashboard/types/dashboard.types'
+import type { ArchivedDocument, DashboardSummary } from '@/features/dashboard/types/dashboard.types'
 
 export interface SignatureTransactionResponse {
   dashboardSummary: DashboardSummary
@@ -9,14 +6,7 @@ export interface SignatureTransactionResponse {
   signedDocument: ArchivedDocument
 }
 
-export type SignatureFileStatus =
-  | 'selected'
-  | 'uploading'
-  | 'uploaded'
-  | 'processing'
-  | 'upload-error'
-  | 'process-error'
-  | 'deleting'
+export type SignatureFileStatus = 'selected' | 'uploading' | 'uploaded' | 'processing' | 'upload-error' | 'process-error' | 'deleting'
 
 export interface SignatureFileItem {
   draftFileId: number | null

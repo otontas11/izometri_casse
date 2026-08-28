@@ -5,10 +5,7 @@ import { getApiErrorMessage } from '@/api/apiError'
 import type { ApiRequestStatus } from '@/types/api.types'
 
 import { dashboardApi } from '../api/dashboard.api'
-import type {
-  ArchivedDocument,
-  DashboardSummary,
-} from '../types/dashboard.types'
+import type { ArchivedDocument, DashboardSummary } from '../types/dashboard.types'
 
 export const useDashboardStore = defineStore('dashboard', () => {
   const dashboardSummary = ref<DashboardSummary | null>(null)
@@ -22,9 +19,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   const deletingDocumentId = ref<number | null>(null)
   const documentDeleteErrorMessage = ref('')
 
-  const isDashboardLoading = computed(
-    () => dashboardRequestStatus.value === 'loading',
-  )
+  const isDashboardLoading = computed(() => dashboardRequestStatus.value === 'loading')
 
   const fetchDashboardData = async () => {
     if (isDashboardLoading.value) {
@@ -35,11 +30,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
     dashboardErrorMessage.value = ''
 
     try {
-      const [dashboardSummaryResponse, recentDocumentsResponse] =
-        await Promise.all([
-          dashboardApi.fetchDashboardSummary(),
-          dashboardApi.fetchRecentDocuments(),
-        ])
+      const [dashboardSummaryResponse, recentDocumentsResponse] = await Promise.all([
+        dashboardApi.fetchDashboardSummary(),
+        dashboardApi.fetchRecentDocuments(),
+      ])
 
       dashboardSummary.value = dashboardSummaryResponse
       recentDocuments.value = recentDocumentsResponse
@@ -86,10 +80,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     }
   }
 
-  const synchronizeDashboardData = (
-    updatedDashboardSummary: DashboardSummary,
-    updatedRecentDocuments: ArchivedDocument[],
-  ) => {
+  const synchronizeDashboardData = (updatedDashboardSummary: DashboardSummary, updatedRecentDocuments: ArchivedDocument[]) => {
     dashboardSummary.value = updatedDashboardSummary
     recentDocuments.value = updatedRecentDocuments
     dashboardRequestStatus.value = 'success'
@@ -105,13 +96,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
     documentDeleteErrorMessage.value = ''
 
     try {
-      const archivedDocumentDeletionResponse =
-        await dashboardApi.deleteArchivedDocument(documentId)
+      const archivedDocumentDeletionResponse = await dashboardApi.deleteArchivedDocument(documentId)
 
-      synchronizeDashboardData(
-        archivedDocumentDeletionResponse.dashboardSummary,
-        archivedDocumentDeletionResponse.recentDocuments,
-      )
+      synchronizeDashboardData(archivedDocumentDeletionResponse.dashboardSummary, archivedDocumentDeletionResponse.recentDocuments)
       return true
     } catch (requestError) {
       documentDeleteErrorMessage.value = getApiErrorMessage(requestError)

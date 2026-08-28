@@ -6,10 +6,7 @@ import { translate } from '@/locales'
 import type { ApiRequestStatus } from '@/types/api.types'
 
 import { profileApi } from '../api/profile.api'
-import type {
-  UpdateProfilePayload,
-  UserProfile,
-} from '../types/profile.types'
+import type { UpdateProfilePayload, UserProfile } from '../types/profile.types'
 
 export const useProfileStore = defineStore('profile', () => {
   const userProfile = ref<UserProfile | null>(null)

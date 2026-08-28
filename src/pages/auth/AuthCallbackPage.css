@@ -3,9 +3,7 @@
   min-height: 100vh;
   place-items: center;
   padding: 1.5rem;
-  background:
-    radial-gradient(circle at 50% 10%, rgb(15 159 132 / 12%), transparent 35%),
-    var(--color-surface-canvas);
+  background: radial-gradient(circle at 50% 10%, rgb(15 159 132 / 12%), transparent 35%), var(--color-surface-canvas);
 }
 
 .auth-callback-page__card {

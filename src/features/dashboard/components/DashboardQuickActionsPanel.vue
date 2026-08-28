@@ -1,48 +1,44 @@
 <template>
-  <section
-    class="dashboard-quick-actions-panel"
-    :aria-label="t('dashboard.quickActions.ariaLabel')"
+  <section class="dashboard-quick-actions-panel"
+           :aria-label="t('dashboard.quickActions.ariaLabel')"
   >
-    <div
-      :class="[
-        'dashboard-quick-actions-panel__drop-area',
-        {
-          'dashboard-quick-actions-panel__drop-area--dragging':
-            isFileDraggedOver,
-          'dashboard-quick-actions-panel__drop-area--disabled':
-            isSignatureActionInProgress,
-        },
-      ]"
-      role="button"
-      :tabindex="isSignatureActionInProgress ? -1 : 0"
-      :aria-disabled="isSignatureActionInProgress"
-      :aria-describedby="dashboardDropAreaDescriptionIds"
-      @click="handleFilePickerOpen"
-      @keydown.enter.prevent="handleFilePickerOpen"
-      @keydown.space.prevent="handleFilePickerOpen"
-      @dragenter.prevent="handleFileDragOver"
-      @dragover.prevent="handleFileDragOver"
-      @dragleave.prevent="handleFileDragLeave"
-      @drop.prevent="handleFileDrop"
+    <div :class="[
+           'dashboard-quick-actions-panel__drop-area',
+           {
+             'dashboard-quick-actions-panel__drop-area--dragging':
+               isFileDraggedOver,
+             'dashboard-quick-actions-panel__drop-area--disabled':
+               isSignatureActionInProgress,
+           },
+         ]"
+         role="button"
+         :tabindex="isSignatureActionInProgress ? -1 : 0"
+         :aria-disabled="isSignatureActionInProgress"
+         :aria-describedby="dashboardDropAreaDescriptionIds"
+         @click="handleFilePickerOpen"
+         @keydown.enter.prevent="handleFilePickerOpen"
+         @keydown.space.prevent="handleFilePickerOpen"
+         @dragenter.prevent="handleFileDragOver"
+         @dragover.prevent="handleFileDragOver"
+         @dragleave.prevent="handleFileDragLeave"
+         @drop.prevent="handleFileDrop"
     >
-      <input
-        id="dashboard-quick-actions-panel-input"
-        ref="dashboardFileInputElement"
-        class="visually-hidden"
-        type="file"
-        multiple
-        tabindex="-1"
-        :accept="DRAFT_FILE_INPUT_ACCEPT"
-        :disabled="isSignatureActionInProgress"
-        :aria-label="t('signature.workspace.inputAriaLabel')"
-        :aria-describedby="dashboardDropAreaDescriptionIds"
-        :aria-invalid="shouldShowValidationMessage ? 'true' : undefined"
-        @change="handleFileInputChange"
+      <input id="dashboard-quick-actions-panel-input"
+             ref="dashboardFileInputElement"
+             class="visually-hidden"
+             type="file"
+             multiple
+             tabindex="-1"
+             :accept="DRAFT_FILE_INPUT_ACCEPT"
+             :disabled="isSignatureActionInProgress"
+             :aria-label="t('signature.workspace.inputAriaLabel')"
+             :aria-describedby="dashboardDropAreaDescriptionIds"
+             :aria-invalid="shouldShowValidationMessage ? 'true' : undefined"
+             @change="handleFileInputChange"
       />
 
-      <span
-        class="dashboard-quick-actions-panel__upload-icon"
-        aria-hidden="true"
+      <span class="dashboard-quick-actions-panel__upload-icon"
+            aria-hidden="true"
       >
         <AppIcon name="upload" :size="30" />
       </span>
@@ -64,11 +60,10 @@
       </small>
     </div>
 
-    <p
-      v-if="shouldShowValidationMessage"
-      id="dashboard-quick-actions-panel-validation-error"
-      class="dashboard-quick-actions-panel__validation-message"
-      role="alert"
+    <p v-if="shouldShowValidationMessage"
+       id="dashboard-quick-actions-panel-validation-error"
+       class="dashboard-quick-actions-panel__validation-message"
+       role="alert"
     >
       <span aria-hidden="true">!</span>
       {{ signatureFileValidationErrorMessage }}
@@ -92,10 +87,8 @@ import { formatFileSize } from '@/utils/formatters'
 
 const router = useRouter()
 const signatureStore = useSignatureStore()
-const {
-  isSignatureActionInProgress,
-  signatureFileValidationErrorMessage,
-} = storeToRefs(signatureStore)
+const { isSignatureActionInProgress, signatureFileValidationErrorMessage } =
+  storeToRefs(signatureStore)
 const { t } = useI18n({ useScope: 'global' })
 
 const dashboardFileInputElement = ref<HTMLInputElement | null>(null)

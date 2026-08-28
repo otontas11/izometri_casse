@@ -11,6 +11,4 @@ export interface DraftFile {
   status: DraftFileStatus
 }
 
-export type DraftFileUploadProgressHandler = (
-  progressPercentage: number,
-) => void
+export type DraftFileUploadProgressHandler = (progressPercentage: number) => void

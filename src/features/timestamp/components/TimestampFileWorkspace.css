@@ -305,18 +305,12 @@
   transition: width 180ms ease;
 }
 
-.timestamp-file-workspace__file-card--uploaded
-  .timestamp-file-workspace__progress-track
-  span {
+.timestamp-file-workspace__file-card--uploaded .timestamp-file-workspace__progress-track span {
   background: var(--color-success);
 }
 
-.timestamp-file-workspace__file-card--upload-error
-  .timestamp-file-workspace__progress-track
-  span,
-.timestamp-file-workspace__file-card--process-error
-  .timestamp-file-workspace__progress-track
-  span {
+.timestamp-file-workspace__file-card--upload-error .timestamp-file-workspace__progress-track span,
+.timestamp-file-workspace__file-card--process-error .timestamp-file-workspace__progress-track span {
   background: var(--color-danger);
 }
 

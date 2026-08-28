@@ -48,8 +48,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
       {
         path: 'documents',
         name: 'document-history',
-        component: () =>
-          import('@/pages/document-history/DocumentHistoryPage.vue'),
+        component: () => import('@/pages/document-history/DocumentHistoryPage.vue'),
         meta: { titleKey: 'routes.documentHistory' },
       },
       {

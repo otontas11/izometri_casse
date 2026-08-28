@@ -1,26 +1,22 @@
 import { environmentConfig } from './env'
 
-const normalizeAuth0Domain = (auth0Domain: string) =>
-  auth0Domain.replace(/^https?:\/\//, '').replace(/\/+$/, '')
+const normalizeAuth0Domain = (auth0Domain: string) => auth0Domain.replace(/^https?:\/\//, '').replace(/\/+$/, '')
 
-const isPlaceholderEnvironmentValue = (environmentValue: string) =>
-  /^(your[-_]|<|change[-_]?me)/i.test(environmentValue)
+const isPlaceholderEnvironmentValue = (environmentValue: string) => /^(your[-_]|<|change[-_]?me)/i.test(environmentValue)
 
 const normalizedAuth0Domain = normalizeAuth0Domain(environmentConfig.auth0Domain)
 
 export const isAuth0Configured = Boolean(
   normalizedAuth0Domain &&
-    environmentConfig.auth0ClientId &&
-    !isPlaceholderEnvironmentValue(normalizedAuth0Domain) &&
-    !isPlaceholderEnvironmentValue(environmentConfig.auth0ClientId),
+  environmentConfig.auth0ClientId &&
+  !isPlaceholderEnvironmentValue(normalizedAuth0Domain) &&
+  !isPlaceholderEnvironmentValue(environmentConfig.auth0ClientId)
 )
 
 export const isAuth0PasswordResetConfigured = Boolean(
   isAuth0Configured &&
-    environmentConfig.auth0DatabaseConnection &&
-    !isPlaceholderEnvironmentValue(
-      environmentConfig.auth0DatabaseConnection,
-    ),
+  environmentConfig.auth0DatabaseConnection &&
+  !isPlaceholderEnvironmentValue(environmentConfig.auth0DatabaseConnection)
 )
 
 export const auth0Config = {

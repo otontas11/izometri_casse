@@ -15,7 +15,7 @@
         >
           <header class="archived-document-delete-modal__header">
             <span aria-hidden="true">
-              <AppIcon :size="23" name="trash"/>
+              <AppIcon :size="23" name="trash" />
             </span>
             <div>
               <small>
@@ -26,13 +26,13 @@
               </h2>
             </div>
             <button :aria-label="
-                t('dashboard.recentDocuments.deleteModalCloseAriaLabel')
-              "
+                      t('dashboard.recentDocuments.deleteModalCloseAriaLabel')
+                    "
                     :disabled="isDeleting"
                     type="button"
                     @click="requestModalClose"
             >
-              <AppIcon :size="19" name="close"/>
+              <AppIcon :size="19" name="close" />
             </button>
           </header>
 
@@ -46,7 +46,7 @@
 
           <div class="archived-document-delete-modal__file-summary">
             <span aria-hidden="true">
-              <AppIcon :size="22" name="document"/>
+              <AppIcon :size="22" name="document" />
             </span>
             <div>
               <strong>{{ archivedDocument.name }}</strong>
@@ -80,8 +80,8 @@
               ></span>
               {{
                 isDeleting
-                    ? t('dashboard.recentDocuments.deleteModalDeleting')
-                    : t('dashboard.recentDocuments.deleteModalConfirm')
+                  ? t('dashboard.recentDocuments.deleteModalDeleting')
+                  : t('dashboard.recentDocuments.deleteModalConfirm')
               }}
             </button>
           </footer>
@@ -92,23 +92,23 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue'
-import {useI18n} from 'vue-i18n'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
-import type {ArchivedDocument} from '@/features/dashboard/types/dashboard.types'
-import {formatFileSize} from '@/utils/formatters'
+import type { ArchivedDocument } from '@/features/dashboard/types/dashboard.types'
+import { formatFileSize } from '@/utils/formatters'
 
 const props = withDefaults(
-    defineProps<{
-      archivedDocument: ArchivedDocument | null
-      errorMessage?: string
-      isDeleting: boolean
-      isOpen: boolean
-    }>(),
-    {
-      errorMessage: '',
-    },
+  defineProps<{
+    archivedDocument: ArchivedDocument | null
+    errorMessage?: string
+    isDeleting: boolean
+    isOpen: boolean
+  }>(),
+  {
+    errorMessage: '',
+  },
 )
 
 const emit = defineEmits<{
@@ -116,7 +116,7 @@ const emit = defineEmits<{
   confirm: []
 }>()
 
-const {t} = useI18n({useScope: 'global'})
+const { t } = useI18n({ useScope: 'global' })
 const modalDialogElement = ref<HTMLElement | null>(null)
 const cancelButtonElement = ref<HTMLButtonElement | null>(null)
 let previouslyFocusedElement: HTMLElement | null = null
@@ -145,9 +145,9 @@ const handleDocumentKeydown = (keyboardEvent: KeyboardEvent) => {
   }
 
   const focusableButtons = Array.from(
-      modalDialogElement.value?.querySelectorAll<HTMLButtonElement>(
-          'button:not(:disabled)',
-      ) ?? [],
+    modalDialogElement.value?.querySelectorAll<HTMLButtonElement>(
+      'button:not(:disabled)',
+    ) ?? [],
   )
 
   if (focusableButtons.length === 0) {
@@ -160,9 +160,9 @@ const handleDocumentKeydown = (keyboardEvent: KeyboardEvent) => {
   const activeElement = document.activeElement
 
   if (
-      keyboardEvent.shiftKey &&
-      (activeElement === firstFocusableButton ||
-          !modalDialogElement.value?.contains(activeElement))
+    keyboardEvent.shiftKey &&
+    (activeElement === firstFocusableButton ||
+      !modalDialogElement.value?.contains(activeElement))
   ) {
     keyboardEvent.preventDefault()
     lastFocusableButton?.focus()
@@ -173,30 +173,30 @@ const handleDocumentKeydown = (keyboardEvent: KeyboardEvent) => {
 }
 
 watch(
-    () => props.isOpen,
-    async (isOpen) => {
-      if (isOpen) {
-        previouslyFocusedElement =
-            document.activeElement instanceof HTMLElement
-                ? document.activeElement
-                : null
-        previousBodyOverflowValue = document.body.style.overflow
-        document.body.style.overflow = 'hidden'
-        isBodyScrollLockedByModal = true
+  () => props.isOpen,
+  async (isOpen) => {
+    if (isOpen) {
+      previouslyFocusedElement =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null
+      previousBodyOverflowValue = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      isBodyScrollLockedByModal = true
 
-        await nextTick()
-        cancelButtonElement.value?.focus()
-        return
-      }
+      await nextTick()
+      cancelButtonElement.value?.focus()
+      return
+    }
 
-      if (isBodyScrollLockedByModal) {
-        document.body.style.overflow = previousBodyOverflowValue
-        isBodyScrollLockedByModal = false
-      }
+    if (isBodyScrollLockedByModal) {
+      document.body.style.overflow = previousBodyOverflowValue
+      isBodyScrollLockedByModal = false
+    }
 
-      previouslyFocusedElement?.focus()
-      previouslyFocusedElement = null
-    },
+    previouslyFocusedElement?.focus()
+    previouslyFocusedElement = null
+  },
 )
 
 onMounted(() => document.addEventListener('keydown', handleDocumentKeydown))
@@ -232,7 +232,8 @@ onBeforeUnmount(() => {
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
   border-radius: 1.25rem;
-  box-shadow: 0 1.5rem 4rem color-mix(in srgb, var(--color-brand-950) 22%, transparent);
+  box-shadow: 0 1.5rem 4rem
+    color-mix(in srgb, var(--color-brand-950) 22%, transparent);
 }
 
 .archived-document-delete-modal__header {
@@ -346,9 +347,9 @@ onBeforeUnmount(() => {
   color: var(--color-danger) !important;
   font-weight: 700;
   background: color-mix(
-      in srgb,
-      var(--color-danger) 8%,
-      var(--color-surface-raised)
+    in srgb,
+    var(--color-danger) 8%,
+    var(--color-surface-raised)
   );
   border: 1px solid color-mix(in srgb, var(--color-danger) 24%, transparent);
   border-radius: var(--radius-sm);
@@ -415,9 +416,9 @@ onBeforeUnmount(() => {
 }
 
 .archived-document-delete-modal-enter-active
-.archived-document-delete-modal__dialog,
+  .archived-document-delete-modal__dialog,
 .archived-document-delete-modal-leave-active
-.archived-document-delete-modal__dialog {
+  .archived-document-delete-modal__dialog {
   transition: transform var(--transition-fast);
 }
 
@@ -427,9 +428,9 @@ onBeforeUnmount(() => {
 }
 
 .archived-document-delete-modal-enter-from
-.archived-document-delete-modal__dialog,
+  .archived-document-delete-modal__dialog,
 .archived-document-delete-modal-leave-to
-.archived-document-delete-modal__dialog {
+  .archived-document-delete-modal__dialog {
   transform: translateY(0.75rem) scale(0.985);
 }
 

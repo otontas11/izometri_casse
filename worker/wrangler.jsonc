@@ -1,34 +1,32 @@
 {
-	"$schema": "../node_modules/wrangler/config-schema.json",
-	"name": "izimza-case-api",
-	"main": "src/index.ts",
-	"compatibility_date": "2026-08-26",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	"observability": {
-		"enabled": true,
-		"logs": {
-			"enabled": true,
-			"head_sampling_rate": 1
-		}
-	},
-	"vars": {
-		"ALLOWED_ORIGINS": "http://localhost:5173,https://izimza.vercel.app",
-		"AUTH0_AUDIENCE": "https://izimza-case-api",
-		"AUTH0_DOMAIN": "dev-tnts.us.auth0.com"
-	},
-	"d1_databases": [
-		{
-			"binding": "DATABASE",
-			"migrations_dir": "migrations",
-			"database_id": "a522cdab-2dad-49ab-adb4-c72affaf3622"
-		}
-	],
-	"r2_buckets": [
-		{
-			"binding": "DOCUMENT_STORAGE",
-			"bucket_name": "izimza-case-api-document-storage"
-		}
-	]
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "izimza-case-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-26",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+    },
+  },
+  "vars": {
+    "ALLOWED_ORIGINS": "http://localhost:5173,https://izimza.vercel.app",
+    "AUTH0_AUDIENCE": "https://izimza-case-api",
+    "AUTH0_DOMAIN": "dev-tnts.us.auth0.com",
+  },
+  "d1_databases": [
+    {
+      "binding": "DATABASE",
+      "migrations_dir": "migrations",
+      "database_id": "a522cdab-2dad-49ab-adb4-c72affaf3622",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "DOCUMENT_STORAGE",
+      "bucket_name": "izimza-case-api-document-storage",
+    },
+  ],
 }

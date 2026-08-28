@@ -23,28 +23,13 @@ export default {
       const requestUrl = new URL(request.url)
 
       if (request.method === 'GET' && requestUrl.pathname === '/health') {
-        return createJsonResponse(
-          { service: 'izimza-case-api', status: 'healthy' },
-          200,
-          corsHeaders,
-        )
+        return createJsonResponse({ service: 'izimza-case-api', status: 'healthy' }, 200, corsHeaders)
       }
 
-      const authenticatedUser = await validateAuth0AccessToken(
-        request,
-        environment,
-      )
-      await ensureAuthenticatedUserProfile(
-        environment.DATABASE,
-        authenticatedUser,
-      )
+      const authenticatedUser = await validateAuth0AccessToken(request, environment)
+      await ensureAuthenticatedUserProfile(environment.DATABASE, authenticatedUser)
 
-      return await routeAuthenticatedRequest(
-        request,
-        environment,
-        authenticatedUser,
-        corsHeaders,
-      )
+      return await routeAuthenticatedRequest(request, environment, authenticatedUser, corsHeaders)
     } catch (requestError) {
       return createErrorResponse(requestError, corsHeaders)
     }

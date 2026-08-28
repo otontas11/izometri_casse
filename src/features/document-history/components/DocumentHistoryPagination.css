@@ -46,8 +46,7 @@
   opacity: 0.45;
 }
 
-.document-history-pagination__controls
-  > .document-history-pagination__page-button--active {
+.document-history-pagination__controls > .document-history-pagination__page-button--active {
   color: var(--color-text-inverse);
   background: var(--color-brand-950);
   border-color: var(--color-brand-950);

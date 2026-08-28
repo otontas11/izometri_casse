@@ -144,12 +144,7 @@
 .dashboard-page__feature-skeleton,
 .dashboard-page__table-skeleton {
   display: block;
-  background: linear-gradient(
-    100deg,
-    var(--color-surface-subtle) 25%,
-    #f8fafc 40%,
-    var(--color-surface-subtle) 58%
-  );
+  background: linear-gradient(100deg, var(--color-surface-subtle) 25%, #f8fafc 40%, var(--color-surface-subtle) 58%);
   background-size: 200% 100%;
   border-radius: var(--radius-lg);
   animation: dashboard-page-shimmer 1.3s infinite linear;

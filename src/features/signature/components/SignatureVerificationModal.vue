@@ -1,19 +1,17 @@
 <template>
   <Teleport to="body">
     <Transition name="signature-verification-modal">
-      <div
-        v-if="isOpen"
-        class="signature-verification-modal"
-        @click.self="requestModalClose"
+      <div v-if="isOpen"
+           class="signature-verification-modal"
+           @click.self="requestModalClose"
       >
-        <section
-          ref="modalDialogElement"
-          class="signature-verification-modal__dialog"
-          role="dialog"
-          aria-modal="true"
-          :aria-busy="isSubmitting"
-          aria-labelledby="signature-verification-modal-title"
-          aria-describedby="signature-verification-modal-description"
+        <section ref="modalDialogElement"
+                 class="signature-verification-modal__dialog"
+                 role="dialog"
+                 aria-modal="true"
+                 :aria-busy="isSubmitting"
+                 aria-labelledby="signature-verification-modal-title"
+                 aria-describedby="signature-verification-modal-description"
         >
           <header class="signature-verification-modal__header">
             <span aria-hidden="true">
@@ -25,19 +23,17 @@
                 {{ t('signature.verification.title') }}
               </h2>
             </div>
-            <button
-              type="button"
-              :disabled="isSubmitting"
-              :aria-label="t('signature.verification.closeAriaLabel')"
-              @click="requestModalClose"
+            <button type="button"
+                    :disabled="isSubmitting"
+                    :aria-label="t('signature.verification.closeAriaLabel')"
+                    @click="requestModalClose"
             >
               <AppIcon name="close" :size="20" />
             </button>
           </header>
 
-          <p
-            id="signature-verification-modal-description"
-            class="signature-verification-modal__phone-message"
+          <p id="signature-verification-modal-description"
+             class="signature-verification-modal__phone-message"
           >
             {{
               t('signature.verification.phoneMessage', {
@@ -46,52 +42,46 @@
             }}
           </p>
 
-          <form
-            class="signature-verification-modal__form"
-            @submit.prevent="handleVerificationCodeSubmit"
+          <form class="signature-verification-modal__form"
+                @submit.prevent="handleVerificationCodeSubmit"
           >
             <fieldset :disabled="isSubmitting">
               <legend>{{ t('signature.verification.codePrompt') }}</legend>
-              <div
-                class="signature-verification-modal__code-inputs"
-                role="group"
-                :aria-label="t('signature.verification.codeInputAriaLabel')"
-                @paste="handleVerificationCodePaste"
+              <div class="signature-verification-modal__code-inputs"
+                   role="group"
+                   :aria-label="t('signature.verification.codeInputAriaLabel')"
+                   @paste="handleVerificationCodePaste"
               >
-                <input
-                  v-for="digitIndex in VERIFICATION_CODE_LENGTH"
-                  :key="digitIndex"
-                  ref="verificationCodeInputElements"
-                  :value="verificationCodeDigits[digitIndex - 1]"
-                  :class="{
-                    'signature-verification-modal__code-input--invalid':
-                      isVerificationCodeInvalid,
-                  }"
-                  type="text"
-                  inputmode="numeric"
-                  pattern="[0-9]*"
-                  maxlength="1"
-                  autocomplete="one-time-code"
-                  :aria-label="
-                    t('signature.verification.codeDigitAriaLabel', {
-                      position: digitIndex,
-                    })
-                  "
-                  :aria-invalid="isVerificationCodeInvalid"
-                  @input="
-                    handleVerificationCodeInput($event, digitIndex - 1)
-                  "
-                  @keydown="
-                    handleVerificationCodeKeydown($event, digitIndex - 1)
-                  "
+                <input v-for="digitIndex in VERIFICATION_CODE_LENGTH"
+                       :key="digitIndex"
+                       ref="verificationCodeInputElements"
+                       :value="verificationCodeDigits[digitIndex - 1]"
+                       :class="{
+                         'signature-verification-modal__code-input--invalid':
+                           isVerificationCodeInvalid,
+                       }"
+                       type="text"
+                       inputmode="numeric"
+                       pattern="[0-9]*"
+                       maxlength="1"
+                       autocomplete="one-time-code"
+                       :aria-label="
+                         t('signature.verification.codeDigitAriaLabel', {
+                           position: digitIndex,
+                         })
+                       "
+                       :aria-invalid="isVerificationCodeInvalid"
+                       @input="handleVerificationCodeInput($event, digitIndex - 1)"
+                       @keydown="
+                         handleVerificationCodeKeydown($event, digitIndex - 1)
+                       "
                 />
               </div>
             </fieldset>
 
-            <p
-              v-if="isVerificationCodeInvalid"
-              class="signature-verification-modal__error-message"
-              role="alert"
+            <p v-if="isVerificationCodeInvalid"
+               class="signature-verification-modal__error-message"
+               role="alert"
             >
               <span aria-hidden="true">!</span>
               {{ t('signature.verification.invalidCode') }}
@@ -108,15 +98,13 @@
               }}
             </p>
 
-            <button
-              class="signature-verification-modal__submit-button"
-              type="submit"
-              :disabled="!canSubmitVerificationCode"
+            <button class="signature-verification-modal__submit-button"
+                    type="submit"
+                    :disabled="!canSubmitVerificationCode"
             >
-              <span
-                v-if="isSubmitting"
-                class="signature-verification-modal__spinner"
-                aria-hidden="true"
+              <span v-if="isSubmitting"
+                    class="signature-verification-modal__spinner"
+                    aria-hidden="true"
               ></span>
               {{
                 isSubmitting
@@ -125,17 +113,16 @@
               }}
             </button>
 
-            <button
-              class="signature-verification-modal__resend-button"
-              type="button"
-              :disabled="resendSecondsRemaining > 0 || isSubmitting"
-              @click="handleVerificationCodeResend"
+            <button class="signature-verification-modal__resend-button"
+                    type="button"
+                    :disabled="resendSecondsRemaining > 0 || isSubmitting"
+                    @click="handleVerificationCodeResend"
             >
               {{
                 resendSecondsRemaining > 0
                   ? t('signature.verification.resendCountdown', {
-                      seconds: resendSecondsRemaining,
-                    })
+                    seconds: resendSecondsRemaining,
+                  })
                   : t('signature.verification.resend')
               }}
             </button>
@@ -147,14 +134,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-} from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
@@ -237,10 +217,7 @@ const updateVerificationCodeDigit = (digitIndex: number, digit: string) => {
   isVerificationCodeInvalid.value = false
 }
 
-const handleVerificationCodeInput = (
-  inputEvent: Event,
-  digitIndex: number,
-) => {
+const handleVerificationCodeInput = (inputEvent: Event, digitIndex: number) => {
   const codeInputElement = inputEvent.target as HTMLInputElement
   const enteredDigit = codeInputElement.value.replace(/\D/g, '').slice(-1)
 

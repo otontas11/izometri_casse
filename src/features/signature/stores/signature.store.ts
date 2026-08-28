@@ -15,9 +15,7 @@ import type { SignatureFileItem } from '../types/signature.types'
 
 const RECENT_SIGNED_DOCUMENT_LIMIT = 5
 
-const createSelectedSignatureFileItem = (
-  selectedFile: File,
-): SignatureFileItem => ({
+const createSelectedSignatureFileItem = (selectedFile: File): SignatureFileItem => ({
   draftFileId: null,
   errorMessage: '',
   file: selectedFile,
@@ -28,9 +26,7 @@ const createSelectedSignatureFileItem = (
   status: 'selected',
 })
 
-const createUploadedSignatureFileItem = (
-  draftFile: DraftFile,
-): SignatureFileItem => ({
+const createUploadedSignatureFileItem = (draftFile: DraftFile): SignatureFileItem => ({
   draftFileId: draftFile.id,
   errorMessage: '',
   file: null,
@@ -53,16 +49,10 @@ export const useSignatureStore = defineStore('signature', () => {
   const recentSignaturesRequestStatus = ref<ApiRequestStatus>('idle')
   const recentSignaturesErrorMessage = ref('')
 
-  const isSignatureActionInProgress = computed(
-    () => signatureActionStatus.value === 'loading',
-  )
-  const isRecentSignaturesLoading = computed(
-    () => recentSignaturesRequestStatus.value === 'loading',
-  )
+  const isSignatureActionInProgress = computed(() => signatureActionStatus.value === 'loading')
+  const isRecentSignaturesLoading = computed(() => recentSignaturesRequestStatus.value === 'loading')
   const canProcessSignatureFiles = computed(() =>
-    signatureFiles.value.some(
-      ({ status }) => status === 'uploaded' || status === 'process-error',
-    ),
+    signatureFiles.value.some(({ status }) => status === 'uploaded' || status === 'process-error')
   )
 
   const clearSignatureActionFeedback = () => {
@@ -71,24 +61,17 @@ export const useSignatureStore = defineStore('signature', () => {
     signatureActionSuccessMessage.value = ''
   }
 
-  const updateSignatureFileItem = (
-    signatureFileId: string,
-    updatedFields: Partial<SignatureFileItem>,
-  ) => {
-    signatureFiles.value = signatureFiles.value.map((signatureFileItem) =>
-      signatureFileItem.id === signatureFileId
-        ? { ...signatureFileItem, ...updatedFields }
-        : signatureFileItem,
+  const updateSignatureFileItem = (signatureFileId: string, updatedFields: Partial<SignatureFileItem>) => {
+    signatureFiles.value = signatureFiles.value.map(signatureFileItem =>
+      signatureFileItem.id === signatureFileId ? { ...signatureFileItem, ...updatedFields } : signatureFileItem
     )
   }
 
   const addRecentSignedDocument = (signedDocument: ArchivedDocument) => {
-    recentSignedDocuments.value = [
-      signedDocument,
-      ...recentSignedDocuments.value.filter(
-        ({ id }) => id !== signedDocument.id,
-      ),
-    ].slice(0, RECENT_SIGNED_DOCUMENT_LIMIT)
+    recentSignedDocuments.value = [signedDocument, ...recentSignedDocuments.value.filter(({ id }) => id !== signedDocument.id)].slice(
+      0,
+      RECENT_SIGNED_DOCUMENT_LIMIT
+    )
     recentSignaturesRequestStatus.value = 'success'
     recentSignaturesErrorMessage.value = ''
   }
@@ -102,10 +85,7 @@ export const useSignatureStore = defineStore('signature', () => {
     recentSignaturesErrorMessage.value = ''
 
     try {
-      recentSignedDocuments.value =
-        await signatureApi.fetchRecentSignedDocuments(
-          RECENT_SIGNED_DOCUMENT_LIMIT,
-        )
+      recentSignedDocuments.value = await signatureApi.fetchRecentSignedDocuments(RECENT_SIGNED_DOCUMENT_LIMIT)
       recentSignaturesRequestStatus.value = 'success'
     } catch (requestError) {
       recentSignaturesRequestStatus.value = 'error'
@@ -115,21 +95,15 @@ export const useSignatureStore = defineStore('signature', () => {
 
   const loadUploadedSignatureFiles = async () => {
     try {
-      const uploadedDraftFiles =
-        await draftFilesStore.fetchUploadedDraftFiles('signature')
+      const uploadedDraftFiles = await draftFilesStore.fetchUploadedDraftFiles('signature')
       const existingDraftFileIds = new Set(
-        signatureFiles.value
-          .map(({ draftFileId }) => draftFileId)
-          .filter((draftFileId): draftFileId is number => draftFileId !== null),
+        signatureFiles.value.map(({ draftFileId }) => draftFileId).filter((draftFileId): draftFileId is number => draftFileId !== null)
       )
       const restoredSignatureFiles = uploadedDraftFiles
         .filter(({ id }) => !existingDraftFileIds.has(id))
         .map(createUploadedSignatureFileItem)
 
-      signatureFiles.value = [
-        ...signatureFiles.value,
-        ...restoredSignatureFiles,
-      ]
+      signatureFiles.value = [...signatureFiles.value, ...restoredSignatureFiles]
     } catch (requestError) {
       signatureActionStatus.value = 'error'
       signatureActionErrorMessage.value = getApiErrorMessage(requestError)
@@ -144,7 +118,7 @@ export const useSignatureStore = defineStore('signature', () => {
     const validSignatureFiles: File[] = []
     const validationErrorMessages: string[] = []
 
-    newSignatureFiles.forEach((signatureFile) => {
+    newSignatureFiles.forEach(signatureFile => {
       const validationResult = validateDraftFile(signatureFile)
 
       if (validationResult.isValid) {
@@ -156,20 +130,16 @@ export const useSignatureStore = defineStore('signature', () => {
         translate('signature.validation.fileError', {
           fileName: signatureFile.name,
           message: validationResult.errorMessage,
-        }),
+        })
       )
     })
 
     if (validSignatureFiles.length > 0) {
-      signatureFiles.value = [
-        ...signatureFiles.value,
-        ...validSignatureFiles.map(createSelectedSignatureFileItem),
-      ]
+      signatureFiles.value = [...signatureFiles.value, ...validSignatureFiles.map(createSelectedSignatureFileItem)]
       clearSignatureActionFeedback()
     }
 
-    signatureFileValidationErrorMessage.value =
-      validationErrorMessages.join(' ')
+    signatureFileValidationErrorMessage.value = validationErrorMessages.join(' ')
 
     return validSignatureFiles.length > 0
   }
@@ -179,18 +149,14 @@ export const useSignatureStore = defineStore('signature', () => {
       return false
     }
 
-    const signatureFileItem = signatureFiles.value.find(
-      ({ id }) => id === signatureFileId,
-    )
+    const signatureFileItem = signatureFiles.value.find(({ id }) => id === signatureFileId)
 
     if (!signatureFileItem) {
       return false
     }
 
     if (signatureFileItem.draftFileId === null) {
-      signatureFiles.value = signatureFiles.value.filter(
-        ({ id }) => id !== signatureFileId,
-      )
+      signatureFiles.value = signatureFiles.value.filter(({ id }) => id !== signatureFileId)
       signatureFileValidationErrorMessage.value = ''
       clearSignatureActionFeedback()
       return true
@@ -203,17 +169,10 @@ export const useSignatureStore = defineStore('signature', () => {
     })
 
     try {
-      await draftFilesStore.deleteDraftFile(
-        signatureFileItem.draftFileId,
-        'signature',
-      )
-      signatureFiles.value = signatureFiles.value.filter(
-        ({ id }) => id !== signatureFileId,
-      )
+      await draftFilesStore.deleteDraftFile(signatureFileItem.draftFileId, 'signature')
+      signatureFiles.value = signatureFiles.value.filter(({ id }) => id !== signatureFileId)
       signatureActionStatus.value = 'success'
-      signatureActionSuccessMessage.value = translate(
-        'signature.feedback.draftDeleted',
-      )
+      signatureActionSuccessMessage.value = translate('signature.feedback.draftDeleted')
       await dashboardStore.fetchDashboardData()
       return true
     } catch (requestError) {
@@ -233,9 +192,7 @@ export const useSignatureStore = defineStore('signature', () => {
       return false
     }
 
-    const uploadedSignatureFiles = signatureFiles.value.filter(
-      ({ draftFileId }) => draftFileId !== null,
-    )
+    const uploadedSignatureFiles = signatureFiles.value.filter(({ draftFileId }) => draftFileId !== null)
 
     if (uploadedSignatureFiles.length === 0) {
       signatureFiles.value = []
@@ -260,10 +217,7 @@ export const useSignatureStore = defineStore('signature', () => {
       })
 
       try {
-        await draftFilesStore.deleteDraftFile(
-          signatureFileItem.draftFileId,
-          'signature',
-        )
+        await draftFilesStore.deleteDraftFile(signatureFileItem.draftFileId, 'signature')
       } catch (requestError) {
         draftFileIdsThatCouldNotBeDeleted.add(signatureFileItem.draftFileId)
         updateSignatureFileItem(signatureFileItem.id, {
@@ -274,18 +228,14 @@ export const useSignatureStore = defineStore('signature', () => {
     }
 
     signatureFiles.value = signatureFiles.value.filter(
-      ({ draftFileId }) =>
-        draftFileId !== null &&
-        draftFileIdsThatCouldNotBeDeleted.has(draftFileId),
+      ({ draftFileId }) => draftFileId !== null && draftFileIdsThatCouldNotBeDeleted.has(draftFileId)
     )
     signatureFileValidationErrorMessage.value = ''
     await dashboardStore.fetchDashboardData()
 
     if (draftFileIdsThatCouldNotBeDeleted.size > 0) {
       signatureActionStatus.value = 'error'
-      signatureActionErrorMessage.value = translate(
-        'signature.feedback.clearFailure',
-      )
+      signatureActionErrorMessage.value = translate('signature.feedback.clearFailure')
       return false
     }
 
@@ -298,15 +248,11 @@ export const useSignatureStore = defineStore('signature', () => {
       return false
     }
 
-    const signatureFilesToUpload = signatureFiles.value.filter(
-      ({ status }) => status === 'selected' || status === 'upload-error',
-    )
+    const signatureFilesToUpload = signatureFiles.value.filter(({ status }) => status === 'selected' || status === 'upload-error')
 
     if (signatureFilesToUpload.length === 0) {
       signatureActionStatus.value = 'error'
-      signatureActionErrorMessage.value = translate(
-        'signature.feedback.selectFilesToUpload',
-      )
+      signatureActionErrorMessage.value = translate('signature.feedback.selectFilesToUpload')
       return false
     }
 
@@ -328,15 +274,11 @@ export const useSignatureStore = defineStore('signature', () => {
       })
 
       try {
-        const uploadedDraftFile = await draftFilesStore.uploadDraftFile(
-          signatureFileItem.file,
-          'signature',
-          (progressPercentage) => {
-            updateSignatureFileItem(signatureFileItem.id, {
-              progressPercentage,
-            })
-          },
-        )
+        const uploadedDraftFile = await draftFilesStore.uploadDraftFile(signatureFileItem.file, 'signature', progressPercentage => {
+          updateSignatureFileItem(signatureFileItem.id, {
+            progressPercentage,
+          })
+        })
 
         updateSignatureFileItem(signatureFileItem.id, {
           draftFileId: uploadedDraftFile.id,
@@ -365,22 +307,17 @@ export const useSignatureStore = defineStore('signature', () => {
     if (failedFileCount > 0) {
       signatureActionStatus.value = 'error'
       signatureActionErrorMessage.value = translate(
-        uploadedFileCount > 0
-          ? 'signature.feedback.uploadPartialFailure'
-          : 'signature.feedback.uploadFailure',
+        uploadedFileCount > 0 ? 'signature.feedback.uploadPartialFailure' : 'signature.feedback.uploadFailure',
         {
           failedCount: failedFileCount,
           uploadedCount: uploadedFileCount,
-        },
+        }
       )
       return false
     }
 
     signatureActionStatus.value = 'success'
-    signatureActionSuccessMessage.value = translate(
-      'signature.feedback.uploadSuccess',
-      { count: uploadedFileCount },
-    )
+    signatureActionSuccessMessage.value = translate('signature.feedback.uploadSuccess', { count: uploadedFileCount })
     return true
   }
 
@@ -399,22 +336,15 @@ export const useSignatureStore = defineStore('signature', () => {
       return false
     }
 
-    const signatureFilesToProcess = signatureFiles.value.filter(
-      ({ status }) => status === 'uploaded' || status === 'process-error',
-    )
+    const signatureFilesToProcess = signatureFiles.value.filter(({ status }) => status === 'uploaded' || status === 'process-error')
 
     if (signatureFilesToProcess.length === 0) {
       signatureActionStatus.value = 'error'
-      signatureActionErrorMessage.value = translate(
-        'signature.feedback.uploadFilesBeforeSigning',
-      )
+      signatureActionErrorMessage.value = translate('signature.feedback.uploadFilesBeforeSigning')
       return false
     }
 
-    if (
-      dashboardStore.dashboardSummary &&
-      dashboardStore.dashboardSummary.remainingCredits < 1
-    ) {
+    if (dashboardStore.dashboardSummary && dashboardStore.dashboardSummary.remainingCredits < 1) {
       reportInsufficientSignatureCredits()
       return false
     }
@@ -430,10 +360,7 @@ export const useSignatureStore = defineStore('signature', () => {
         continue
       }
 
-      if (
-        dashboardStore.dashboardSummary &&
-        dashboardStore.dashboardSummary.remainingCredits < 1
-      ) {
+      if (dashboardStore.dashboardSummary && dashboardStore.dashboardSummary.remainingCredits < 1) {
         updateSignatureFileItem(signatureFileItem.id, {
           errorMessage: translate('errors.insufficientCredits'),
           status: 'process-error',
@@ -449,23 +376,12 @@ export const useSignatureStore = defineStore('signature', () => {
       })
 
       try {
-        const signatureTransaction =
-          await signatureApi.createSignatureTransaction(
-            signatureFileItem.draftFileId,
-          )
+        const signatureTransaction = await signatureApi.createSignatureTransaction(signatureFileItem.draftFileId)
 
-        dashboardStore.synchronizeDashboardData(
-          signatureTransaction.dashboardSummary,
-          signatureTransaction.recentDocuments,
-        )
-        draftFilesStore.removeProcessedDraftFile(
-          signatureFileItem.draftFileId,
-          'signature',
-        )
+        dashboardStore.synchronizeDashboardData(signatureTransaction.dashboardSummary, signatureTransaction.recentDocuments)
+        draftFilesStore.removeProcessedDraftFile(signatureFileItem.draftFileId, 'signature')
         addRecentSignedDocument(signatureTransaction.signedDocument)
-        signatureFiles.value = signatureFiles.value.filter(
-          ({ id }) => id !== signatureFileItem.id,
-        )
+        signatureFiles.value = signatureFiles.value.filter(({ id }) => id !== signatureFileItem.id)
         completedFileCount += 1
       } catch (requestError) {
         updateSignatureFileItem(signatureFileItem.id, {
@@ -491,10 +407,7 @@ export const useSignatureStore = defineStore('signature', () => {
     }
 
     signatureActionStatus.value = 'success'
-    signatureActionSuccessMessage.value = translate(
-      'signature.feedback.batchSuccess',
-      { count: completedFileCount },
-    )
+    signatureActionSuccessMessage.value = translate('signature.feedback.batchSuccess', { count: completedFileCount })
     return true
   }
 

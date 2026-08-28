@@ -4,24 +4,14 @@ import { defineStore } from 'pinia'
 import type { ApiRequestStatus } from '@/types/api.types'
 
 import { draftFilesApi } from '../api/draftFiles.api'
-import type {
-  DraftFile,
-  DraftFileOperation,
-  DraftFileUploadProgressHandler,
-} from '../types/draftFile.types'
+import type { DraftFile, DraftFileOperation, DraftFileUploadProgressHandler } from '../types/draftFile.types'
 
-const createEmptyDraftFileCollection = (): Record<
-  DraftFileOperation,
-  DraftFile[]
-> => ({
+const createEmptyDraftFileCollection = (): Record<DraftFileOperation, DraftFile[]> => ({
   signature: [],
   timestamp: [],
 })
 
-const createInitialLoadStatuses = (): Record<
-  DraftFileOperation,
-  ApiRequestStatus
-> => ({
+const createInitialLoadStatuses = (): Record<DraftFileOperation, ApiRequestStatus> => ({
   signature: 'idle',
   timestamp: 'idle',
 })
@@ -30,39 +20,24 @@ export const useDraftFilesStore = defineStore('draftFiles', () => {
   const uploadedDraftFiles = ref(createEmptyDraftFileCollection())
   const draftFilesLoadStatus = ref(createInitialLoadStatuses())
   const latestUploadedDraftFile = computed(() => {
-    const allUploadedDraftFiles = [
-      ...uploadedDraftFiles.value.signature,
-      ...uploadedDraftFiles.value.timestamp,
-    ]
+    const allUploadedDraftFiles = [...uploadedDraftFiles.value.signature, ...uploadedDraftFiles.value.timestamp]
 
-    return allUploadedDraftFiles.reduce<DraftFile | null>(
-      (latestDraftFile, uploadedDraftFile) => {
-        if (!latestDraftFile) {
-          return uploadedDraftFile
-        }
+    return allUploadedDraftFiles.reduce<DraftFile | null>((latestDraftFile, uploadedDraftFile) => {
+      if (!latestDraftFile) {
+        return uploadedDraftFile
+      }
 
-        const latestDraftFileCreationTime = Date.parse(
-          latestDraftFile.createdAt,
-        )
-        const uploadedDraftFileCreationTime = Date.parse(
-          uploadedDraftFile.createdAt,
-        )
-        const isUploadedDraftFileNewer =
-          uploadedDraftFileCreationTime > latestDraftFileCreationTime ||
-          (uploadedDraftFileCreationTime === latestDraftFileCreationTime &&
-            uploadedDraftFile.id > latestDraftFile.id)
+      const latestDraftFileCreationTime = Date.parse(latestDraftFile.createdAt)
+      const uploadedDraftFileCreationTime = Date.parse(uploadedDraftFile.createdAt)
+      const isUploadedDraftFileNewer =
+        uploadedDraftFileCreationTime > latestDraftFileCreationTime ||
+        (uploadedDraftFileCreationTime === latestDraftFileCreationTime && uploadedDraftFile.id > latestDraftFile.id)
 
-        return isUploadedDraftFileNewer
-          ? uploadedDraftFile
-          : latestDraftFile
-      },
-      null,
-    )
+      return isUploadedDraftFileNewer ? uploadedDraftFile : latestDraftFile
+    }, null)
   })
 
-  const fetchUploadedDraftFiles = async (
-    intendedOperation: DraftFileOperation,
-  ) => {
+  const fetchUploadedDraftFiles = async (intendedOperation: DraftFileOperation) => {
     if (draftFilesLoadStatus.value[intendedOperation] === 'loading') {
       return uploadedDraftFiles.value[intendedOperation]
     }
@@ -70,8 +45,7 @@ export const useDraftFilesStore = defineStore('draftFiles', () => {
     draftFilesLoadStatus.value[intendedOperation] = 'loading'
 
     try {
-      const operationDraftFiles =
-        await draftFilesApi.fetchUploadedDraftFiles(intendedOperation)
+      const operationDraftFiles = await draftFilesApi.fetchUploadedDraftFiles(intendedOperation)
       uploadedDraftFiles.value[intendedOperation] = operationDraftFiles
       draftFilesLoadStatus.value[intendedOperation] = 'success'
       return operationDraftFiles
@@ -84,43 +58,25 @@ export const useDraftFilesStore = defineStore('draftFiles', () => {
   const uploadDraftFile = async (
     file: File,
     intendedOperation: DraftFileOperation,
-    updateUploadProgress: DraftFileUploadProgressHandler,
+    updateUploadProgress: DraftFileUploadProgressHandler
   ) => {
-    const uploadedDraftFile = await draftFilesApi.uploadDraftFile(
-      file,
-      intendedOperation,
-      updateUploadProgress,
-    )
+    const uploadedDraftFile = await draftFilesApi.uploadDraftFile(file, intendedOperation, updateUploadProgress)
 
     uploadedDraftFiles.value[intendedOperation] = [
       uploadedDraftFile,
-      ...uploadedDraftFiles.value[intendedOperation].filter(
-        ({ id }) => id !== uploadedDraftFile.id,
-      ),
+      ...uploadedDraftFiles.value[intendedOperation].filter(({ id }) => id !== uploadedDraftFile.id),
     ]
 
     return uploadedDraftFile
   }
 
-  const deleteDraftFile = async (
-    draftFileId: number,
-    intendedOperation: DraftFileOperation,
-  ) => {
+  const deleteDraftFile = async (draftFileId: number, intendedOperation: DraftFileOperation) => {
     await draftFilesApi.deleteDraftFile(draftFileId)
-    uploadedDraftFiles.value[intendedOperation] =
-      uploadedDraftFiles.value[intendedOperation].filter(
-        ({ id }) => id !== draftFileId,
-      )
+    uploadedDraftFiles.value[intendedOperation] = uploadedDraftFiles.value[intendedOperation].filter(({ id }) => id !== draftFileId)
   }
 
-  const removeProcessedDraftFile = (
-    draftFileId: number,
-    intendedOperation: DraftFileOperation,
-  ) => {
-    uploadedDraftFiles.value[intendedOperation] =
-      uploadedDraftFiles.value[intendedOperation].filter(
-        ({ id }) => id !== draftFileId,
-      )
+  const removeProcessedDraftFile = (draftFileId: number, intendedOperation: DraftFileOperation) => {
+    uploadedDraftFiles.value[intendedOperation] = uploadedDraftFiles.value[intendedOperation].filter(({ id }) => id !== draftFileId)
   }
 
   return {

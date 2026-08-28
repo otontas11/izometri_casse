@@ -33,7 +33,7 @@
     </section>
 
     <section aria-labelledby="login-title" class="login-page__panel">
-      <LanguageSwitcher class="login-page__language-switcher"/>
+      <LanguageSwitcher class="login-page__language-switcher" />
 
       <div class="login-page__card">
         <div aria-hidden="true" class="login-page__card-seal">
@@ -64,7 +64,10 @@
           </small>
         </div>
 
-        <div v-else-if=" authenticationErrorMessage || currentRoute.query.reason === 'auth_error'"
+        <div v-else-if="
+               authenticationErrorMessage ||
+                 currentRoute.query.reason === 'auth_error'
+             "
              class="login-page__card-notice login-page__card-notice--error"
              role="alert"
         >
@@ -72,37 +75,32 @@
           <p>
             {{
               authenticationErrorMessage ||
-              t('auth.login.authenticationErrorDescription')
+                t('auth.login.authenticationErrorDescription')
             }}
           </p>
         </div>
 
         <div class="login-page__card-actions">
           <button :disabled="
-              !isAuth0Configured ||
-              isAuth0Loading ||
-              isAuthenticationSubmitting
-            "
+                    !isAuth0Configured || isAuth0Loading || isAuthenticationSubmitting
+                  "
                   class="login-page__card-button login-page__card-button--primary"
                   type="button"
                   @click="handleAuthenticationStart('login')"
           >
-            <span
-                v-if="isAuth0Loading || isAuthenticationSubmitting"
-                class="login-page__card-spinner"
+            <span v-if="isAuth0Loading || isAuthenticationSubmitting"
+                  class="login-page__card-spinner"
             ></span>
             {{
               isAuth0Loading || isAuthenticationSubmitting
-                  ? t('auth.login.checkingSession')
-                  : t('auth.login.signIn')
+                ? t('auth.login.checkingSession')
+                : t('auth.login.signIn')
             }}
           </button>
 
           <button :disabled="
-              !isAuth0Configured ||
-              isAuth0Loading ||
-              isAuthenticationSubmitting
-            "
+                    !isAuth0Configured || isAuth0Loading || isAuthenticationSubmitting
+                  "
                   class="login-page__card-button login-page__card-button--secondary"
                   type="button"
                   @click="handleAuthenticationStart('signup')"
@@ -120,23 +118,20 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue'
-import {useAuth0} from '@auth0/auth0-vue'
-import {useRoute, useRouter} from 'vue-router'
-import {useI18n} from 'vue-i18n'
+import { computed, ref, watch } from 'vue'
+import { useAuth0 } from '@auth0/auth0-vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
-import {
-  auth0Config,
-  isAuth0Configured,
-} from '@/config/auth0.config'
+import { auth0Config, isAuth0Configured } from '@/config/auth0.config'
 
 type AuthMode = 'login' | 'signup'
 
 const currentRoute = useRoute()
 const applicationRouter = useRouter()
 const auth0Client = isAuth0Configured ? useAuth0() : null
-const {locale, t} = useI18n({useScope: 'global'})
+const { locale, t } = useI18n({ useScope: 'global' })
 const isAuthenticationSubmitting = ref(false)
 const localAuthenticationError = ref('')
 
@@ -144,11 +139,11 @@ const authenticationRedirectTarget = computed(() => {
   const requestedRedirectPath = currentRoute.query.redirect
 
   if (
-      typeof requestedRedirectPath !== 'string' ||
-      !requestedRedirectPath.startsWith('/') ||
-      requestedRedirectPath.startsWith('//') ||
-      requestedRedirectPath.startsWith('/login') ||
-      requestedRedirectPath.startsWith('/auth/callback')
+    typeof requestedRedirectPath !== 'string' ||
+    !requestedRedirectPath.startsWith('/') ||
+    requestedRedirectPath.startsWith('//') ||
+    requestedRedirectPath.startsWith('/login') ||
+    requestedRedirectPath.startsWith('/auth/callback')
   ) {
     return '/'
   }
@@ -158,15 +153,14 @@ const authenticationRedirectTarget = computed(() => {
 
 const isAuth0Loading = computed(() => auth0Client?.isLoading.value ?? false)
 const authenticationErrorMessage = computed(
-    () =>
-        localAuthenticationError.value ||
-        (auth0Client?.error.value
-            ? t('auth.login.authenticationErrorDescription')
-            : ''),
+  () =>
+    localAuthenticationError.value ||
+    (auth0Client?.error.value
+      ? t('auth.login.authenticationErrorDescription')
+      : ''),
 )
 const hasAuth0ConfigurationError = computed(
-    () =>
-        !isAuth0Configured || currentRoute.query.reason === 'configuration',
+  () => !isAuth0Configured || currentRoute.query.reason === 'configuration',
 )
 
 const handleAuthenticationStart = async (authenticationMode: AuthMode) => {
@@ -179,10 +173,10 @@ const handleAuthenticationStart = async (authenticationMode: AuthMode) => {
 
   try {
     await auth0Client.loginWithRedirect({
-      appState: {target: authenticationRedirectTarget.value},
+      appState: { target: authenticationRedirectTarget.value },
       authorizationParams: {
         ui_locales: locale.value,
-        ...(authenticationMode === 'signup' ? {screen_hint: 'signup'} : {}),
+        ...(authenticationMode === 'signup' ? { screen_hint: 'signup' } : {}),
       },
     })
   } catch {
@@ -192,13 +186,13 @@ const handleAuthenticationStart = async (authenticationMode: AuthMode) => {
 }
 
 watch(
-    () => auth0Client?.isAuthenticated.value,
-    (isAuthenticated) => {
-      if (isAuthenticated) {
-        void applicationRouter.replace(authenticationRedirectTarget.value)
-      }
-    },
-    {immediate: true},
+  () => auth0Client?.isAuthenticated.value,
+  (isAuthenticated) => {
+    if (isAuthenticated) {
+      void applicationRouter.replace(authenticationRedirectTarget.value)
+    }
+  },
+  { immediate: true },
 )
 </script>
 

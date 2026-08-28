@@ -1,8 +1,7 @@
 <template>
-  <RouterLink
-    class="pending-transaction-card"
-    :aria-label="pendingTransactionAriaLabel"
-    :to="{ name: draftFile.intendedOperation }"
+  <RouterLink class="pending-transaction-card"
+              :aria-label="pendingTransactionAriaLabel"
+              :to="{ name: draftFile.intendedOperation }"
   >
     <span class="pending-transaction-card__icon" aria-hidden="true">
       <AppIcon :name="draftFile.intendedOperation" :size="20" />

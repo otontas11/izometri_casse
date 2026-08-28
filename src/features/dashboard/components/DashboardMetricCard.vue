@@ -11,14 +11,13 @@
       <span v-if="detail" class="dashboard-metric-card__detail">
         {{ detail }}
       </span>
-      <div
-        v-if="progress !== undefined"
-        class="dashboard-metric-card__progress"
-        role="progressbar"
-        :aria-label="t('dashboard.metrics.archiveUsageAriaLabel')"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        :aria-valuenow="Math.round(progress)"
+      <div v-if="progress !== undefined"
+           class="dashboard-metric-card__progress"
+           role="progressbar"
+           :aria-label="t('dashboard.metrics.archiveUsageAriaLabel')"
+           aria-valuemin="0"
+           aria-valuemax="100"
+           :aria-valuenow="Math.round(progress)"
       >
         <span :style="{ width: `${progress}%` }"></span>
       </div>

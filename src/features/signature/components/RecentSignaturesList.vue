@@ -1,7 +1,6 @@
 <template>
-  <section
-    class="recent-signatures-list"
-    aria-labelledby="recent-signatures-list-title"
+  <section class="recent-signatures-list"
+           aria-labelledby="recent-signatures-list-title"
   >
     <header class="recent-signatures-list__header">
       <div>
@@ -18,11 +17,10 @@
             })
           }}
         </strong>
-        <RouterLink
-          :to="{
-            name: 'document-history',
-            query: { operations: 'signature' },
-          }"
+        <RouterLink :to="{
+          name: 'document-history',
+          query: { operations: 'signature' },
+        }"
         >
           {{ t('common.viewAll') }}
           <AppIcon name="arrow-right" :size="16" />
@@ -30,10 +28,9 @@
       </div>
     </header>
 
-    <p
-      v-if="errorMessage && signedDocuments.length > 0"
-      class="recent-signatures-list__warning-message"
-      role="alert"
+    <p v-if="errorMessage && signedDocuments.length > 0"
+       class="recent-signatures-list__warning-message"
+       role="alert"
     >
       <span aria-hidden="true">!</span>
       {{ errorMessage }}
@@ -42,20 +39,18 @@
       </button>
     </p>
 
-    <div
-      v-if="isLoading && signedDocuments.length === 0"
-      class="recent-signatures-list__loading-state"
-      role="status"
-      aria-busy="true"
+    <div v-if="isLoading && signedDocuments.length === 0"
+         class="recent-signatures-list__loading-state"
+         role="status"
+         aria-busy="true"
     >
       <span aria-hidden="true"></span>
       <p>{{ t('signature.recentSignatures.loading') }}</p>
     </div>
 
-    <div
-      v-else-if="errorMessage && signedDocuments.length === 0"
-      class="recent-signatures-list__error-state"
-      role="alert"
+    <div v-else-if="errorMessage && signedDocuments.length === 0"
+         class="recent-signatures-list__error-state"
+         role="alert"
     >
       <span aria-hidden="true">!</span>
       <h3>{{ t('signature.recentSignatures.errorTitle') }}</h3>
@@ -66,9 +61,8 @@
       </button>
     </div>
 
-    <div
-      v-else-if="signedDocuments.length === 0"
-      class="recent-signatures-list__empty-state"
+    <div v-else-if="signedDocuments.length === 0"
+         class="recent-signatures-list__empty-state"
     >
       <span aria-hidden="true">
         <AppIcon name="signature" :size="25" />
@@ -78,15 +72,11 @@
     </div>
 
     <ul v-else class="recent-signatures-list__documents">
-      <li
-        v-for="signedDocument in signedDocuments"
-        :key="signedDocument.id"
-        class="recent-signatures-list__document"
+      <li v-for="signedDocument in signedDocuments"
+          :key="signedDocument.id"
+          class="recent-signatures-list__document"
       >
-        <span
-          class="recent-signatures-list__document-icon"
-          aria-hidden="true"
-        >
+        <span class="recent-signatures-list__document-icon" aria-hidden="true">
           <AppIcon name="document" :size="20" />
         </span>
 

@@ -15,7 +15,7 @@ const storybookRouter = createRouter({
   ],
 })
 
-setup((vueApplication) => {
+setup(vueApplication => {
   vueApplication.use(i18n)
   vueApplication.use(storybookRouter)
 })

@@ -31,21 +31,7 @@ const supportedDraftFileExtensions = new Set([
 const documentFileTypeExtensions = {
   excel: ['.xls', '.xlsx'],
   eyp: ['.eyp'],
-  image: [
-    '.avif',
-    '.bmp',
-    '.gif',
-    '.heic',
-    '.heif',
-    '.ico',
-    '.jpeg',
-    '.jpg',
-    '.png',
-    '.svg',
-    '.tif',
-    '.tiff',
-    '.webp',
-  ],
+  image: ['.avif', '.bmp', '.gif', '.heic', '.heif', '.ico', '.jpeg', '.jpg', '.png', '.svg', '.tif', '.tiff', '.webp'],
   office: ['.docx', '.xlsx', '.pptx'],
   pdf: ['.pdf'],
   text: ['.txt'],
@@ -57,9 +43,7 @@ const documentFileTypeExtensions = {
 const jsonServerApplication = jsonServer.create()
 const defaultDatabasePath = path.join(__dirname, 'db.json')
 const configuredDatabasePath = process.env.JSON_SERVER_DATABASE_PATH
-const databasePath = configuredDatabasePath
-  ? path.resolve(configuredDatabasePath)
-  : defaultDatabasePath
+const databasePath = configuredDatabasePath ? path.resolve(configuredDatabasePath) : defaultDatabasePath
 const jsonServerRouter = jsonServer.router(databasePath)
 const database = jsonServerRouter.db
 const uploadedDraftFileContents = new Map()
@@ -71,55 +55,38 @@ const draftFileUpload = multer({
     files: 1,
   },
 }).single('file')
-const serverPort = Number.parseInt(
-  process.env.PORT || String(DEFAULT_JSON_SERVER_PORT),
-  10,
-)
+const serverPort = Number.parseInt(process.env.PORT || String(DEFAULT_JSON_SERVER_PORT), 10)
 
-const getNextNumericRecordId = (records) =>
+const getNextNumericRecordId = records =>
   records.reduce((largestRecordId, record) => {
     const numericRecordId = Number(record.id)
 
-    return Number.isFinite(numericRecordId)
-      ? Math.max(largestRecordId, numericRecordId)
-      : largestRecordId
+    return Number.isFinite(numericRecordId) ? Math.max(largestRecordId, numericRecordId) : largestRecordId
   }, 0) + 1
 
-const getFileExtension = (fileName) => {
+const getFileExtension = fileName => {
   const extensionSeparatorIndex = fileName.lastIndexOf('.')
 
-  return extensionSeparatorIndex >= 0
-    ? fileName.slice(extensionSeparatorIndex).toLowerCase()
-    : ''
+  return extensionSeparatorIndex >= 0 ? fileName.slice(extensionSeparatorIndex).toLowerCase() : ''
 }
 
-const isDocumentOperation = (operationCandidate) =>
-  operationCandidate === 'signature' || operationCandidate === 'timestamp'
+const isDocumentOperation = operationCandidate => operationCandidate === 'signature' || operationCandidate === 'timestamp'
 
-const getDocumentHistoryFilterValues = (
-  requestedFilterValues,
-  legacyRequestedFilterValue,
-) => {
-  const selectedQueryValue =
-    requestedFilterValues ?? legacyRequestedFilterValue ?? ''
-  const selectedQueryValues = Array.isArray(selectedQueryValue)
-    ? selectedQueryValue
-    : [selectedQueryValue]
+const getDocumentHistoryFilterValues = (requestedFilterValues, legacyRequestedFilterValue) => {
+  const selectedQueryValue = requestedFilterValues ?? legacyRequestedFilterValue ?? ''
+  const selectedQueryValues = Array.isArray(selectedQueryValue) ? selectedQueryValue : [selectedQueryValue]
 
   return [
     ...new Set(
       selectedQueryValues
-        .flatMap((selectedQueryEntry) =>
-          String(selectedQueryEntry).split(','),
-        )
-        .map((selectedFilterValue) => selectedFilterValue.trim())
-        .filter(Boolean),
+        .flatMap(selectedQueryEntry => String(selectedQueryEntry).split(','))
+        .map(selectedFilterValue => selectedFilterValue.trim())
+        .filter(Boolean)
     ),
   ]
 }
 
-const isSupportedDraftFileName = (fileName) =>
-  supportedDraftFileExtensions.has(getFileExtension(fileName))
+const isSupportedDraftFileName = fileName => supportedDraftFileExtensions.has(getFileExtension(fileName))
 
 const createInsufficientCreditsErrorResponse = () => ({
   error: 'INSUFFICIENT_CREDITS',
@@ -133,12 +100,7 @@ const getRequiredDatabaseCollections = () => {
   const draftFiles = database.get('draftFiles').value()
   const timestampJobs = database.get('timestampJobs').value()
 
-  if (
-    !dashboardSummary ||
-    !Array.isArray(archivedDocuments) ||
-    !Array.isArray(draftFiles) ||
-    !Array.isArray(timestampJobs)
-  ) {
+  if (!dashboardSummary || !Array.isArray(archivedDocuments) || !Array.isArray(draftFiles) || !Array.isArray(timestampJobs)) {
     throw new Error('Fake API veritabanı işlem için hazır değil.')
   }
 
@@ -150,13 +112,9 @@ const getRequiredDatabaseCollections = () => {
   }
 }
 
-const getRecentDocuments = (archivedDocuments) =>
+const getRecentDocuments = archivedDocuments =>
   [...archivedDocuments]
-    .sort(
-      (firstDocument, secondDocument) =>
-        new Date(secondDocument.createdAt).getTime() -
-        new Date(firstDocument.createdAt).getTime(),
-    )
+    .sort((firstDocument, secondDocument) => new Date(secondDocument.createdAt).getTime() - new Date(firstDocument.createdAt).getTime())
     .slice(0, RECENT_DOCUMENT_LIMIT)
 
 const createDraftFile = (uploadedFile, intendedOperation) => {
@@ -172,12 +130,7 @@ const createDraftFile = (uploadedFile, intendedOperation) => {
   }
   const updatedDashboardSummary = {
     ...dashboardSummary,
-    storageUsedMb: Number(
-      (
-        dashboardSummary.storageUsedMb +
-        draftFile.fileSize / BYTES_PER_MEGABYTE
-      ).toFixed(2),
-    ),
+    storageUsedMb: Number((dashboardSummary.storageUsedMb + draftFile.fileSize / BYTES_PER_MEGABYTE).toFixed(2)),
   }
 
   database
@@ -195,17 +148,10 @@ const createDraftFile = (uploadedFile, intendedOperation) => {
 }
 
 const createDocumentTransaction = (draftFileId, intendedOperation) => {
-  const {
-    archivedDocuments,
-    dashboardSummary,
-    draftFiles,
-    timestampJobs,
-  } = getRequiredDatabaseCollections()
+  const { archivedDocuments, dashboardSummary, draftFiles, timestampJobs } = getRequiredDatabaseCollections()
   const draftFile = draftFiles.find(
     ({ id, intendedOperation: draftOperation, status }) =>
-      id === draftFileId &&
-      draftOperation === intendedOperation &&
-      status === 'uploaded',
+      id === draftFileId && draftOperation === intendedOperation && status === 'uploaded'
   )
 
   if (!draftFile) {
@@ -233,37 +179,26 @@ const createDocumentTransaction = (draftFileId, intendedOperation) => {
     operation: intendedOperation,
     sizeBytes: draftFile.fileSize,
   }
-  const updatedDraftFiles = draftFiles.map((draftFileRecord) =>
+  const updatedDraftFiles = draftFiles.map(draftFileRecord =>
     draftFileRecord.id === draftFileId
       ? {
           ...draftFileRecord,
           processedAt: transactionDate,
           status: 'processed',
         }
-      : draftFileRecord,
+      : draftFileRecord
   )
-  const updatedArchivedDocuments = [
-    ...archivedDocuments,
-    archivedDocument,
-  ]
+  const updatedArchivedDocuments = [...archivedDocuments, archivedDocument]
   const updatedDashboardSummary = {
     ...dashboardSummary,
-    remainingCredits:
-      dashboardSummary.remainingCredits - DOCUMENT_TRANSACTION_CREDIT_COST,
-    totalSignedDocuments:
-      dashboardSummary.totalSignedDocuments +
-      (intendedOperation === 'signature' ? 1 : 0),
-    totalTimestampedDocuments:
-      dashboardSummary.totalTimestampedDocuments +
-      (intendedOperation === 'timestamp' ? 1 : 0),
+    remainingCredits: dashboardSummary.remainingCredits - DOCUMENT_TRANSACTION_CREDIT_COST,
+    totalSignedDocuments: dashboardSummary.totalSignedDocuments + (intendedOperation === 'signature' ? 1 : 0),
+    totalTimestampedDocuments: dashboardSummary.totalTimestampedDocuments + (intendedOperation === 'timestamp' ? 1 : 0),
   }
   const uploadedDraftFileContent = uploadedDraftFileContents.get(draftFileId)
 
   if (uploadedDraftFileContent) {
-    archivedDocumentContents.set(
-      archivedDocument.id,
-      uploadedDraftFileContent,
-    )
+    archivedDocumentContents.set(archivedDocument.id, uploadedDraftFileContent)
   }
 
   const databaseUpdates = {
@@ -307,11 +242,9 @@ const createDocumentTransaction = (draftFileId, intendedOperation) => {
   }
 }
 
-const deleteDraftFile = (draftFileId) => {
+const deleteDraftFile = draftFileId => {
   const { dashboardSummary, draftFiles } = getRequiredDatabaseCollections()
-  const draftFile = draftFiles.find(
-    ({ id, status }) => id === draftFileId && status === 'uploaded',
-  )
+  const draftFile = draftFiles.find(({ id, status }) => id === draftFileId && status === 'uploaded')
 
   if (!draftFile) {
     return false
@@ -321,15 +254,7 @@ const deleteDraftFile = (draftFileId) => {
     .assign({
       dashboard: {
         ...dashboardSummary,
-        storageUsedMb: Math.max(
-          0,
-          Number(
-            (
-              dashboardSummary.storageUsedMb -
-              draftFile.fileSize / BYTES_PER_MEGABYTE
-            ).toFixed(2),
-          ),
-        ),
+        storageUsedMb: Math.max(0, Number((dashboardSummary.storageUsedMb - draftFile.fileSize / BYTES_PER_MEGABYTE).toFixed(2))),
       },
       draftFiles: draftFiles.filter(({ id }) => id !== draftFileId),
     })
@@ -338,60 +263,33 @@ const deleteDraftFile = (draftFileId) => {
   return true
 }
 
-const deleteArchivedDocument = (documentId) => {
-  const {
-    archivedDocuments,
-    dashboardSummary,
-    draftFiles,
-    timestampJobs,
-  } = getRequiredDatabaseCollections()
+const deleteArchivedDocument = documentId => {
+  const { archivedDocuments, dashboardSummary, draftFiles, timestampJobs } = getRequiredDatabaseCollections()
   const archivedDocument = archivedDocuments.find(({ id }) => id === documentId)
 
   if (!archivedDocument) {
     return null
   }
 
-  const linkedDraftFileId = Number.isSafeInteger(archivedDocument.draftFileId)
-    ? archivedDocument.draftFileId
-    : null
-  const updatedArchivedDocuments = archivedDocuments.filter(
-    ({ id }) => id !== documentId,
-  )
-  const updatedDraftFiles =
-    linkedDraftFileId === null
-      ? draftFiles
-      : draftFiles.filter(({ id }) => id !== linkedDraftFileId)
-  const updatedTimestampJobs = timestampJobs.filter((timestampJob) => {
+  const linkedDraftFileId = Number.isSafeInteger(archivedDocument.draftFileId) ? archivedDocument.draftFileId : null
+  const updatedArchivedDocuments = archivedDocuments.filter(({ id }) => id !== documentId)
+  const updatedDraftFiles = linkedDraftFileId === null ? draftFiles : draftFiles.filter(({ id }) => id !== linkedDraftFileId)
+  const updatedTimestampJobs = timestampJobs.filter(timestampJob => {
     if (archivedDocument.operation !== 'timestamp') {
       return true
     }
 
-    const timestampDocumentId = Number.isSafeInteger(timestampJob.documentId)
-      ? timestampJob.documentId
-      : timestampJob.id
+    const timestampDocumentId = Number.isSafeInteger(timestampJob.documentId) ? timestampJob.documentId : timestampJob.id
 
     return timestampDocumentId !== documentId
   })
   const updatedDashboardSummary = {
     ...dashboardSummary,
-    storageUsedMb: Math.max(
-      0,
-      Number(
-        (
-          dashboardSummary.storageUsedMb -
-          archivedDocument.sizeBytes / BYTES_PER_MEGABYTE
-        ).toFixed(2),
-      ),
-    ),
-    totalSignedDocuments: Math.max(
-      0,
-      dashboardSummary.totalSignedDocuments -
-        (archivedDocument.operation === 'signature' ? 1 : 0),
-    ),
+    storageUsedMb: Math.max(0, Number((dashboardSummary.storageUsedMb - archivedDocument.sizeBytes / BYTES_PER_MEGABYTE).toFixed(2))),
+    totalSignedDocuments: Math.max(0, dashboardSummary.totalSignedDocuments - (archivedDocument.operation === 'signature' ? 1 : 0)),
     totalTimestampedDocuments: Math.max(
       0,
-      dashboardSummary.totalTimestampedDocuments -
-        (archivedDocument.operation === 'timestamp' ? 1 : 0),
+      dashboardSummary.totalTimestampedDocuments - (archivedDocument.operation === 'timestamp' ? 1 : 0)
     ),
   }
 
@@ -420,28 +318,15 @@ jsonServerApplication.use(jsonServer.bodyParser)
 
 jsonServerApplication.get('/document-history', (request, response) => {
   const pageNumber = Number(String(request.query.page || '1'))
-  const pageSize = Math.min(
-    50,
-    Number(String(request.query.pageSize || '10')),
-  )
+  const pageSize = Math.min(50, Number(String(request.query.pageSize || '10')))
   const fileNameSearch = String(request.query.search || '')
     .trim()
     .toLocaleLowerCase('tr-TR')
-  const selectedFileTypes = getDocumentHistoryFilterValues(
-    request.query.fileTypes,
-    request.query.fileType,
-  )
-  const selectedOperations = getDocumentHistoryFilterValues(
-    request.query.operations,
-    request.query.operation,
-  )
+  const selectedFileTypes = getDocumentHistoryFilterValues(request.query.fileTypes, request.query.fileType)
+  const selectedOperations = getDocumentHistoryFilterValues(request.query.operations, request.query.operation)
   const createdFrom = String(request.query.createdFrom || '')
   const createdBefore = String(request.query.createdBefore || '')
-  const hasValidPagination =
-    Number.isSafeInteger(pageNumber) &&
-    pageNumber > 0 &&
-    Number.isSafeInteger(pageSize) &&
-    pageSize > 0
+  const hasValidPagination = Number.isSafeInteger(pageNumber) && pageNumber > 0 && Number.isSafeInteger(pageSize) && pageSize > 0
 
   if (!hasValidPagination) {
     response.status(422).json({
@@ -453,17 +338,11 @@ jsonServerApplication.get('/document-history', (request, response) => {
 
   if (
     fileNameSearch.length > 100 ||
-    selectedOperations.some(
-      (selectedOperation) => !isDocumentOperation(selectedOperation),
-    ) ||
-    selectedFileTypes.some(
-      (selectedFileType) => !documentFileTypeExtensions[selectedFileType],
-    ) ||
+    selectedOperations.some(selectedOperation => !isDocumentOperation(selectedOperation)) ||
+    selectedFileTypes.some(selectedFileType => !documentFileTypeExtensions[selectedFileType]) ||
     (createdFrom && Number.isNaN(Date.parse(createdFrom))) ||
     (createdBefore && Number.isNaN(Date.parse(createdBefore))) ||
-    (createdFrom &&
-      createdBefore &&
-      Date.parse(createdBefore) <= Date.parse(createdFrom))
+    (createdFrom && createdBefore && Date.parse(createdBefore) <= Date.parse(createdFrom))
   ) {
     response.status(422).json({
       error: 'INVALID_DOCUMENT_HISTORY_FILTER',
@@ -472,47 +351,32 @@ jsonServerApplication.get('/document-history', (request, response) => {
     return
   }
 
-  const selectedFileExtensions = [
-    ...new Set(
-      selectedFileTypes.flatMap(
-        (selectedFileType) => documentFileTypeExtensions[selectedFileType],
-      ),
-    ),
-  ]
+  const selectedFileExtensions = [...new Set(selectedFileTypes.flatMap(selectedFileType => documentFileTypeExtensions[selectedFileType]))]
   const filteredDocuments = database
     .get('documents')
     .value()
-    .filter((archivedDocument) => {
+    .filter(archivedDocument => {
       const normalizedFileName = archivedDocument.name.toLocaleLowerCase('tr-TR')
       const documentCreationTime = Date.parse(archivedDocument.createdAt)
 
       return (
         (!archivedDocument.status || archivedDocument.status === 'completed') &&
         (!fileNameSearch || normalizedFileName.includes(fileNameSearch)) &&
-        (selectedOperations.length === 0 ||
-          selectedOperations.includes(archivedDocument.operation)) &&
-        (selectedFileTypes.length === 0 ||
-          selectedFileExtensions.some((fileExtension) =>
-            normalizedFileName.endsWith(fileExtension),
-          )) &&
+        (selectedOperations.length === 0 || selectedOperations.includes(archivedDocument.operation)) &&
+        (selectedFileTypes.length === 0 || selectedFileExtensions.some(fileExtension => normalizedFileName.endsWith(fileExtension))) &&
         (!createdFrom || documentCreationTime >= Date.parse(createdFrom)) &&
         (!createdBefore || documentCreationTime < Date.parse(createdBefore))
       )
     })
     .sort(
       (firstDocument, secondDocument) =>
-        new Date(secondDocument.createdAt).getTime() -
-          new Date(firstDocument.createdAt).getTime() ||
-        secondDocument.id - firstDocument.id,
+        new Date(secondDocument.createdAt).getTime() - new Date(firstDocument.createdAt).getTime() || secondDocument.id - firstDocument.id
     )
   const totalDocumentCount = filteredDocuments.length
   const documentOffset = (pageNumber - 1) * pageSize
 
   response.json({
-    items: filteredDocuments.slice(
-      documentOffset,
-      documentOffset + pageSize,
-    ),
+    items: filteredDocuments.slice(documentOffset, documentOffset + pageSize),
     pagination: {
       currentPage: pageNumber,
       pageSize,
@@ -533,27 +397,19 @@ jsonServerApplication.get('/draft-files', (request, response) => {
     return
   }
 
-  const draftFiles = database
-    .get('draftFiles')
-    .filter({ intendedOperation, status: 'uploaded' })
-    .orderBy(['createdAt'], ['desc'])
-    .value()
+  const draftFiles = database.get('draftFiles').filter({ intendedOperation, status: 'uploaded' }).orderBy(['createdAt'], ['desc']).value()
 
   response.json(draftFiles)
 })
 
 jsonServerApplication.post('/draft-files', (request, response) => {
-  draftFileUpload(request, response, (fileUploadError) => {
+  draftFileUpload(request, response, fileUploadError => {
     if (fileUploadError) {
       const isFileTooLarge = fileUploadError.code === 'LIMIT_FILE_SIZE'
 
       response.status(isFileTooLarge ? 413 : 400).json({
-        error: isFileTooLarge
-          ? 'DRAFT_FILE_TOO_LARGE'
-          : 'INVALID_DRAFT_FILE_UPLOAD',
-        message: isFileTooLarge
-          ? 'Dosya boyutu 25 MB sınırını aşamaz.'
-          : 'Yüklenecek dosya okunamadı.',
+        error: isFileTooLarge ? 'DRAFT_FILE_TOO_LARGE' : 'INVALID_DRAFT_FILE_UPLOAD',
+        message: isFileTooLarge ? 'Dosya boyutu 25 MB sınırını aşamaz.' : 'Yüklenecek dosya okunamadı.',
       })
       return
     }
@@ -580,8 +436,7 @@ jsonServerApplication.post('/draft-files', (request, response) => {
     if (!isSupportedDraftFileName(uploadedFile.originalname)) {
       response.status(415).json({
         error: 'UNSUPPORTED_DRAFT_FILE_TYPE',
-        message:
-          'Yalnızca PDF, Word, XML, UBL ve görsel dosyalarına izin verilir.',
+        message: 'Yalnızca PDF, Word, XML, UBL ve görsel dosyalarına izin verilir.',
       })
       return
     }
@@ -591,10 +446,7 @@ jsonServerApplication.post('/draft-files', (request, response) => {
     } catch (draftFileCreationError) {
       response.status(500).json({
         error: 'DRAFT_FILE_UPLOAD_FAILED',
-        message:
-          draftFileCreationError instanceof Error
-            ? draftFileCreationError.message
-            : 'Dosya yükleme işlemi tamamlanamadı.',
+        message: draftFileCreationError instanceof Error ? draftFileCreationError.message : 'Dosya yükleme işlemi tamamlanamadı.',
       })
     }
   })
@@ -626,8 +478,7 @@ jsonServerApplication.post('/signature-transactions', (request, response) => {
   }
 
   try {
-    const { errorResponse, transactionResponse } =
-      createDocumentTransaction(draftFileId, 'signature')
+    const { errorResponse, transactionResponse } = createDocumentTransaction(draftFileId, 'signature')
 
     if (errorResponse) {
       response.status(errorResponse.statusCode).json({
@@ -641,10 +492,7 @@ jsonServerApplication.post('/signature-transactions', (request, response) => {
   } catch (transactionError) {
     response.status(500).json({
       error: 'SIGNATURE_TRANSACTION_FAILED',
-      message:
-        transactionError instanceof Error
-          ? transactionError.message
-          : 'İmzalama işlemi tamamlanamadı.',
+      message: transactionError instanceof Error ? transactionError.message : 'İmzalama işlemi tamamlanamadı.',
     })
   }
 })
@@ -661,8 +509,7 @@ jsonServerApplication.post('/timestamp-transactions', (request, response) => {
   }
 
   try {
-    const { errorResponse, transactionResponse } =
-      createDocumentTransaction(draftFileId, 'timestamp')
+    const { errorResponse, transactionResponse } = createDocumentTransaction(draftFileId, 'timestamp')
 
     if (errorResponse) {
       response.status(errorResponse.statusCode).json({
@@ -676,20 +523,14 @@ jsonServerApplication.post('/timestamp-transactions', (request, response) => {
   } catch (transactionError) {
     response.status(500).json({
       error: 'TIMESTAMP_TRANSACTION_FAILED',
-      message:
-        transactionError instanceof Error
-          ? transactionError.message
-          : 'Zaman damgalama işlemi tamamlanamadı.',
+      message: transactionError instanceof Error ? transactionError.message : 'Zaman damgalama işlemi tamamlanamadı.',
     })
   }
 })
 
 jsonServerApplication.get('/documents/:documentId/download', (request, response) => {
   const documentId = Number.parseInt(request.params.documentId, 10)
-  const archivedDocument = database
-    .get('documents')
-    .find({ id: documentId })
-    .value()
+  const archivedDocument = database.get('documents').find({ id: documentId }).value()
 
   if (!archivedDocument) {
     response.status(404).json({
@@ -700,24 +541,19 @@ jsonServerApplication.get('/documents/:documentId/download', (request, response)
   }
 
   const archivedDocumentContent = archivedDocumentContents.get(documentId)
-  const documentContent =
-    archivedDocumentContent?.content ??
-    Buffer.from(`İzİmza fake arşiv kaydı: ${archivedDocument.name}`, 'utf8')
+  const documentContent = archivedDocumentContent?.content ?? Buffer.from(`İzİmza fake arşiv kaydı: ${archivedDocument.name}`, 'utf8')
 
   response.set({
     'Cache-Control': 'private, no-store',
     'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(archivedDocument.name)}`,
-    'Content-Type':
-      archivedDocumentContent?.mimeType || 'text/plain; charset=utf-8',
+    'Content-Type': archivedDocumentContent?.mimeType || 'text/plain; charset=utf-8',
   })
   response.send(documentContent)
 })
 
 jsonServerApplication.delete('/documents/:documentId', (request, response) => {
   const documentId = Number.parseInt(request.params.documentId, 10)
-  const archivedDocumentDeletionResponse = Number.isSafeInteger(documentId)
-    ? deleteArchivedDocument(documentId)
-    : null
+  const archivedDocumentDeletionResponse = Number.isSafeInteger(documentId) ? deleteArchivedDocument(documentId) : null
 
   if (!archivedDocumentDeletionResponse) {
     response.status(404).json({
@@ -733,7 +569,5 @@ jsonServerApplication.delete('/documents/:documentId', (request, response) => {
 jsonServerApplication.use(jsonServerRouter)
 
 jsonServerApplication.listen(serverPort, () => {
-  console.log(
-    `İzİmza fake API ${serverPort} portunda ${databasePath} verisini kullanıyor.`,
-  )
+  console.log(`İzİmza fake API ${serverPort} portunda ${databasePath} verisini kullanıyor.`)
 })

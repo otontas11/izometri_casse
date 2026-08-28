@@ -1,7 +1,6 @@
 <template>
-  <section
-    class="profile-password-reset-panel"
-    aria-labelledby="profile-password-reset-panel-title"
+  <section class="profile-password-reset-panel"
+           aria-labelledby="profile-password-reset-panel-title"
   >
     <span class="profile-password-reset-panel__icon" aria-hidden="true">
       <AppIcon name="mail" :size="22" />
@@ -21,16 +20,14 @@
       </p>
     </div>
 
-    <button
-      type="button"
-      :disabled="isRequesting"
-      :aria-busy="isRequesting"
-      @click="emit('request')"
+    <button type="button"
+            :disabled="isRequesting"
+            :aria-busy="isRequesting"
+            @click="emit('request')"
     >
-      <span
-        v-if="isRequesting"
-        class="profile-password-reset-panel__spinner"
-        aria-hidden="true"
+      <span v-if="isRequesting"
+            class="profile-password-reset-panel__spinner"
+            aria-hidden="true"
       ></span>
       <AppIcon v-else name="mail" :size="18" />
       {{

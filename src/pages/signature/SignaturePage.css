@@ -97,8 +97,7 @@
 }
 
 .signature-page__transaction-summary--insufficient > span,
-.signature-page__transaction-summary--insufficient
-  .signature-page__available-credits {
+.signature-page__transaction-summary--insufficient .signature-page__available-credits {
   color: var(--color-danger);
 }
 

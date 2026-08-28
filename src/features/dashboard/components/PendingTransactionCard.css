@@ -8,11 +8,7 @@
   padding: 0.7rem 0.8rem;
   color: inherit;
   text-decoration: none;
-  background: linear-gradient(
-    135deg,
-    var(--color-surface-raised) 35%,
-    #fff3cf 145%
-  );
+  background: linear-gradient(135deg, var(--color-surface-raised) 35%, #fff3cf 145%);
   border: 1px solid #f6d991;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);

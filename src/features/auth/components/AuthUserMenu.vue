@@ -7,10 +7,10 @@
     <button ref="userMenuTriggerElement"
             :aria-expanded="isUserMenuOpen"
             :aria-label="
-        isUserMenuOpen
-          ? t('auth.userMenu.closeAriaLabel')
-          : t('auth.userMenu.openAriaLabel')
-      "
+              isUserMenuOpen
+                ? t('auth.userMenu.closeAriaLabel')
+                : t('auth.userMenu.openAriaLabel')
+            "
             aria-controls="authenticated-user-popover"
             class="auth-user-menu__trigger"
             type="button"
@@ -33,7 +33,9 @@
     >
       <div class="auth-user-menu__identity">
         <strong>{{ authenticatedUserDisplayName }}</strong>
-        <small v-if="authenticatedUserEmail">{{ authenticatedUserEmail }}</small>
+        <small v-if="authenticatedUserEmail">{{
+          authenticatedUserEmail
+        }}</small>
       </div>
 
       <RouterLink :to="{ name: 'profile' }" @click="closeUserMenu">
@@ -47,54 +49,54 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue'
-import {useAuth0} from '@auth0/auth0-vue'
-import {RouterLink} from 'vue-router'
-import {useI18n} from 'vue-i18n'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useAuth0 } from '@auth0/auth0-vue'
+import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
-import {auth0Config} from '@/config/auth0.config'
-import {getApplicationLocaleCode} from '@/locales'
+import { auth0Config } from '@/config/auth0.config'
+import { getApplicationLocaleCode } from '@/locales'
 
-const {logout: logoutFromAuth0, user: authenticatedUser} = useAuth0()
+const { logout: logoutFromAuth0, user: authenticatedUser } = useAuth0()
 const isUserMenuOpen = ref(false)
 const userMenuElement = ref<HTMLElement | null>(null)
 const userMenuTriggerElement = ref<HTMLButtonElement | null>(null)
 const userMenuPopoverElement = ref<HTMLElement | null>(null)
 const hasAuthenticatedUserPictureError = ref(false)
-const {t} = useI18n({useScope: 'global'})
+const { t } = useI18n({ useScope: 'global' })
 
 const authenticatedUserDisplayName = computed(
-    () =>
-        authenticatedUser.value?.name ||
-        authenticatedUser.value?.nickname ||
-        authenticatedUser.value?.email ||
-        t('auth.userMenu.fallbackName'),
+  () =>
+    authenticatedUser.value?.name ||
+    authenticatedUser.value?.nickname ||
+    authenticatedUser.value?.email ||
+    t('auth.userMenu.fallbackName'),
 )
 const authenticatedUserEmail = computed(
-    () => authenticatedUser.value?.email ?? '',
+  () => authenticatedUser.value?.email ?? '',
 )
 const authenticatedUserPicture = computed(
-    () => authenticatedUser.value?.picture ?? '',
+  () => authenticatedUser.value?.picture ?? '',
 )
 const shouldDisplayAuthenticatedUserPicture = computed(
-    () =>
-        Boolean(authenticatedUserPicture.value) &&
-        !hasAuthenticatedUserPictureError.value,
+  () =>
+    Boolean(authenticatedUserPicture.value) &&
+    !hasAuthenticatedUserPictureError.value,
 )
 const authenticatedUserInitials = computed(() => {
   const displayNameWords = authenticatedUserDisplayName.value
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
 
   if (displayNameWords.length === 0) {
     return 'İZ'
   }
 
   return displayNameWords
-      .slice(0, 2)
-      .map((word) => word.charAt(0).toLocaleUpperCase(getApplicationLocaleCode()))
-      .join('')
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toLocaleUpperCase(getApplicationLocaleCode()))
+    .join('')
 })
 
 const closeUserMenu = () => {
@@ -115,8 +117,8 @@ const openUserMenuAndFocusFirstAction = async () => {
   isUserMenuOpen.value = true
   await nextTick()
   userMenuPopoverElement.value
-      ?.querySelector<HTMLElement>('a[href], button:not(:disabled)')
-      ?.focus()
+    ?.querySelector<HTMLElement>('a[href], button:not(:disabled)')
+    ?.focus()
 }
 
 const handleUserMenuTriggerKeydown = (keyboardEvent: KeyboardEvent) => {
@@ -130,8 +132,8 @@ const handleUserMenuFocusOut = (focusEvent: FocusEvent) => {
   const nextFocusedElement = focusEvent.relatedTarget
 
   if (
-      !(nextFocusedElement instanceof Node) ||
-      !userMenuElement.value?.contains(nextFocusedElement)
+    !(nextFocusedElement instanceof Node) ||
+    !userMenuElement.value?.contains(nextFocusedElement)
   ) {
     closeUserMenu()
   }
@@ -139,8 +141,8 @@ const handleUserMenuFocusOut = (focusEvent: FocusEvent) => {
 
 const handleOutsidePointerDown = (pointerEvent: PointerEvent) => {
   if (
-      pointerEvent.target instanceof Node &&
-      !userMenuElement.value?.contains(pointerEvent.target)
+    pointerEvent.target instanceof Node &&
+    !userMenuElement.value?.contains(pointerEvent.target)
   ) {
     closeUserMenu()
   }
@@ -160,10 +162,10 @@ watch(authenticatedUserPicture, () => {
 })
 
 onMounted(() =>
-    document.addEventListener('pointerdown', handleOutsidePointerDown),
+  document.addEventListener('pointerdown', handleOutsidePointerDown),
 )
 onBeforeUnmount(() =>
-    document.removeEventListener('pointerdown', handleOutsidePointerDown),
+  document.removeEventListener('pointerdown', handleOutsidePointerDown),
 )
 </script>
 

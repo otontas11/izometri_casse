@@ -1,42 +1,38 @@
 <template>
-  <section
-    class="signature-file-workspace"
-    aria-labelledby="signature-file-workspace-title"
+  <section class="signature-file-workspace"
+           aria-labelledby="signature-file-workspace-title"
   >
-    <div
-      :class="[
-        'signature-file-workspace__drop-area',
-        {
-          'signature-file-workspace__drop-area--dragging':
-            isFileDraggedOver,
-          'signature-file-workspace__drop-area--disabled': isBusy,
-        },
-      ]"
-      role="button"
-      :tabindex="isBusy ? -1 : 0"
-      :aria-disabled="isBusy"
-      :aria-describedby="signatureFileInputDescriptionIds"
-      @click="openFilePicker"
-      @keydown.enter.prevent="openFilePicker"
-      @keydown.space.prevent="openFilePicker"
-      @dragenter.prevent="handleFileDragOver"
-      @dragover.prevent="handleFileDragOver"
-      @dragleave.prevent="handleFileDragLeave"
-      @drop.prevent="handleFileDrop"
+    <div :class="[
+           'signature-file-workspace__drop-area',
+           {
+             'signature-file-workspace__drop-area--dragging': isFileDraggedOver,
+             'signature-file-workspace__drop-area--disabled': isBusy,
+           },
+         ]"
+         role="button"
+         :tabindex="isBusy ? -1 : 0"
+         :aria-disabled="isBusy"
+         :aria-describedby="signatureFileInputDescriptionIds"
+         @click="openFilePicker"
+         @keydown.enter.prevent="openFilePicker"
+         @keydown.space.prevent="openFilePicker"
+         @dragenter.prevent="handleFileDragOver"
+         @dragover.prevent="handleFileDragOver"
+         @dragleave.prevent="handleFileDragLeave"
+         @drop.prevent="handleFileDrop"
     >
-      <input
-        id="signature-file-workspace-input"
-        ref="fileInputElement"
-        class="visually-hidden"
-        type="file"
-        multiple
-        tabindex="-1"
-        :accept="DRAFT_FILE_INPUT_ACCEPT"
-        :disabled="isBusy"
-        :aria-label="t('signature.workspace.inputAriaLabel')"
-        :aria-describedby="signatureFileInputDescriptionIds"
-        :aria-invalid="fileValidationErrorMessage ? 'true' : undefined"
-        @change="handleFileInputChange"
+      <input id="signature-file-workspace-input"
+             ref="fileInputElement"
+             class="visually-hidden"
+             type="file"
+             multiple
+             tabindex="-1"
+             :accept="DRAFT_FILE_INPUT_ACCEPT"
+             :disabled="isBusy"
+             :aria-label="t('signature.workspace.inputAriaLabel')"
+             :aria-describedby="signatureFileInputDescriptionIds"
+             :aria-invalid="fileValidationErrorMessage ? 'true' : undefined"
+             @change="handleFileInputChange"
       />
 
       <span class="signature-file-workspace__upload-icon" aria-hidden="true">
@@ -62,20 +58,18 @@
       </small>
     </div>
 
-    <p
-      v-if="fileValidationErrorMessage"
-      id="signature-file-workspace-validation-error"
-      class="signature-file-workspace__validation-message"
-      role="alert"
+    <p v-if="fileValidationErrorMessage"
+       id="signature-file-workspace-validation-error"
+       class="signature-file-workspace__validation-message"
+       role="alert"
     >
       <span aria-hidden="true">!</span>
       {{ fileValidationErrorMessage }}
     </p>
 
-    <section
-      v-if="signatureFiles.length > 0"
-      class="signature-file-workspace__file-list-section"
-      aria-labelledby="signature-file-workspace-list-title"
+    <section v-if="signatureFiles.length > 0"
+             class="signature-file-workspace__file-list-section"
+             aria-labelledby="signature-file-workspace-list-title"
     >
       <header class="signature-file-workspace__file-list-header">
         <div>
@@ -94,18 +88,16 @@
       </header>
 
       <ul class="signature-file-workspace__file-list">
-        <li
-          v-for="signatureFileItem in signatureFiles"
-          :key="signatureFileItem.id"
-          :class="[
-            'signature-file-workspace__file-card',
-            `signature-file-workspace__file-card--${signatureFileItem.status}`,
-          ]"
+        <li v-for="signatureFileItem in signatureFiles"
+            :key="signatureFileItem.id"
+            :class="[
+              'signature-file-workspace__file-card',
+              `signature-file-workspace__file-card--${signatureFileItem.status}`,
+            ]"
         >
           <div class="signature-file-workspace__file-card-header">
-            <span
-              class="signature-file-workspace__file-type-icon"
-              aria-hidden="true"
+            <span class="signature-file-workspace__file-type-icon"
+                  aria-hidden="true"
             >
               <AppIcon name="document" :size="21" />
             </span>
@@ -117,24 +109,22 @@
               <small>{{ formatFileSize(signatureFileItem.fileSize) }}</small>
             </div>
 
-            <span
-              :class="[
-                'signature-file-workspace__status-badge',
-                `signature-file-workspace__status-badge--${signatureFileItem.status}`,
-              ]"
+            <span :class="[
+              'signature-file-workspace__status-badge',
+              `signature-file-workspace__status-badge--${signatureFileItem.status}`,
+            ]"
             >
               {{ getSignatureFileStatusLabel(signatureFileItem.status) }}
             </span>
 
-            <button
-              type="button"
-              :disabled="isBusy"
-              :aria-label="
-                t('signature.workspace.removeAriaLabel', {
-                  fileName: signatureFileItem.fileName,
-                })
-              "
-              @click="emit('remove-file', signatureFileItem.id)"
+            <button type="button"
+                    :disabled="isBusy"
+                    :aria-label="
+                      t('signature.workspace.removeAriaLabel', {
+                        fileName: signatureFileItem.fileName,
+                      })
+                    "
+                    @click="emit('remove-file', signatureFileItem.id)"
             >
               <AppIcon name="trash" :size="18" />
             </button>
@@ -146,29 +136,26 @@
             </span>
             <strong>{{ signatureFileItem.progressPercentage }}%</strong>
           </div>
-          <div
-            class="signature-file-workspace__progress-track"
-            role="progressbar"
-            :aria-label="
-              t('signature.workspace.progressAriaLabel', {
-                fileName: signatureFileItem.fileName,
-              })
-            "
-            aria-valuemin="0"
-            aria-valuemax="100"
-            :aria-valuenow="signatureFileItem.progressPercentage"
+          <div class="signature-file-workspace__progress-track"
+               role="progressbar"
+               :aria-label="
+                 t('signature.workspace.progressAriaLabel', {
+                   fileName: signatureFileItem.fileName,
+                 })
+               "
+               aria-valuemin="0"
+               aria-valuemax="100"
+               :aria-valuenow="signatureFileItem.progressPercentage"
           >
-            <span
-              :style="{
-                width: `${signatureFileItem.progressPercentage}%`,
-              }"
+            <span :style="{
+              width: `${signatureFileItem.progressPercentage}%`,
+            }"
             ></span>
           </div>
 
-          <p
-            v-if="signatureFileItem.errorMessage"
-            class="signature-file-workspace__file-error"
-            role="alert"
+          <p v-if="signatureFileItem.errorMessage"
+             class="signature-file-workspace__file-error"
+             role="alert"
           >
             {{ signatureFileItem.errorMessage }}
           </p>
@@ -176,33 +163,30 @@
       </ul>
     </section>
 
-    <div
-      :class="[
-        'signature-file-workspace__actions',
-        {
-          'signature-file-workspace__actions--with-retry':
-            hasSignatureUploadError,
-        },
-      ]"
+    <div :class="[
+      'signature-file-workspace__actions',
+      {
+        'signature-file-workspace__actions--with-retry':
+          hasSignatureUploadError,
+      },
+    ]"
     >
-      <button
-        v-if="hasSignatureUploadError"
-        class="signature-file-workspace__upload-button"
-        type="button"
-        :disabled="isBusy"
-        :aria-busy="isBusy"
-        @click="emit('request-upload')"
+      <button v-if="hasSignatureUploadError"
+              class="signature-file-workspace__upload-button"
+              type="button"
+              :disabled="isBusy"
+              :aria-busy="isBusy"
+              @click="emit('request-upload')"
       >
         <AppIcon name="refresh" :size="21" />
         {{ t('signature.workspace.retryUpload') }}
       </button>
 
-      <button
-        class="signature-file-workspace__submit-button"
-        type="button"
-        :disabled="!canProcess || isBusy"
-        :aria-busy="isBusy"
-        @click="emit('request-signature')"
+      <button class="signature-file-workspace__submit-button"
+              type="button"
+              :disabled="!canProcess || isBusy"
+              :aria-busy="isBusy"
+              @click="emit('request-signature')"
       >
         <AppIcon name="signature" :size="21" />
         {{ t('signature.workspace.signFiles') }}

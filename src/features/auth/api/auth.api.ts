@@ -17,17 +17,13 @@ const requestAuth0PasswordResetEmail = async (emailAddress: string) => {
   }
 
   try {
-    await axios.post<string>(
-      `https://${auth0Config.domain}/dbconnections/change_password`,
-      passwordResetRequest,
-      {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        timeout: 10_000,
+    await axios.post<string>(`https://${auth0Config.domain}/dbconnections/change_password`, passwordResetRequest, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
-    )
+      timeout: 10_000,
+    })
   } catch (requestError) {
     throw toApiRequestError(requestError)
   }

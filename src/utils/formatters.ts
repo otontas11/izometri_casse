@@ -8,12 +8,8 @@ export const formatFileSize = (fileSizeInBytes: number) => {
     return '0 B'
   }
 
-  const fileSizeUnitIndex = Math.min(
-    Math.floor(Math.log(fileSizeInBytes) / Math.log(FILE_SIZE_UNIT_BASE)),
-    fileSizeUnits.length - 1,
-  )
-  const normalizedFileSize =
-    fileSizeInBytes / FILE_SIZE_UNIT_BASE ** fileSizeUnitIndex
+  const fileSizeUnitIndex = Math.min(Math.floor(Math.log(fileSizeInBytes) / Math.log(FILE_SIZE_UNIT_BASE)), fileSizeUnits.length - 1)
+  const normalizedFileSize = fileSizeInBytes / FILE_SIZE_UNIT_BASE ** fileSizeUnitIndex
 
   const localizedFileSize = new Intl.NumberFormat(getApplicationLocaleCode(), {
     maximumFractionDigits: 1,

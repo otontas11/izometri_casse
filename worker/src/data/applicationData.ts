@@ -24,21 +24,7 @@ const DEFAULT_STORAGE_LIMIT_BYTES = 1024 * BYTES_PER_MEGABYTE
 const documentFileTypeExtensions: Record<DocumentFileTypeFilter, string[]> = {
   excel: ['.xls', '.xlsx'],
   eyp: ['.eyp'],
-  image: [
-    '.avif',
-    '.bmp',
-    '.gif',
-    '.heic',
-    '.heif',
-    '.ico',
-    '.jpeg',
-    '.jpg',
-    '.png',
-    '.svg',
-    '.tif',
-    '.tiff',
-    '.webp',
-  ],
+  image: ['.avif', '.bmp', '.gif', '.heic', '.heif', '.ico', '.jpeg', '.jpg', '.png', '.svg', '.tif', '.tiff', '.webp'],
   office: ['.docx', '.xlsx', '.pptx'],
   pdf: ['.pdf'],
   text: ['.txt'],
@@ -47,9 +33,7 @@ const documentFileTypeExtensions: Record<DocumentFileTypeFilter, string[]> = {
   xml: ['.xml', '.ubl'],
 }
 
-const mapProfileDatabaseRecord = (
-  profileRecord: ProfileDatabaseRecord,
-): UserProfile => ({
+const mapProfileDatabaseRecord = (profileRecord: ProfileDatabaseRecord): UserProfile => ({
   avatarUrl: profileRecord.avatar_url,
   email: profileRecord.email,
   firstName: profileRecord.first_name,
@@ -58,9 +42,7 @@ const mapProfileDatabaseRecord = (
   phone: profileRecord.phone,
 })
 
-export const mapArchivedDocument = (
-  documentRecord: DocumentDatabaseRecord,
-): ArchivedDocument => ({
+export const mapArchivedDocument = (documentRecord: DocumentDatabaseRecord): ArchivedDocument => ({
   createdAt: documentRecord.created_at,
   id: documentRecord.id,
   name: documentRecord.file_name,
@@ -68,9 +50,7 @@ export const mapArchivedDocument = (
   sizeBytes: documentRecord.file_size,
 })
 
-export const mapTimestampJob = (
-  documentRecord: DocumentDatabaseRecord,
-): TimestampJob => ({
+export const mapTimestampJob = (documentRecord: DocumentDatabaseRecord): TimestampJob => ({
   completedAt: documentRecord.completed_at,
   createdAt: documentRecord.created_at,
   creditCost: documentRecord.credit_cost,
@@ -81,9 +61,7 @@ export const mapTimestampJob = (
   status: documentRecord.status,
 })
 
-export const mapDraftFile = (
-  draftFileRecord: DraftFileDatabaseRecord,
-): DraftFile => ({
+export const mapDraftFile = (draftFileRecord: DraftFileDatabaseRecord): DraftFile => ({
   createdAt: draftFileRecord.created_at,
   fileName: draftFileRecord.file_name,
   fileSize: draftFileRecord.file_size,
@@ -93,10 +71,7 @@ export const mapDraftFile = (
   status: draftFileRecord.status,
 })
 
-export const ensureAuthenticatedUserProfile = async (
-  database: D1Database,
-  authenticatedUser: AuthenticatedUser,
-) => {
+export const ensureAuthenticatedUserProfile = async (database: D1Database, authenticatedUser: AuthenticatedUser) => {
   const profileCreationDate = new Date().toISOString()
 
   await database
@@ -112,7 +87,7 @@ export const ensureAuthenticatedUserProfile = async (
         storage_limit_bytes,
         created_at,
         updated_at
-      ) VALUES (?, ?, ?, ?, '', NULL, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, '', NULL, ?, ?, ?, ?)`
     )
     .bind(
       authenticatedUser.userId,
@@ -122,15 +97,12 @@ export const ensureAuthenticatedUserProfile = async (
       DEFAULT_REMAINING_CREDITS,
       DEFAULT_STORAGE_LIMIT_BYTES,
       profileCreationDate,
-      profileCreationDate,
+      profileCreationDate
     )
     .run()
 }
 
-export const fetchUserProfile = async (
-  database: D1Database,
-  authenticatedUserId: string,
-) => {
+export const fetchUserProfile = async (database: D1Database, authenticatedUserId: string) => {
   const profileRecord = await database
     .prepare(
       `SELECT
@@ -143,49 +115,32 @@ export const fetchUserProfile = async (
         remaining_credits,
         storage_limit_bytes
       FROM profiles
-      WHERE auth0_user_id = ?`,
+      WHERE auth0_user_id = ?`
     )
     .bind(authenticatedUserId)
     .first<ProfileDatabaseRecord>()
 
   if (!profileRecord) {
-    throw new WorkerApiError(
-      404,
-      'PROFILE_NOT_FOUND',
-      'Kullanıcı profili bulunamadı.',
-    )
+    throw new WorkerApiError(404, 'PROFILE_NOT_FOUND', 'Kullanıcı profili bulunamadı.')
   }
 
   return mapProfileDatabaseRecord(profileRecord)
 }
 
-export const updateUserProfile = async (
-  database: D1Database,
-  authenticatedUserId: string,
-  profileUpdates: UpdateProfilePayload,
-) => {
+export const updateUserProfile = async (database: D1Database, authenticatedUserId: string, profileUpdates: UpdateProfilePayload) => {
   await database
     .prepare(
       `UPDATE profiles
       SET first_name = ?, last_name = ?, phone = ?, updated_at = ?
-      WHERE auth0_user_id = ?`,
+      WHERE auth0_user_id = ?`
     )
-    .bind(
-      profileUpdates.firstName,
-      profileUpdates.lastName,
-      profileUpdates.phone,
-      new Date().toISOString(),
-      authenticatedUserId,
-    )
+    .bind(profileUpdates.firstName, profileUpdates.lastName, profileUpdates.phone, new Date().toISOString(), authenticatedUserId)
     .run()
 
   return fetchUserProfile(database, authenticatedUserId)
 }
 
-export const fetchDashboardSummary = async (
-  database: D1Database,
-  authenticatedUserId: string,
-): Promise<DashboardSummary> => {
+export const fetchDashboardSummary = async (database: D1Database, authenticatedUserId: string): Promise<DashboardSummary> => {
   const dashboardRecord = await database
     .prepare(
       `SELECT
@@ -217,30 +172,21 @@ export const fetchDashboardSummary = async (
         ) AS storage_used_bytes
       FROM profiles
       WHERE profiles.auth0_user_id = ?
-      `,
+      `
     )
     .bind(authenticatedUserId)
     .first<DashboardDatabaseRecord>()
 
   if (!dashboardRecord) {
-    throw new WorkerApiError(
-      404,
-      'DASHBOARD_NOT_FOUND',
-      'Dashboard bilgileri bulunamadı.',
-    )
+    throw new WorkerApiError(404, 'DASHBOARD_NOT_FOUND', 'Dashboard bilgileri bulunamadı.')
   }
 
   return {
     remainingCredits: dashboardRecord.remaining_credits,
-    storageLimitMb: Number(
-      (dashboardRecord.storage_limit_bytes / BYTES_PER_MEGABYTE).toFixed(2),
-    ),
-    storageUsedMb: Number(
-      (dashboardRecord.storage_used_bytes / BYTES_PER_MEGABYTE).toFixed(2),
-    ),
+    storageLimitMb: Number((dashboardRecord.storage_limit_bytes / BYTES_PER_MEGABYTE).toFixed(2)),
+    storageUsedMb: Number((dashboardRecord.storage_used_bytes / BYTES_PER_MEGABYTE).toFixed(2)),
     totalSignedDocuments: dashboardRecord.signed_document_count,
-    totalTimestampedDocuments:
-      dashboardRecord.timestamped_document_count,
+    totalTimestampedDocuments: dashboardRecord.timestamped_document_count,
   }
 }
 
@@ -248,7 +194,7 @@ export const fetchRecentDocuments = async (
   database: D1Database,
   authenticatedUserId: string,
   documentLimit: number,
-  documentOperation?: DocumentOperation,
+  documentOperation?: DocumentOperation
 ) => {
   const recentDocumentsStatement = documentOperation
     ? database
@@ -257,7 +203,7 @@ export const fetchRecentDocuments = async (
           FROM documents
           WHERE auth0_user_id = ? AND operation = ?
           ORDER BY created_at DESC
-          LIMIT ?`,
+          LIMIT ?`
         )
         .bind(authenticatedUserId, documentOperation, documentLimit)
     : database
@@ -266,11 +212,10 @@ export const fetchRecentDocuments = async (
           FROM documents
           WHERE auth0_user_id = ?
           ORDER BY created_at DESC
-          LIMIT ?`,
+          LIMIT ?`
         )
         .bind(authenticatedUserId, documentLimit)
-  const { results: documentRecords } =
-    await recentDocumentsStatement.all<DocumentDatabaseRecord>()
+  const { results: documentRecords } = await recentDocumentsStatement.all<DocumentDatabaseRecord>()
 
   return documentRecords.map(mapArchivedDocument)
 }
@@ -278,12 +223,9 @@ export const fetchRecentDocuments = async (
 export const fetchDocumentHistory = async (
   database: D1Database,
   authenticatedUserId: string,
-  documentHistoryRequest: DocumentHistoryRequest,
+  documentHistoryRequest: DocumentHistoryRequest
 ): Promise<DocumentHistoryResponse> => {
-  const documentConditions = [
-    'auth0_user_id = ?',
-    "status = 'completed'",
-  ]
+  const documentConditions = ['auth0_user_id = ?', "status = 'completed'"]
   const conditionBindings: unknown[] = [authenticatedUserId]
 
   if (documentHistoryRequest.fileNameSearch) {
@@ -302,43 +244,29 @@ export const fetchDocumentHistory = async (
   }
 
   if (documentHistoryRequest.operations?.length) {
-    const operationPlaceholders = documentHistoryRequest.operations.map(
-      () => '?',
-    )
+    const operationPlaceholders = documentHistoryRequest.operations.map(() => '?')
 
-    documentConditions.push(
-      `operation IN (${operationPlaceholders.join(', ')})`,
-    )
+    documentConditions.push(`operation IN (${operationPlaceholders.join(', ')})`)
     conditionBindings.push(...documentHistoryRequest.operations)
   }
 
   if (documentHistoryRequest.fileTypes?.length) {
     const fileTypeExtensions = [
-      ...new Set(
-        documentHistoryRequest.fileTypes.flatMap(
-          (documentFileType) =>
-            documentFileTypeExtensions[documentFileType],
-        ),
-      ),
+      ...new Set(documentHistoryRequest.fileTypes.flatMap(documentFileType => documentFileTypeExtensions[documentFileType])),
     ]
-    const fileTypeConditions = fileTypeExtensions.map(
-      () => 'LOWER(file_name) LIKE ?',
-    )
+    const fileTypeConditions = fileTypeExtensions.map(() => 'LOWER(file_name) LIKE ?')
 
     documentConditions.push(`(${fileTypeConditions.join(' OR ')})`)
-    conditionBindings.push(
-      ...fileTypeExtensions.map((fileExtension) => `%${fileExtension}`),
-    )
+    conditionBindings.push(...fileTypeExtensions.map(fileExtension => `%${fileExtension}`))
   }
 
   const documentConditionsSql = documentConditions.join(' AND ')
-  const documentOffset =
-    (documentHistoryRequest.page - 1) * documentHistoryRequest.pageSize
+  const documentOffset = (documentHistoryRequest.page - 1) * documentHistoryRequest.pageSize
   const documentCountStatement = database
     .prepare(
       `SELECT COUNT(*) AS total_count
       FROM documents
-      WHERE ${documentConditionsSql}`,
+      WHERE ${documentConditionsSql}`
     )
     .bind(...conditionBindings)
   const documentRecordsStatement = database
@@ -347,13 +275,9 @@ export const fetchDocumentHistory = async (
       FROM documents
       WHERE ${documentConditionsSql}
       ORDER BY created_at DESC, id DESC
-      LIMIT ? OFFSET ?`,
+      LIMIT ? OFFSET ?`
     )
-    .bind(
-      ...conditionBindings,
-      documentHistoryRequest.pageSize,
-      documentOffset,
-    )
+    .bind(...conditionBindings, documentHistoryRequest.pageSize, documentOffset)
   const [documentCountRecord, documentRecordsResult] = await Promise.all([
     documentCountStatement.first<DocumentHistoryCountDatabaseRecord>(),
     documentRecordsStatement.all<DocumentDatabaseRecord>(),
@@ -366,23 +290,18 @@ export const fetchDocumentHistory = async (
       currentPage: documentHistoryRequest.page,
       pageSize: documentHistoryRequest.pageSize,
       totalItems: totalDocumentCount,
-      totalPages: Math.ceil(
-        totalDocumentCount / documentHistoryRequest.pageSize,
-      ),
+      totalPages: Math.ceil(totalDocumentCount / documentHistoryRequest.pageSize),
     },
   }
 }
 
-export const fetchTimestampJobs = async (
-  database: D1Database,
-  authenticatedUserId: string,
-) => {
+export const fetchTimestampJobs = async (database: D1Database, authenticatedUserId: string) => {
   const { results: timestampDocumentRecords } = await database
     .prepare(
       `SELECT *
       FROM documents
       WHERE auth0_user_id = ? AND operation = 'timestamp'
-      ORDER BY created_at DESC`,
+      ORDER BY created_at DESC`
     )
     .bind(authenticatedUserId)
     .all<DocumentDatabaseRecord>()
@@ -402,7 +321,7 @@ interface UploadedDraftFileDetails {
 export const insertUploadedDraftFile = async (
   database: D1Database,
   authenticatedUserId: string,
-  draftFileDetails: UploadedDraftFileDetails,
+  draftFileDetails: UploadedDraftFileDetails
 ) => {
   const draftFileInsertResult = await database
     .prepare(
@@ -415,7 +334,7 @@ export const insertUploadedDraftFile = async (
         intended_operation,
         status,
         created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, 'uploaded', ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, 'uploaded', ?)`
     )
     .bind(
       authenticatedUserId,
@@ -424,7 +343,7 @@ export const insertUploadedDraftFile = async (
       draftFileDetails.fileSize,
       draftFileDetails.mimeType,
       draftFileDetails.intendedOperation,
-      draftFileDetails.createdAt,
+      draftFileDetails.createdAt
     )
     .run()
 
@@ -444,11 +363,7 @@ export const insertUploadedDraftFile = async (
   return mapDraftFile(createdDraftFileRecord)
 }
 
-export const fetchUploadedDraftFiles = async (
-  database: D1Database,
-  authenticatedUserId: string,
-  intendedOperation: DocumentOperation,
-) => {
+export const fetchUploadedDraftFiles = async (database: D1Database, authenticatedUserId: string, intendedOperation: DocumentOperation) => {
   const { results: draftFileRecords } = await database
     .prepare(
       `SELECT *
@@ -456,7 +371,7 @@ export const fetchUploadedDraftFiles = async (
       WHERE auth0_user_id = ?
         AND intended_operation = ?
         AND status = 'uploaded'
-      ORDER BY created_at DESC`,
+      ORDER BY created_at DESC`
     )
     .bind(authenticatedUserId, intendedOperation)
     .all<DraftFileDatabaseRecord>()
@@ -468,7 +383,7 @@ export const fetchProcessableDraftFile = async (
   database: D1Database,
   authenticatedUserId: string,
   draftFileId: number,
-  intendedOperation: DocumentOperation,
+  intendedOperation: DocumentOperation
 ) => {
   const draftFileRecord = await database
     .prepare(
@@ -477,44 +392,32 @@ export const fetchProcessableDraftFile = async (
       WHERE id = ?
         AND auth0_user_id = ?
         AND intended_operation = ?
-        AND status = 'uploaded'`,
+        AND status = 'uploaded'`
     )
     .bind(draftFileId, authenticatedUserId, intendedOperation)
     .first<DraftFileDatabaseRecord>()
 
   if (!draftFileRecord) {
-    throw new WorkerApiError(
-      409,
-      'DRAFT_FILE_NOT_AVAILABLE',
-      'Taslak dosya bulunamadı veya daha önce işlenmiş.',
-    )
+    throw new WorkerApiError(409, 'DRAFT_FILE_NOT_AVAILABLE', 'Taslak dosya bulunamadı veya daha önce işlenmiş.')
   }
 
   return draftFileRecord
 }
 
-export const deleteUploadedDraftFileRecord = async (
-  database: D1Database,
-  authenticatedUserId: string,
-  draftFileId: number,
-) => {
+export const deleteUploadedDraftFileRecord = async (database: D1Database, authenticatedUserId: string, draftFileId: number) => {
   const draftFileRecord = await database
     .prepare(
       `SELECT *
       FROM draft_files
       WHERE id = ?
         AND auth0_user_id = ?
-        AND status = 'uploaded'`,
+        AND status = 'uploaded'`
     )
     .bind(draftFileId, authenticatedUserId)
     .first<DraftFileDatabaseRecord>()
 
   if (!draftFileRecord) {
-    throw new WorkerApiError(
-      404,
-      'DRAFT_FILE_NOT_FOUND',
-      'Silinecek taslak dosya bulunamadı.',
-    )
+    throw new WorkerApiError(404, 'DRAFT_FILE_NOT_FOUND', 'Silinecek taslak dosya bulunamadı.')
   }
 
   const draftFileDeleteResult = await database
@@ -522,17 +425,13 @@ export const deleteUploadedDraftFileRecord = async (
       `DELETE FROM draft_files
       WHERE id = ?
         AND auth0_user_id = ?
-        AND status = 'uploaded'`,
+        AND status = 'uploaded'`
     )
     .bind(draftFileId, authenticatedUserId)
     .run()
 
   if (draftFileDeleteResult.meta.changes !== 1) {
-    throw new WorkerApiError(
-      409,
-      'DRAFT_FILE_DELETE_CONFLICT',
-      'Taslak dosya durumu değiştiği için silinemedi.',
-    )
+    throw new WorkerApiError(409, 'DRAFT_FILE_DELETE_CONFLICT', 'Taslak dosya durumu değiştiği için silinemedi.')
   }
 
   return draftFileRecord
@@ -542,7 +441,7 @@ export const createCompletedDocumentFromDraft = async (
   database: D1Database,
   authenticatedUserId: string,
   draftFileRecord: DraftFileDatabaseRecord,
-  creditCost: number,
+  creditCost: number
 ) => {
   const transactionDate = new Date().toISOString()
   const [documentInsertResult, draftFileUpdateResult] = await database.batch([
@@ -560,7 +459,7 @@ export const createCompletedDocumentFromDraft = async (
           credit_cost,
           created_at,
           completed_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?)`
       )
       .bind(
         authenticatedUserId,
@@ -572,7 +471,7 @@ export const createCompletedDocumentFromDraft = async (
         draftFileRecord.intended_operation,
         creditCost,
         transactionDate,
-        transactionDate,
+        transactionDate
       ),
     database
       .prepare(
@@ -580,17 +479,13 @@ export const createCompletedDocumentFromDraft = async (
         SET status = 'processed', processed_at = ?
         WHERE id = ?
           AND auth0_user_id = ?
-          AND status = 'uploaded'`,
+          AND status = 'uploaded'`
       )
       .bind(transactionDate, draftFileRecord.id, authenticatedUserId),
   ])
 
   if (draftFileUpdateResult.meta.changes !== 1) {
-    throw new WorkerApiError(
-      409,
-      'DRAFT_FILE_PROCESSING_CONFLICT',
-      'Taslak dosya durumu değiştiği için işlem tamamlanamadı.',
-    )
+    throw new WorkerApiError(409, 'DRAFT_FILE_PROCESSING_CONFLICT', 'Taslak dosya durumu değiştiği için işlem tamamlanamadı.')
   }
 
   return {
@@ -609,41 +504,23 @@ export const createCompletedDocumentFromDraft = async (
   } satisfies DocumentDatabaseRecord
 }
 
-export const fetchOwnedDocument = async (
-  database: D1Database,
-  authenticatedUserId: string,
-  documentId: number,
-) => {
+export const fetchOwnedDocument = async (database: D1Database, authenticatedUserId: string, documentId: number) => {
   const ownedDocument = await database
     .prepare('SELECT * FROM documents WHERE id = ? AND auth0_user_id = ?')
     .bind(documentId, authenticatedUserId)
     .first<DocumentDatabaseRecord>()
 
   if (!ownedDocument) {
-    throw new WorkerApiError(
-      404,
-      'DOCUMENT_NOT_FOUND',
-      'İstenen belge bulunamadı.',
-    )
+    throw new WorkerApiError(404, 'DOCUMENT_NOT_FOUND', 'İstenen belge bulunamadı.')
   }
 
   return ownedDocument
 }
 
-export const deleteOwnedDocumentRecord = async (
-  database: D1Database,
-  authenticatedUserId: string,
-  documentId: number,
-) => {
-  const ownedDocument = await fetchOwnedDocument(
-    database,
-    authenticatedUserId,
-    documentId,
-  )
+export const deleteOwnedDocumentRecord = async (database: D1Database, authenticatedUserId: string, documentId: number) => {
+  const ownedDocument = await fetchOwnedDocument(database, authenticatedUserId, documentId)
   const documentDeletionStatements = [
-    database
-      .prepare('DELETE FROM documents WHERE id = ? AND auth0_user_id = ?')
-      .bind(documentId, authenticatedUserId),
+    database.prepare('DELETE FROM documents WHERE id = ? AND auth0_user_id = ?').bind(documentId, authenticatedUserId),
   ]
 
   if (ownedDocument.draft_file_id !== null) {
@@ -653,33 +530,25 @@ export const deleteOwnedDocumentRecord = async (
           `DELETE FROM draft_files
           WHERE id = ?
             AND auth0_user_id = ?
-            AND status = 'processed'`,
+            AND status = 'processed'`
         )
-        .bind(ownedDocument.draft_file_id, authenticatedUserId),
+        .bind(ownedDocument.draft_file_id, authenticatedUserId)
     )
   }
 
-  const [documentDeleteResult, linkedDraftFileDeleteResult] =
-    await database.batch(documentDeletionStatements)
+  const [documentDeleteResult, linkedDraftFileDeleteResult] = await database.batch(documentDeletionStatements)
 
   if (documentDeleteResult.meta.changes !== 1) {
-    throw new WorkerApiError(
-      409,
-      'DOCUMENT_DELETE_CONFLICT',
-      'Belge durumu değiştiği için silinemedi.',
-    )
+    throw new WorkerApiError(409, 'DOCUMENT_DELETE_CONFLICT', 'Belge durumu değiştiği için silinemedi.')
   }
 
-  if (
-    ownedDocument.draft_file_id !== null &&
-    linkedDraftFileDeleteResult?.meta.changes !== 1
-  ) {
+  if (ownedDocument.draft_file_id !== null && linkedDraftFileDeleteResult?.meta.changes !== 1) {
     console.error(
       JSON.stringify({
         documentId,
         draftFileId: ownedDocument.draft_file_id,
         message: 'Silinen belgeye bağlı işlenmiş taslak bulunamadı.',
-      }),
+      })
     )
   }
 

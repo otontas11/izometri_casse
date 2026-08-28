@@ -1,8 +1,7 @@
 <template>
-  <section
-    class="document-history-table"
-    aria-labelledby="document-history-table-title"
-    :aria-busy="isLoading"
+  <section class="document-history-table"
+           aria-labelledby="document-history-table-title"
+           :aria-busy="isLoading"
   >
     <header class="document-history-table__header">
       <div>
@@ -20,19 +19,17 @@
       </strong>
     </header>
 
-    <div
-      v-if="isLoading"
-      class="document-history-table__loading-state"
-      role="status"
-      :aria-label="t('documentHistory.table.loading')"
+    <div v-if="isLoading"
+         class="document-history-table__loading-state"
+         role="status"
+         :aria-label="t('documentHistory.table.loading')"
     >
       <span v-for="skeletonIndex in 5" :key="skeletonIndex"></span>
     </div>
 
-    <div
-      v-else-if="errorMessage"
-      class="document-history-table__error-state"
-      role="alert"
+    <div v-else-if="errorMessage"
+         class="document-history-table__error-state"
+         role="alert"
     >
       <span aria-hidden="true">!</span>
       <h3>{{ t('documentHistory.table.errorTitle') }}</h3>
@@ -43,12 +40,13 @@
       </button>
     </div>
 
-    <table
-      v-else-if="archivedDocuments.length"
-      class="document-history-table__content"
+    <table v-else-if="archivedDocuments.length"
+           class="document-history-table__content"
     >
       <caption class="visually-hidden">
-        {{ t('documentHistory.table.caption') }}
+        {{
+          t('documentHistory.table.caption')
+        }}
       </caption>
       <thead>
         <tr class="document-history-table__column-headings">
@@ -60,14 +58,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="archivedDocument in archivedDocuments"
-          :key="archivedDocument.id"
-          class="document-history-table__row"
+        <tr v-for="archivedDocument in archivedDocuments"
+            :key="archivedDocument.id"
+            class="document-history-table__row"
         >
-          <td
-            class="document-history-table__file"
-            :data-label="t('documentHistory.table.document')"
+          <td class="document-history-table__file"
+              :data-label="t('documentHistory.table.document')"
           >
             <span aria-hidden="true">
               <AppIcon name="document" :size="20" />
@@ -81,111 +77,102 @@
               </small>
             </div>
           </td>
-          <td
-            class="document-history-table__operation-cell"
-            :data-label="t('documentHistory.table.operation')"
+          <td class="document-history-table__operation-cell"
+              :data-label="t('documentHistory.table.operation')"
           >
-            <span
-              :class="[
-                'document-history-table__operation',
-                `document-history-table__operation--${archivedDocument.operation}`,
-              ]"
+            <span :class="[
+              'document-history-table__operation',
+              `document-history-table__operation--${archivedDocument.operation}`,
+            ]"
             >
-              {{ t(documentOperationTranslationKeys[archivedDocument.operation]) }}
+              {{
+                t(documentOperationTranslationKeys[archivedDocument.operation])
+              }}
             </span>
           </td>
-          <td
-            class="document-history-table__date-cell"
-            :data-label="t('documentHistory.table.date')"
+          <td class="document-history-table__date-cell"
+              :data-label="t('documentHistory.table.date')"
           >
             <time :datetime="archivedDocument.createdAt">
               {{ formatDateTime(archivedDocument.createdAt) }}
             </time>
           </td>
-          <td
-            class="document-history-table__size-cell"
-            :data-label="t('documentHistory.table.size')"
+          <td class="document-history-table__size-cell"
+              :data-label="t('documentHistory.table.size')"
           >
             {{ formatFileSize(archivedDocument.sizeBytes) }}
           </td>
           <td class="document-history-table__actions">
-            <button
-              type="button"
-              class="document-history-table__preview-button"
-              :disabled="
-                previewingDocumentId !== null || deletingDocumentId !== null
-              "
-              :aria-busy="previewingDocumentId === archivedDocument.id"
-              :aria-label="
-                t('documentHistory.table.previewAriaLabel', {
-                  fileName: archivedDocument.name,
-                })
-              "
-              :title="t('documentHistory.table.previewTitle')"
-              @click="handleDocumentPreview(archivedDocument)"
+            <button type="button"
+                    class="document-history-table__preview-button"
+                    :disabled="
+                      previewingDocumentId !== null || deletingDocumentId !== null
+                    "
+                    :aria-busy="previewingDocumentId === archivedDocument.id"
+                    :aria-label="
+                      t('documentHistory.table.previewAriaLabel', {
+                        fileName: archivedDocument.name,
+                      })
+                    "
+                    :title="t('documentHistory.table.previewTitle')"
+                    @click="handleDocumentPreview(archivedDocument)"
             >
               <AppIcon name="eye" :size="17" />
             </button>
 
-            <button
-              type="button"
-              class="document-history-table__download-button"
-              :disabled="
-                downloadingDocumentId !== null || deletingDocumentId !== null
-              "
-              :aria-busy="downloadingDocumentId === archivedDocument.id"
-              :aria-label="
-                t('documentHistory.table.downloadAriaLabel', {
-                  fileName: archivedDocument.name,
-                })
-              "
-              :title="t('documentHistory.table.downloadTitle')"
-              @click="handleDocumentDownload(archivedDocument)"
+            <button type="button"
+                    class="document-history-table__download-button"
+                    :disabled="
+                      downloadingDocumentId !== null || deletingDocumentId !== null
+                    "
+                    :aria-busy="downloadingDocumentId === archivedDocument.id"
+                    :aria-label="
+                      t('documentHistory.table.downloadAriaLabel', {
+                        fileName: archivedDocument.name,
+                      })
+                    "
+                    :title="t('documentHistory.table.downloadTitle')"
+                    @click="handleDocumentDownload(archivedDocument)"
             >
               <AppIcon name="download" :size="18" />
             </button>
 
-            <div
-              class="document-history-table__action-menu"
-              data-document-history-menu
+            <div class="document-history-table__action-menu"
+                 data-document-history-menu
             >
-              <button
-                type="button"
-                class="document-history-table__menu-button"
-                :disabled="deletingDocumentId !== null"
-                aria-haspopup="menu"
-                :aria-expanded="openDocumentMenuId === archivedDocument.id"
-                :aria-controls="getDocumentMenuElementId(archivedDocument.id)"
-                :aria-label="
-                  t('documentHistory.table.menuAriaLabel', {
-                    fileName: archivedDocument.name,
-                  })
-                "
-                @click="handleDocumentMenuToggle(archivedDocument.id)"
+              <button type="button"
+                      class="document-history-table__menu-button"
+                      :disabled="deletingDocumentId !== null"
+                      aria-haspopup="menu"
+                      :aria-expanded="openDocumentMenuId === archivedDocument.id"
+                      :aria-controls="getDocumentMenuElementId(archivedDocument.id)"
+                      :aria-label="
+                        t('documentHistory.table.menuAriaLabel', {
+                          fileName: archivedDocument.name,
+                        })
+                      "
+                      @click="handleDocumentMenuToggle(archivedDocument.id)"
               >
                 <AppIcon name="more-horizontal" :size="19" />
               </button>
 
-              <div
-                v-if="openDocumentMenuId === archivedDocument.id"
-                :id="getDocumentMenuElementId(archivedDocument.id)"
-                class="document-history-table__menu"
-                role="menu"
+              <div v-if="openDocumentMenuId === archivedDocument.id"
+                   :id="getDocumentMenuElementId(archivedDocument.id)"
+                   class="document-history-table__menu"
+                   role="menu"
               >
-                <button
-                  type="button"
-                  role="menuitem"
-                  @click="handleDocumentEmailSend(archivedDocument)"
+                <button type="button"
+                        role="menuitem"
+                        @click="handleDocumentEmailSend(archivedDocument)"
                 >
                   <AppIcon name="mail" :size="17" />
                   <span>{{ t('documentHistory.table.sendByEmail') }}</span>
                 </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  class="document-history-table__delete-menu-button"
-                  :disabled="deletingDocumentId !== null"
-                  @click="handleDocumentDelete(archivedDocument)"
+                <button type="button"
+                        role="menuitem"
+                        class="document-history-table__delete-menu-button"
+                        :disabled="deletingDocumentId !== null"
+                        @click="handleDocumentDelete(archivedDocument)"
                 >
                   <AppIcon name="trash" :size="17" />
                   <span>{{ t('documentHistory.table.deleteDocument') }}</span>
@@ -300,10 +287,7 @@ const handleDocumentMenuKeydown = (keyboardEvent: KeyboardEvent) => {
 }
 
 onMounted(() => {
-  document.addEventListener(
-    'pointerdown',
-    handleDocumentMenuOutsidePointerDown,
-  )
+  document.addEventListener('pointerdown', handleDocumentMenuOutsidePointerDown)
   document.addEventListener('keydown', handleDocumentMenuKeydown)
 })
 

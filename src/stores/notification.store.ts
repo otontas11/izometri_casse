@@ -22,9 +22,7 @@ export const useNotificationStore = defineStore('notification', () => {
   const activeNotifications = ref<AppNotification[]>([])
 
   const dismissNotification = (notificationId: number) => {
-    activeNotifications.value = activeNotifications.value.filter(
-      (activeNotification) => activeNotification.id !== notificationId,
-    )
+    activeNotifications.value = activeNotifications.value.filter(activeNotification => activeNotification.id !== notificationId)
   }
 
   const showNotification = ({

@@ -1,41 +1,38 @@
 <template>
-  <section
-    class="timestamp-file-workspace"
-    aria-labelledby="timestamp-file-workspace-title"
+  <section class="timestamp-file-workspace"
+           aria-labelledby="timestamp-file-workspace-title"
   >
-    <div
-      :class="[
-        'timestamp-file-workspace__drop-area',
-        {
-          'timestamp-file-workspace__drop-area--dragging': isFileDraggedOver,
-          'timestamp-file-workspace__drop-area--disabled': isBusy,
-        },
-      ]"
-      role="button"
-      :tabindex="isBusy ? -1 : 0"
-      :aria-disabled="isBusy"
-      :aria-describedby="timestampFileInputDescriptionIds"
-      @click="openFilePicker"
-      @keydown.enter.prevent="openFilePicker"
-      @keydown.space.prevent="openFilePicker"
-      @dragenter.prevent="handleFileDragOver"
-      @dragover.prevent="handleFileDragOver"
-      @dragleave.prevent="handleFileDragLeave"
-      @drop.prevent="handleFileDrop"
+    <div :class="[
+           'timestamp-file-workspace__drop-area',
+           {
+             'timestamp-file-workspace__drop-area--dragging': isFileDraggedOver,
+             'timestamp-file-workspace__drop-area--disabled': isBusy,
+           },
+         ]"
+         role="button"
+         :tabindex="isBusy ? -1 : 0"
+         :aria-disabled="isBusy"
+         :aria-describedby="timestampFileInputDescriptionIds"
+         @click="openFilePicker"
+         @keydown.enter.prevent="openFilePicker"
+         @keydown.space.prevent="openFilePicker"
+         @dragenter.prevent="handleFileDragOver"
+         @dragover.prevent="handleFileDragOver"
+         @dragleave.prevent="handleFileDragLeave"
+         @drop.prevent="handleFileDrop"
     >
-      <input
-        id="timestamp-file-workspace-input"
-        ref="fileInputElement"
-        class="visually-hidden"
-        type="file"
-        multiple
-        tabindex="-1"
-        :accept="DRAFT_FILE_INPUT_ACCEPT"
-        :disabled="isBusy"
-        :aria-label="t('timestamp.workspace.inputAriaLabel')"
-        :aria-describedby="timestampFileInputDescriptionIds"
-        :aria-invalid="fileValidationErrorMessage ? 'true' : undefined"
-        @change="handleFileInputChange"
+      <input id="timestamp-file-workspace-input"
+             ref="fileInputElement"
+             class="visually-hidden"
+             type="file"
+             multiple
+             tabindex="-1"
+             :accept="DRAFT_FILE_INPUT_ACCEPT"
+             :disabled="isBusy"
+             :aria-label="t('timestamp.workspace.inputAriaLabel')"
+             :aria-describedby="timestampFileInputDescriptionIds"
+             :aria-invalid="fileValidationErrorMessage ? 'true' : undefined"
+             @change="handleFileInputChange"
       />
 
       <span class="timestamp-file-workspace__upload-icon" aria-hidden="true">
@@ -61,20 +58,18 @@
       </small>
     </div>
 
-    <p
-      v-if="fileValidationErrorMessage"
-      id="timestamp-file-workspace-validation-error"
-      class="timestamp-file-workspace__validation-message"
-      role="alert"
+    <p v-if="fileValidationErrorMessage"
+       id="timestamp-file-workspace-validation-error"
+       class="timestamp-file-workspace__validation-message"
+       role="alert"
     >
       <span aria-hidden="true">!</span>
       {{ fileValidationErrorMessage }}
     </p>
 
-    <section
-      v-if="timestampFiles.length > 0"
-      class="timestamp-file-workspace__file-list-section"
-      aria-labelledby="timestamp-file-workspace-list-title"
+    <section v-if="timestampFiles.length > 0"
+             class="timestamp-file-workspace__file-list-section"
+             aria-labelledby="timestamp-file-workspace-list-title"
     >
       <header class="timestamp-file-workspace__file-list-header">
         <div>
@@ -93,18 +88,16 @@
       </header>
 
       <ul class="timestamp-file-workspace__file-list">
-        <li
-          v-for="timestampFileItem in timestampFiles"
-          :key="timestampFileItem.id"
-          :class="[
-            'timestamp-file-workspace__file-card',
-            `timestamp-file-workspace__file-card--${timestampFileItem.status}`,
-          ]"
+        <li v-for="timestampFileItem in timestampFiles"
+            :key="timestampFileItem.id"
+            :class="[
+              'timestamp-file-workspace__file-card',
+              `timestamp-file-workspace__file-card--${timestampFileItem.status}`,
+            ]"
         >
           <div class="timestamp-file-workspace__file-card-header">
-            <span
-              class="timestamp-file-workspace__file-type-icon"
-              aria-hidden="true"
+            <span class="timestamp-file-workspace__file-type-icon"
+                  aria-hidden="true"
             >
               <AppIcon name="document" :size="21" />
             </span>
@@ -116,24 +109,22 @@
               <small>{{ formatFileSize(timestampFileItem.fileSize) }}</small>
             </div>
 
-            <span
-              :class="[
-                'timestamp-file-workspace__status-badge',
-                `timestamp-file-workspace__status-badge--${timestampFileItem.status}`,
-              ]"
+            <span :class="[
+              'timestamp-file-workspace__status-badge',
+              `timestamp-file-workspace__status-badge--${timestampFileItem.status}`,
+            ]"
             >
               {{ getTimestampFileStatusLabel(timestampFileItem.status) }}
             </span>
 
-            <button
-              type="button"
-              :disabled="isBusy"
-              :aria-label="
-                t('timestamp.workspace.removeAriaLabel', {
-                  fileName: timestampFileItem.fileName,
-                })
-              "
-              @click="emit('remove-file', timestampFileItem.id)"
+            <button type="button"
+                    :disabled="isBusy"
+                    :aria-label="
+                      t('timestamp.workspace.removeAriaLabel', {
+                        fileName: timestampFileItem.fileName,
+                      })
+                    "
+                    @click="emit('remove-file', timestampFileItem.id)"
             >
               <AppIcon name="trash" :size="18" />
             </button>
@@ -145,29 +136,26 @@
             </span>
             <strong>{{ timestampFileItem.progressPercentage }}%</strong>
           </div>
-          <div
-            class="timestamp-file-workspace__progress-track"
-            role="progressbar"
-            :aria-label="
-              t('timestamp.workspace.progressAriaLabel', {
-                fileName: timestampFileItem.fileName,
-              })
-            "
-            aria-valuemin="0"
-            aria-valuemax="100"
-            :aria-valuenow="timestampFileItem.progressPercentage"
+          <div class="timestamp-file-workspace__progress-track"
+               role="progressbar"
+               :aria-label="
+                 t('timestamp.workspace.progressAriaLabel', {
+                   fileName: timestampFileItem.fileName,
+                 })
+               "
+               aria-valuemin="0"
+               aria-valuemax="100"
+               :aria-valuenow="timestampFileItem.progressPercentage"
           >
-            <span
-              :style="{
-                width: `${timestampFileItem.progressPercentage}%`,
-              }"
+            <span :style="{
+              width: `${timestampFileItem.progressPercentage}%`,
+            }"
             ></span>
           </div>
 
-          <p
-            v-if="timestampFileItem.errorMessage"
-            class="timestamp-file-workspace__file-error"
-            role="alert"
+          <p v-if="timestampFileItem.errorMessage"
+             class="timestamp-file-workspace__file-error"
+             role="alert"
           >
             {{ timestampFileItem.errorMessage }}
           </p>
@@ -175,33 +163,30 @@
       </ul>
     </section>
 
-    <div
-      :class="[
-        'timestamp-file-workspace__actions',
-        {
-          'timestamp-file-workspace__actions--with-retry':
-            hasTimestampUploadError,
-        },
-      ]"
+    <div :class="[
+      'timestamp-file-workspace__actions',
+      {
+        'timestamp-file-workspace__actions--with-retry':
+          hasTimestampUploadError,
+      },
+    ]"
     >
-      <button
-        v-if="hasTimestampUploadError"
-        class="timestamp-file-workspace__upload-button"
-        type="button"
-        :disabled="isBusy"
-        :aria-busy="isBusy"
-        @click="emit('request-upload')"
+      <button v-if="hasTimestampUploadError"
+              class="timestamp-file-workspace__upload-button"
+              type="button"
+              :disabled="isBusy"
+              :aria-busy="isBusy"
+              @click="emit('request-upload')"
       >
         <AppIcon name="refresh" :size="21" />
         {{ t('timestamp.workspace.retryUpload') }}
       </button>
 
-      <button
-        class="timestamp-file-workspace__submit-button"
-        type="button"
-        :disabled="!canProcess || isBusy"
-        :aria-busy="isBusy"
-        @click="emit('request-timestamp')"
+      <button class="timestamp-file-workspace__submit-button"
+              type="button"
+              :disabled="!canProcess || isBusy"
+              :aria-busy="isBusy"
+              @click="emit('request-timestamp')"
       >
         <AppIcon name="timestamp" :size="21" />
         {{ t('timestamp.workspace.timestampFiles') }}

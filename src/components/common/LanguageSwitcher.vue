@@ -1,24 +1,20 @@
 <template>
-  <div
-    ref="languageSwitcherElement"
-    class="language-switcher"
-    @focusout="handleLanguageSwitcherFocusOut"
-    @keydown.esc.stop.prevent="closeLanguageMenuAndRestoreTriggerFocus"
+  <div ref="languageSwitcherElement"
+       class="language-switcher"
+       @focusout="handleLanguageSwitcherFocusOut"
+       @keydown.esc.stop.prevent="closeLanguageMenuAndRestoreTriggerFocus"
   >
-    <button
-      ref="languageMenuTriggerElement"
-      class="language-switcher__trigger"
-      type="button"
-      aria-haspopup="menu"
-      aria-controls="application-language-menu"
-      :aria-expanded="isLanguageMenuOpen"
-      :aria-label="
-        isLanguageMenuOpen
-          ? t('language.closeMenu')
-          : t('language.openMenu')
-      "
-      @click="handleLanguageMenuTriggerClick"
-      @keydown="handleLanguageMenuTriggerKeydown"
+    <button ref="languageMenuTriggerElement"
+            class="language-switcher__trigger"
+            type="button"
+            aria-haspopup="menu"
+            aria-controls="application-language-menu"
+            :aria-expanded="isLanguageMenuOpen"
+            :aria-label="
+              isLanguageMenuOpen ? t('language.closeMenu') : t('language.openMenu')
+            "
+            @click="handleLanguageMenuTriggerClick"
+            @keydown="handleLanguageMenuTriggerKeydown"
     >
       <span class="language-switcher__current-code">
         {{ selectedLanguageOption.code }}
@@ -26,45 +22,42 @@
       <span class="language-switcher__current-name">
         {{ getLanguageName(selectedLanguageOption.locale) }}
       </span>
-      <span
-        :class="[
-          'language-switcher__chevron',
-          {
-            'language-switcher__chevron--open': isLanguageMenuOpen,
-          },
-        ]"
-        aria-hidden="true"
+      <span :class="[
+              'language-switcher__chevron',
+              {
+                'language-switcher__chevron--open': isLanguageMenuOpen,
+              },
+            ]"
+            aria-hidden="true"
       ></span>
     </button>
 
-    <div
-      v-if="isLanguageMenuOpen"
-      id="application-language-menu"
-      ref="languageMenuElement"
-      class="language-switcher__menu"
-      role="menu"
-      :aria-label="t('language.selectorLabel')"
+    <div v-if="isLanguageMenuOpen"
+         id="application-language-menu"
+         ref="languageMenuElement"
+         class="language-switcher__menu"
+         role="menu"
+         :aria-label="t('language.selectorLabel')"
     >
-      <button
-        v-for="languageOption in languageOptions"
-        :key="languageOption.locale"
-        type="button"
-        role="menuitemradio"
-        :class="[
-          'language-switcher__option',
-          {
-            'language-switcher__option--active':
-              locale === languageOption.locale,
-          },
-        ]"
-        :aria-checked="locale === languageOption.locale"
-        :aria-label="
-          t('language.switchTo', {
-            language: getLanguageName(languageOption.locale),
-          })
-        "
-        @click="handleLanguageSelection(languageOption.locale)"
-        @keydown="handleLanguageOptionKeydown"
+      <button v-for="languageOption in languageOptions"
+              :key="languageOption.locale"
+              type="button"
+              role="menuitemradio"
+              :class="[
+                'language-switcher__option',
+                {
+                  'language-switcher__option--active':
+                    locale === languageOption.locale,
+                },
+              ]"
+              :aria-checked="locale === languageOption.locale"
+              :aria-label="
+                t('language.switchTo', {
+                  language: getLanguageName(languageOption.locale),
+                })
+              "
+              @click="handleLanguageSelection(languageOption.locale)"
+              @keydown="handleLanguageOptionKeydown"
       >
         <span class="language-switcher__option-code">
           {{ languageOption.code }}
@@ -72,10 +65,7 @@
         <span class="language-switcher__option-name">
           {{ getLanguageName(languageOption.locale) }}
         </span>
-        <span
-          class="language-switcher__option-check"
-          aria-hidden="true"
-        >
+        <span class="language-switcher__option-check" aria-hidden="true">
           {{ locale === languageOption.locale ? '✓' : '' }}
         </span>
       </button>
@@ -84,13 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-} from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import {
@@ -126,11 +110,7 @@ const selectedLanguageOption = computed(
 )
 
 const getLanguageName = (applicationLocale: SupportedApplicationLocale) =>
-  t(
-    applicationLocale === 'tr'
-      ? 'language.turkish'
-      : 'language.english',
-  )
+  t(applicationLocale === 'tr' ? 'language.turkish' : 'language.english')
 
 const closeLanguageMenu = () => {
   isLanguageMenuOpen.value = false
@@ -152,9 +132,8 @@ const openLanguageMenuAndFocusOption = async (
   isLanguageMenuOpen.value = true
   await nextTick()
   const languageOptionElements = Array.from(
-    languageMenuElement.value?.querySelectorAll<HTMLButtonElement>(
-      'button',
-    ) ?? [],
+    languageMenuElement.value?.querySelectorAll<HTMLButtonElement>('button') ??
+      [],
   )
   const languageOptionToFocus = shouldFocusLastOption
     ? languageOptionElements[languageOptionElements.length - 1]
@@ -168,22 +147,16 @@ const handleLanguageMenuTriggerClick = () => {
 }
 
 const handleLanguageMenuTriggerKeydown = (keyboardEvent: KeyboardEvent) => {
-  if (
-    keyboardEvent.key === 'ArrowDown' ||
-    keyboardEvent.key === 'ArrowUp'
-  ) {
+  if (keyboardEvent.key === 'ArrowDown' || keyboardEvent.key === 'ArrowUp') {
     keyboardEvent.preventDefault()
-    void openLanguageMenuAndFocusOption(
-      keyboardEvent.key === 'ArrowUp',
-    )
+    void openLanguageMenuAndFocusOption(keyboardEvent.key === 'ArrowUp')
   }
 }
 
 const handleLanguageOptionKeydown = (keyboardEvent: KeyboardEvent) => {
   const languageOptionElements = Array.from(
-    languageMenuElement.value?.querySelectorAll<HTMLButtonElement>(
-      'button',
-    ) ?? [],
+    languageMenuElement.value?.querySelectorAll<HTMLButtonElement>('button') ??
+      [],
   )
   const focusedOptionIndex = languageOptionElements.indexOf(
     keyboardEvent.currentTarget as HTMLButtonElement,

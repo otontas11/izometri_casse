@@ -19,8 +19,7 @@
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
   border-radius: 1.35rem;
-  box-shadow: 0 1.5rem 4rem
-    color-mix(in srgb, var(--color-brand-950) 24%, transparent);
+  box-shadow: 0 1.5rem 4rem color-mix(in srgb, var(--color-brand-950) 24%, transparent);
 }
 
 .signature-verification-modal__header {
@@ -141,8 +140,7 @@
   box-shadow: 0 0 0 3px rgb(37 99 235 / 12%);
 }
 
-.signature-verification-modal__code-inputs
-  .signature-verification-modal__code-input--invalid {
+.signature-verification-modal__code-inputs .signature-verification-modal__code-input--invalid {
   border-color: var(--color-danger);
   box-shadow: 0 0 0 3px rgb(198 40 58 / 10%);
 }
@@ -235,10 +233,8 @@
   transition: opacity var(--transition-fast);
 }
 
-.signature-verification-modal-enter-active
-  .signature-verification-modal__dialog,
-.signature-verification-modal-leave-active
-  .signature-verification-modal__dialog {
+.signature-verification-modal-enter-active .signature-verification-modal__dialog,
+.signature-verification-modal-leave-active .signature-verification-modal__dialog {
   transition: transform var(--transition-fast);
 }
 
@@ -247,10 +243,8 @@
   opacity: 0;
 }
 
-.signature-verification-modal-enter-from
-  .signature-verification-modal__dialog,
-.signature-verification-modal-leave-to
-  .signature-verification-modal__dialog {
+.signature-verification-modal-enter-from .signature-verification-modal__dialog,
+.signature-verification-modal-leave-to .signature-verification-modal__dialog {
   transform: translateY(0.75rem) scale(0.985);
 }
 

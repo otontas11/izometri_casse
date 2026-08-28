@@ -18,6 +18,6 @@ export const auth0Plugin = isAuth0Configured
       },
       {
         errorPath: '/login?reason=auth_error',
-      },
+      }
     )
   : null

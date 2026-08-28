@@ -1,28 +1,25 @@
 <template>
-  <TransitionGroup
-    name="toast-notification"
-    tag="div"
-    class="toast-notification"
-    aria-live="polite"
-    :aria-label="t('notifications.ariaLabel')"
+  <TransitionGroup name="toast-notification"
+                   tag="div"
+                   class="toast-notification"
+                   aria-live="polite"
+                   :aria-label="t('notifications.ariaLabel')"
   >
-    <article
-      v-for="notification in activeNotifications"
-      :key="notification.id"
-      :class="[
-        'toast-notification__message',
-        `toast-notification__message--${notification.variant}`,
-      ]"
-      :role="notification.variant === 'error' ? 'alert' : 'status'"
+    <article v-for="notification in activeNotifications"
+             :key="notification.id"
+             :class="[
+               'toast-notification__message',
+               `toast-notification__message--${notification.variant}`,
+             ]"
+             :role="notification.variant === 'error' ? 'alert' : 'status'"
     >
       <span class="toast-notification__symbol" aria-hidden="true">
         {{ notificationSymbols[notification.variant] }}
       </span>
       <p>{{ notification.message }}</p>
-      <button
-        type="button"
-        :aria-label="t('notifications.dismissAriaLabel')"
-        @click="notificationStore.dismissNotification(notification.id)"
+      <button type="button"
+              :aria-label="t('notifications.dismissAriaLabel')"
+              @click="notificationStore.dismissNotification(notification.id)"
       >
         ×
       </button>

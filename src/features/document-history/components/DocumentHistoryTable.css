@@ -57,7 +57,9 @@
 .document-history-table__column-headings,
 .document-history-table__row {
   display: grid;
-  grid-template-columns: minmax(15rem, 2fr) minmax(9rem, 0.8fr) minmax(10rem, 1fr) minmax(6rem, 0.55fr) 7rem;
+  grid-template-columns:
+    minmax(15rem, 2fr) minmax(9rem, 0.8fr) minmax(10rem, 1fr)
+    minmax(6rem, 0.55fr) 7rem;
   gap: 1rem;
   align-items: center;
   padding-inline: 1.5rem;
@@ -247,12 +249,7 @@
 
 .document-history-table__loading-state span {
   height: 4rem;
-  background: linear-gradient(
-    100deg,
-    var(--color-surface-subtle) 25%,
-    var(--color-surface-raised) 40%,
-    var(--color-surface-subtle) 58%
-  );
+  background: linear-gradient(100deg, var(--color-surface-subtle) 25%, var(--color-surface-raised) 40%, var(--color-surface-subtle) 58%);
   background-size: 200% 100%;
   border-radius: var(--radius-sm);
   animation: document-history-table-shimmer 1.3s infinite linear;
@@ -328,7 +325,9 @@
 @media (max-width: 79.99rem) {
   .document-history-table__column-headings,
   .document-history-table__row {
-    grid-template-columns: minmax(13rem, 1.7fr) minmax(8rem, 0.8fr) minmax(9rem, 1fr) 7rem;
+    grid-template-columns:
+      minmax(13rem, 1.7fr) minmax(8rem, 0.8fr) minmax(9rem, 1fr)
+      7rem;
   }
 
   .document-history-table__column-headings > th:nth-child(4),

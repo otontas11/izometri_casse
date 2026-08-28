@@ -1,7 +1,6 @@
 <template>
-  <section
-    class="document-history-page"
-    aria-labelledby="document-history-page-title"
+  <section class="document-history-page"
+           aria-labelledby="document-history-page-title"
   >
     <header class="document-history-page__header">
       <div>
@@ -13,56 +12,51 @@
       </div>
     </header>
 
-    <DocumentHistoryFilters
-      :filters="selectedFilters"
-      @change="handleFiltersChange"
-      @reset="handleFiltersReset"
+    <DocumentHistoryFilters :filters="selectedFilters"
+                            @change="handleFiltersChange"
+                            @reset="handleFiltersReset"
     />
 
-    <DocumentHistoryTable
-      :archived-documents="archivedDocuments"
-      :deleting-document-id="deletingDocumentId"
-      :downloading-document-id="downloadingDocumentId"
-      :error-message="documentHistoryErrorMessage"
-      :has-active-filters="hasActiveFilters"
-      :is-loading="isDocumentHistoryLoading"
-      :previewing-document-id="previewingDocumentId"
-      :total-document-count="documentHistoryPagination.totalItems"
-      @delete="handleDocumentDeleteRequest"
-      @download="handleDocumentDownload"
-      @preview="handleDocumentPreview"
-      @retry="handleDocumentHistoryRetry"
-      @send-email="handleDocumentEmailSend"
+    <DocumentHistoryTable :archived-documents="archivedDocuments"
+                          :deleting-document-id="deletingDocumentId"
+                          :downloading-document-id="downloadingDocumentId"
+                          :error-message="documentHistoryErrorMessage"
+                          :has-active-filters="hasActiveFilters"
+                          :is-loading="isDocumentHistoryLoading"
+                          :previewing-document-id="previewingDocumentId"
+                          :total-document-count="documentHistoryPagination.totalItems"
+                          @delete="handleDocumentDeleteRequest"
+                          @download="handleDocumentDownload"
+                          @preview="handleDocumentPreview"
+                          @retry="handleDocumentHistoryRetry"
+                          @send-email="handleDocumentEmailSend"
     />
 
-    <DocumentHistoryPagination
-      v-if="!documentHistoryErrorMessage"
-      :current-page="documentHistoryPagination.currentPage"
-      :is-loading="isDocumentHistoryLoading"
-      :page-size="documentHistoryPagination.pageSize"
-      :total-items="documentHistoryPagination.totalItems"
-      :total-pages="documentHistoryPagination.totalPages"
-      @change="handlePageChange"
+    <DocumentHistoryPagination v-if="!documentHistoryErrorMessage"
+                               :current-page="documentHistoryPagination.currentPage"
+                               :is-loading="isDocumentHistoryLoading"
+                               :page-size="documentHistoryPagination.pageSize"
+                               :total-items="documentHistoryPagination.totalItems"
+                               :total-pages="documentHistoryPagination.totalPages"
+                               @change="handlePageChange"
     />
 
-    <ArchivedDocumentPreviewDrawer
-      :archived-document="selectedDocumentForPreview"
-      :document-content="previewDocumentContent"
-      :error-message="documentPreviewErrorMessage"
-      :is-loading="isSelectedDocumentPreviewLoading"
-      :is-open="isDocumentPreviewDrawerOpen"
-      @close="handleDocumentPreviewDrawerClose"
-      @download="handleDocumentDownload"
-      @retry="handleDocumentPreview"
+    <ArchivedDocumentPreviewDrawer :archived-document="selectedDocumentForPreview"
+                                   :document-content="previewDocumentContent"
+                                   :error-message="documentPreviewErrorMessage"
+                                   :is-loading="isSelectedDocumentPreviewLoading"
+                                   :is-open="isDocumentPreviewDrawerOpen"
+                                   @close="handleDocumentPreviewDrawerClose"
+                                   @download="handleDocumentDownload"
+                                   @retry="handleDocumentPreview"
     />
 
-    <ArchivedDocumentDeleteModal
-      :archived-document="documentPendingDeletion"
-      :error-message="documentDeleteErrorMessage"
-      :is-deleting="isSelectedDocumentDeleting"
-      :is-open="isDocumentDeleteModalOpen"
-      @close="handleDocumentDeleteModalClose"
-      @confirm="handleDocumentDeleteConfirm"
+    <ArchivedDocumentDeleteModal :archived-document="documentPendingDeletion"
+                                 :error-message="documentDeleteErrorMessage"
+                                 :is-deleting="isSelectedDocumentDeleting"
+                                 :is-open="isDocumentDeleteModalOpen"
+                                 @close="handleDocumentDeleteModalClose"
+                                 @confirm="handleDocumentDeleteConfirm"
     />
   </section>
 </template>
@@ -184,9 +178,7 @@ const getRouteDocumentFileTypes = (
 ): DocumentFileTypeFilter[] =>
   getRouteFilterValues(routeQueryValue, legacyRouteQueryValue).filter(
     (requestedFileType): requestedFileType is DocumentFileTypeFilter =>
-      validDocumentFileTypes.has(
-        requestedFileType as DocumentFileTypeFilter,
-      ),
+      validDocumentFileTypes.has(requestedFileType as DocumentFileTypeFilter),
   )
 
 const getRouteSelectedDate = (routeQueryValue: unknown) => {
@@ -194,11 +186,7 @@ const getRouteSelectedDate = (routeQueryValue: unknown) => {
   const [requestedYear, requestedMonth, requestedDay] = requestedDate
     .split('-')
     .map(Number)
-  const parsedDate = new Date(
-    requestedYear,
-    requestedMonth - 1,
-    requestedDay,
-  )
+  const parsedDate = new Date(requestedYear, requestedMonth - 1, requestedDay)
   const isExactCalendarDate =
     parsedDate.getFullYear() === requestedYear &&
     parsedDate.getMonth() === requestedMonth - 1 &&

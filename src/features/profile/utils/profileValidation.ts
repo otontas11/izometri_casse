@@ -16,20 +16,14 @@ export const createEmptyProfileFormErrors = (): ProfileFormErrors => ({
   phone: '',
 })
 
-export const validateProfileName = (
-  profileName: string,
-  fieldLabel: string,
-) => {
+export const validateProfileName = (profileName: string, fieldLabel: string) => {
   const trimmedProfileName = profileName.trim()
 
   if (!trimmedProfileName) {
     return translate('profile.validation.required', { fieldLabel })
   }
 
-  if (
-    trimmedProfileName.length < PROFILE_NAME_MINIMUM_LENGTH ||
-    trimmedProfileName.length > PROFILE_NAME_MAXIMUM_LENGTH
-  ) {
+  if (trimmedProfileName.length < PROFILE_NAME_MINIMUM_LENGTH || trimmedProfileName.length > PROFILE_NAME_MAXIMUM_LENGTH) {
     return translate('profile.validation.nameLength', {
       fieldLabel,
       maximumLength: PROFILE_NAME_MAXIMUM_LENGTH,
@@ -60,20 +54,10 @@ export const validateProfilePhone = (phoneNumber: string) => {
   return ''
 }
 
-export const validateProfileForm = (
-  profileFormValues: UpdateProfilePayload,
-): ProfileFormErrors => ({
-  firstName: validateProfileName(
-    profileFormValues.firstName,
-    translate('profile.form.firstName'),
-  ),
-  lastName: validateProfileName(
-    profileFormValues.lastName,
-    translate('profile.form.lastName'),
-  ),
+export const validateProfileForm = (profileFormValues: UpdateProfilePayload): ProfileFormErrors => ({
+  firstName: validateProfileName(profileFormValues.firstName, translate('profile.form.firstName')),
+  lastName: validateProfileName(profileFormValues.lastName, translate('profile.form.lastName')),
   phone: validateProfilePhone(profileFormValues.phone),
 })
 
-export const hasProfileFormErrors = (
-  profileFormErrors: ProfileFormErrors,
-) => Object.values(profileFormErrors).some(Boolean)
+export const hasProfileFormErrors = (profileFormErrors: ProfileFormErrors) => Object.values(profileFormErrors).some(Boolean)

@@ -1,14 +1,15 @@
 <template>
   <main class="auth-callback-page">
     <section aria-live="polite" class="auth-callback-page__card">
-      <template v-if="authenticationCallbackErrorMessage || !isAuth0Configured"
-      >
-        <span aria-hidden="true" class="auth-callback-page__card-icon auth-callback-page__card-icon--error">!</span>
+      <template v-if="authenticationCallbackErrorMessage || !isAuth0Configured">
+        <span aria-hidden="true"
+              class="auth-callback-page__card-icon auth-callback-page__card-icon--error"
+        >!</span>
         <h1>{{ t('auth.callback.failedTitle') }}</h1>
         <p>
           {{
             authenticationCallbackErrorMessage ||
-            t('auth.callback.configurationError')
+              t('auth.callback.configurationError')
           }}
         </p>
         <RouterLink :to="{ name: 'login', query: { reason: 'auth_error' } }">
@@ -17,7 +18,9 @@
       </template>
 
       <template v-else>
-        <span aria-hidden="true" class="auth-callback-page__card-spinner"></span>
+        <span aria-hidden="true"
+              class="auth-callback-page__card-spinner"
+        ></span>
         <h1>{{ t('auth.callback.preparingTitle') }}</h1>
         <p>{{ t('auth.callback.preparingDescription') }}</p>
       </template>
@@ -26,18 +29,17 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
-import {useAuth0} from '@auth0/auth0-vue'
-import {RouterLink} from 'vue-router'
-import {useI18n} from 'vue-i18n'
+import { computed } from 'vue'
+import { useAuth0 } from '@auth0/auth0-vue'
+import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
-import {isAuth0Configured} from '@/config/auth0.config'
+import { isAuth0Configured } from '@/config/auth0.config'
 
 const auth0Client = isAuth0Configured ? useAuth0() : null
-const {t} = useI18n({useScope: 'global'})
-const authenticationCallbackErrorMessage = computed(
-    () =>
-        auth0Client?.error.value ? t('auth.callback.authenticationError') : '',
+const { t } = useI18n({ useScope: 'global' })
+const authenticationCallbackErrorMessage = computed(() =>
+  auth0Client?.error.value ? t('auth.callback.authenticationError') : '',
 )
 </script>
 

@@ -1,11 +1,12 @@
 <template>
-  <section class="profile-identity-card" aria-labelledby="profile-identity-title">
+  <section class="profile-identity-card"
+           aria-labelledby="profile-identity-title"
+  >
     <div class="profile-identity-card__avatar" aria-hidden="true">
-      <img
-        v-if="shouldDisplayAvatarImage"
-        :src="avatarUrl"
-        alt=""
-        @error="hasAvatarImageError = true"
+      <img v-if="shouldDisplayAvatarImage"
+           :src="avatarUrl"
+           alt=""
+           @error="hasAvatarImageError = true"
       />
       <span v-else>{{ initials }}</span>
     </div>
@@ -15,19 +16,18 @@
       <h2 id="profile-identity-title">{{ displayName }}</h2>
       <p class="profile-identity-card__email-address">{{ emailAddress }}</p>
 
-      <span
-        :class="[
-          'profile-identity-card__verification-status',
-          {
-            'profile-identity-card__verification-status--pending':
-              !isEmailVerified,
-          },
-        ]"
-        :aria-describedby="
-          !isEmailVerified
-            ? 'profile-identity-verification-description'
-            : undefined
-        "
+      <span :class="[
+              'profile-identity-card__verification-status',
+              {
+                'profile-identity-card__verification-status--pending':
+                  !isEmailVerified,
+              },
+            ]"
+            :aria-describedby="
+              !isEmailVerified
+                ? 'profile-identity-verification-description'
+                : undefined
+            "
       >
         <span aria-hidden="true">{{ isEmailVerified ? '✓' : '!' }}</span>
         {{
@@ -37,10 +37,9 @@
         }}
       </span>
 
-      <p
-        v-if="!isEmailVerified"
-        id="profile-identity-verification-description"
-        class="profile-identity-card__verification-description"
+      <p v-if="!isEmailVerified"
+         id="profile-identity-verification-description"
+         class="profile-identity-card__verification-description"
       >
         {{ t('profile.identity.verificationPendingDescription') }}
       </p>
@@ -188,8 +187,7 @@ watch(
   font-size: var(--font-size-small);
   font-weight: 500;
   background: color-mix(in srgb, var(--color-accent-600) 24%, transparent);
-  border: 1px solid
-    color-mix(in srgb, var(--color-accent-100) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent-100) 20%, transparent);
   border-radius: 999px;
 }
 

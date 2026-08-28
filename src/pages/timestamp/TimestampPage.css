@@ -88,8 +88,7 @@
 }
 
 .timestamp-page__transaction-summary--insufficient > span,
-.timestamp-page__transaction-summary--insufficient
-  .timestamp-page__available-credits {
+.timestamp-page__transaction-summary--insufficient .timestamp-page__available-credits {
   color: var(--color-danger);
 }
 

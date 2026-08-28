@@ -185,7 +185,9 @@
 
 .recent-signatures-list__document {
   display: grid;
-  grid-template-columns: auto minmax(12rem, 1.5fr) minmax(10rem, 1fr) minmax(6rem, 0.5fr) auto;
+  grid-template-columns:
+    auto minmax(12rem, 1.5fr) minmax(10rem, 1fr) minmax(6rem, 0.5fr)
+    auto;
   gap: 1rem;
   align-items: center;
   min-height: 4.75rem;

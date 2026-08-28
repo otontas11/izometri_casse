@@ -1,7 +1,4 @@
-import type {
-  ArchivedDocument,
-  DashboardSummary,
-} from '@/features/dashboard/types/dashboard.types'
+import type { ArchivedDocument, DashboardSummary } from '@/features/dashboard/types/dashboard.types'
 
 export type TimestampJobStatus = 'completed' | 'failed' | 'processing'
 
@@ -22,14 +19,7 @@ export interface TimestampTransactionResponse {
   timestampJob: TimestampJob
 }
 
-export type TimestampFileStatus =
-  | 'selected'
-  | 'uploading'
-  | 'uploaded'
-  | 'processing'
-  | 'upload-error'
-  | 'process-error'
-  | 'deleting'
+export type TimestampFileStatus = 'selected' | 'uploading' | 'uploaded' | 'processing' | 'upload-error' | 'process-error' | 'deleting'
 
 export interface TimestampFileItem {
   draftFileId: number | null

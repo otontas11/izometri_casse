@@ -1,7 +1,6 @@
 <template>
-  <section
-    class="recent-documents-table"
-    aria-labelledby="recent-documents-title"
+  <section class="recent-documents-table"
+           aria-labelledby="recent-documents-title"
   >
     <header class="recent-documents-table__heading">
       <div>
@@ -25,12 +24,13 @@
       </div>
     </header>
 
-    <table
-      v-if="archivedDocuments.length"
-      class="recent-documents-table__content"
+    <table v-if="archivedDocuments.length"
+           class="recent-documents-table__content"
     >
       <caption class="visually-hidden">
-        {{ t('dashboard.recentDocuments.title') }}
+        {{
+          t('dashboard.recentDocuments.title')
+        }}
       </caption>
       <thead>
         <tr class="recent-documents-table__column-headings">
@@ -42,14 +42,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="archivedDocument in archivedDocuments"
-          :key="archivedDocument.id"
-          class="recent-documents-table__row"
+        <tr v-for="archivedDocument in archivedDocuments"
+            :key="archivedDocument.id"
+            class="recent-documents-table__row"
         >
-          <td
-            class="recent-documents-table__file"
-            :data-label="t('dashboard.recentDocuments.document')"
+          <td class="recent-documents-table__file"
+              :data-label="t('dashboard.recentDocuments.document')"
           >
             <span aria-hidden="true">
               <AppIcon name="document" :size="20" />
@@ -61,113 +59,101 @@
               </small>
             </div>
           </td>
-          <td
-            class="recent-documents-table__operation-cell"
-            :data-label="t('dashboard.recentDocuments.operation')"
+          <td class="recent-documents-table__operation-cell"
+              :data-label="t('dashboard.recentDocuments.operation')"
           >
-            <span
-              :class="[
-                'recent-documents-table__operation',
-                `recent-documents-table__operation--${archivedDocument.operation}`,
-              ]"
+            <span :class="[
+              'recent-documents-table__operation',
+              `recent-documents-table__operation--${archivedDocument.operation}`,
+            ]"
             >
-              {{ t(documentOperationTranslationKeys[archivedDocument.operation]) }}
+              {{
+                t(documentOperationTranslationKeys[archivedDocument.operation])
+              }}
             </span>
           </td>
-          <td
-            class="recent-documents-table__date-cell"
-            :data-label="t('dashboard.recentDocuments.date')"
+          <td class="recent-documents-table__date-cell"
+              :data-label="t('dashboard.recentDocuments.date')"
           >
             <time :datetime="archivedDocument.createdAt">
               {{ formatDateTime(archivedDocument.createdAt) }}
             </time>
           </td>
-          <td
-            class="recent-documents-table__size-cell"
-            :data-label="t('dashboard.recentDocuments.size')"
+          <td class="recent-documents-table__size-cell"
+              :data-label="t('dashboard.recentDocuments.size')"
           >
             {{ formatFileSize(archivedDocument.sizeBytes) }}
           </td>
-          <td
-            class="recent-documents-table__actions"
-            :data-label="t('dashboard.recentDocuments.actions')"
+          <td class="recent-documents-table__actions"
+              :data-label="t('dashboard.recentDocuments.actions')"
           >
-            <button
-              type="button"
-              class="recent-documents-table__preview-button"
-              :disabled="
-                previewingDocumentId !== null || deletingDocumentId !== null
-              "
-              :aria-busy="previewingDocumentId === archivedDocument.id"
-              :aria-label="
-                t('dashboard.recentDocuments.previewAriaLabel', {
-                  fileName: archivedDocument.name,
-                })
-              "
-              :title="t('dashboard.recentDocuments.previewTitle')"
-              @click="handleDocumentPreview(archivedDocument)"
+            <button type="button"
+                    class="recent-documents-table__preview-button"
+                    :disabled="
+                      previewingDocumentId !== null || deletingDocumentId !== null
+                    "
+                    :aria-busy="previewingDocumentId === archivedDocument.id"
+                    :aria-label="
+                      t('dashboard.recentDocuments.previewAriaLabel', {
+                        fileName: archivedDocument.name,
+                      })
+                    "
+                    :title="t('dashboard.recentDocuments.previewTitle')"
+                    @click="handleDocumentPreview(archivedDocument)"
             >
               <AppIcon name="eye" :size="17" />
             </button>
-            <button
-              type="button"
-              class="recent-documents-table__download-button"
-              :disabled="
-                downloadingDocumentId !== null || deletingDocumentId !== null
-              "
-              :aria-busy="downloadingDocumentId === archivedDocument.id"
-              :aria-label="
-                t('dashboard.recentDocuments.downloadAriaLabel', {
-                  fileName: archivedDocument.name,
-                })
-              "
-              :title="t('dashboard.recentDocuments.downloadTitle')"
-              @click="handleDocumentDownload(archivedDocument)"
+            <button type="button"
+                    class="recent-documents-table__download-button"
+                    :disabled="
+                      downloadingDocumentId !== null || deletingDocumentId !== null
+                    "
+                    :aria-busy="downloadingDocumentId === archivedDocument.id"
+                    :aria-label="
+                      t('dashboard.recentDocuments.downloadAriaLabel', {
+                        fileName: archivedDocument.name,
+                      })
+                    "
+                    :title="t('dashboard.recentDocuments.downloadTitle')"
+                    @click="handleDocumentDownload(archivedDocument)"
             >
               <AppIcon name="download" :size="18" />
             </button>
 
-            <div
-              class="recent-documents-table__action-menu"
-              data-document-menu
-            >
-              <button
-                type="button"
-                class="recent-documents-table__menu-button"
-                :disabled="deletingDocumentId !== null"
-                aria-haspopup="menu"
-                :aria-expanded="openDocumentMenuId === archivedDocument.id"
-                :aria-controls="getDocumentMenuElementId(archivedDocument.id)"
-                :aria-label="
-                  t('dashboard.recentDocuments.menuAriaLabel', {
-                    fileName: archivedDocument.name,
-                  })
-                "
-                @click="handleDocumentMenuToggle(archivedDocument.id)"
+            <div class="recent-documents-table__action-menu" data-document-menu>
+              <button type="button"
+                      class="recent-documents-table__menu-button"
+                      :disabled="deletingDocumentId !== null"
+                      aria-haspopup="menu"
+                      :aria-expanded="openDocumentMenuId === archivedDocument.id"
+                      :aria-controls="getDocumentMenuElementId(archivedDocument.id)"
+                      :aria-label="
+                        t('dashboard.recentDocuments.menuAriaLabel', {
+                          fileName: archivedDocument.name,
+                        })
+                      "
+                      @click="handleDocumentMenuToggle(archivedDocument.id)"
               >
                 <AppIcon name="more-horizontal" :size="19" />
               </button>
 
-              <div
-                v-if="openDocumentMenuId === archivedDocument.id"
-                :id="getDocumentMenuElementId(archivedDocument.id)"
-                class="recent-documents-table__menu"
-                role="menu"
+              <div v-if="openDocumentMenuId === archivedDocument.id"
+                   :id="getDocumentMenuElementId(archivedDocument.id)"
+                   class="recent-documents-table__menu"
+                   role="menu"
               >
-                <button
-                  type="button"
-                  role="menuitem"
-                  @click="handleDocumentEmailSend(archivedDocument)"
+                <button type="button"
+                        role="menuitem"
+                        @click="handleDocumentEmailSend(archivedDocument)"
                 >
                   <AppIcon name="mail" :size="17" />
                   <span>{{ t('dashboard.recentDocuments.sendByEmail') }}</span>
                 </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  class="recent-documents-table__delete-menu-button"
-                  :disabled="deletingDocumentId !== null"
-                  @click="handleDocumentDelete(archivedDocument)"
+                <button type="button"
+                        role="menuitem"
+                        class="recent-documents-table__delete-menu-button"
+                        :disabled="deletingDocumentId !== null"
+                        @click="handleDocumentDelete(archivedDocument)"
                 >
                   <AppIcon name="trash" :size="17" />
                   <span>
@@ -368,7 +354,9 @@ onBeforeUnmount(() => {
 .recent-documents-table__column-headings,
 .recent-documents-table__row {
   display: grid;
-  grid-template-columns: minmax(15rem, 2fr) minmax(8rem, 0.8fr) minmax(10rem, 1fr) minmax(5rem, 0.55fr) 7rem;
+  grid-template-columns:
+    minmax(15rem, 2fr) minmax(8rem, 0.8fr) minmax(10rem, 1fr)
+    minmax(5rem, 0.55fr) 7rem;
   gap: 1rem;
   align-items: center;
   padding-inline: 1.5rem;
@@ -616,7 +604,9 @@ onBeforeUnmount(() => {
 @media (max-width: 79.99rem) {
   .recent-documents-table__column-headings,
   .recent-documents-table__row {
-    grid-template-columns: minmax(13rem, 1.7fr) minmax(7rem, 0.8fr) minmax(9rem, 1fr) 7rem;
+    grid-template-columns:
+      minmax(13rem, 1.7fr) minmax(7rem, 0.8fr) minmax(9rem, 1fr)
+      7rem;
   }
 
   .recent-documents-table__column-headings > th:nth-child(4),

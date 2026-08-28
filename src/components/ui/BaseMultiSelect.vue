@@ -1,94 +1,82 @@
 <template>
-  <div
-    ref="multiSelectElement"
-    :class="[
-      'base-multi-select',
-      { 'base-multi-select--open': isDropdownOpen },
-    ]"
-    @focusout="handleFocusOut"
-    @keydown.esc.stop.prevent="closeDropdownAndRestoreTriggerFocus"
+  <div ref="multiSelectElement"
+       :class="[
+         'base-multi-select',
+         { 'base-multi-select--open': isDropdownOpen },
+       ]"
+       @focusout="handleFocusOut"
+       @keydown.esc.stop.prevent="closeDropdownAndRestoreTriggerFocus"
   >
     <span :id="labelElementId" class="base-multi-select__label">
       {{ label }}
     </span>
 
-    <button
-      :id="id"
-      ref="triggerElement"
-      class="base-multi-select__trigger"
-      type="button"
-      aria-haspopup="true"
-      :aria-controls="optionsPanelId"
-      :aria-expanded="isDropdownOpen"
-      :aria-labelledby="`${labelElementId} ${summaryElementId}`"
-      :disabled="disabled"
-      @click="handleTriggerClick"
-      @keydown="handleTriggerKeydown"
+    <button :id="id"
+            ref="triggerElement"
+            class="base-multi-select__trigger"
+            type="button"
+            aria-haspopup="true"
+            :aria-controls="optionsPanelId"
+            :aria-expanded="isDropdownOpen"
+            :aria-labelledby="`${labelElementId} ${summaryElementId}`"
+            :disabled="disabled"
+            @click="handleTriggerClick"
+            @keydown="handleTriggerKeydown"
     >
-      <span
-        :id="summaryElementId"
-        :class="[
-          'base-multi-select__summary',
-          {
-            'base-multi-select__summary--placeholder':
-              modelValue.length === 0,
-          },
-        ]"
+      <span :id="summaryElementId"
+            :class="[
+              'base-multi-select__summary',
+              {
+                'base-multi-select__summary--placeholder': modelValue.length === 0,
+              },
+            ]"
       >
         {{ selectedValueSummary }}
       </span>
-      <span
-        v-if="modelValue.length > 0"
-        class="base-multi-select__selection-count"
-        aria-hidden="true"
+      <span v-if="modelValue.length > 0"
+            class="base-multi-select__selection-count"
+            aria-hidden="true"
       >
         {{ modelValue.length }}
       </span>
-      <AppIcon
-        class="base-multi-select__chevron"
-        name="chevron-down"
-        :size="17"
+      <AppIcon class="base-multi-select__chevron"
+               name="chevron-down"
+               :size="17"
       />
     </button>
 
-    <div
-      v-if="isDropdownOpen"
-      :id="optionsPanelId"
-      ref="optionsPanelElement"
-      class="base-multi-select__panel"
-      role="group"
-      :aria-labelledby="labelElementId"
+    <div v-if="isDropdownOpen"
+         :id="optionsPanelId"
+         ref="optionsPanelElement"
+         class="base-multi-select__panel"
+         role="group"
+         :aria-labelledby="labelElementId"
     >
-      <div
-        v-for="multiSelectOption in options"
-        :key="multiSelectOption.value"
-        :class="[
-          'base-multi-select__option',
-          {
-            'base-multi-select__option--selected': modelValue.includes(
-              multiSelectOption.value,
-            ),
-          },
-        ]"
+      <div v-for="multiSelectOption in options"
+           :key="multiSelectOption.value"
+           :class="[
+             'base-multi-select__option',
+             {
+               'base-multi-select__option--selected': modelValue.includes(
+                 multiSelectOption.value,
+               ),
+             },
+           ]"
       >
-        <button
-          type="button"
-          class="base-multi-select__checkbox"
-          role="checkbox"
-          data-multi-select-checkbox
-          :aria-checked="modelValue.includes(multiSelectOption.value)"
-          :aria-label="multiSelectOption.label"
-          @click="handleOptionToggle(multiSelectOption.value)"
-          @keydown="handleCheckboxKeydown"
+        <button type="button"
+                class="base-multi-select__checkbox"
+                role="checkbox"
+                data-multi-select-checkbox
+                :aria-checked="modelValue.includes(multiSelectOption.value)"
+                :aria-label="multiSelectOption.label"
+                @click="handleOptionToggle(multiSelectOption.value)"
+                @keydown="handleCheckboxKeydown"
         >
           <span aria-hidden="true">
             {{ modelValue.includes(multiSelectOption.value) ? '✓' : '' }}
           </span>
         </button>
-        <span
-          class="base-multi-select__option-label"
-          @pointerdown.prevent
-        >
+        <span class="base-multi-select__option-label" @pointerdown.prevent>
           {{ multiSelectOption.label }}
         </span>
       </div>
@@ -213,10 +201,7 @@ const handleTriggerClick = () => {
 }
 
 const handleTriggerKeydown = (keyboardEvent: KeyboardEvent) => {
-  if (
-    keyboardEvent.key !== 'ArrowDown' &&
-    keyboardEvent.key !== 'ArrowUp'
-  ) {
+  if (keyboardEvent.key !== 'ArrowDown' && keyboardEvent.key !== 'ArrowUp') {
     return
   }
 
@@ -246,8 +231,7 @@ const handleCheckboxKeydown = (keyboardEvent: KeyboardEvent) => {
   let checkboxIndexToFocus: number
 
   if (keyboardEvent.key === 'ArrowDown') {
-    checkboxIndexToFocus =
-      (focusedCheckboxIndex + 1) % checkboxElements.length
+    checkboxIndexToFocus = (focusedCheckboxIndex + 1) % checkboxElements.length
   } else if (keyboardEvent.key === 'ArrowUp') {
     checkboxIndexToFocus =
       (focusedCheckboxIndex - 1 + checkboxElements.length) %

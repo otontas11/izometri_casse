@@ -1,23 +1,20 @@
 <template>
   <div class="app-layout">
-    <AppSidebar
-      :is-open="isSidebarOpen"
-      @close="handleSidebarClose"
-      @navigate="handleSidebarNavigation"
+    <AppSidebar :is-open="isSidebarOpen"
+                @close="handleSidebarClose"
+                @navigate="handleSidebarNavigation"
     />
 
-    <div
-      v-if="isSidebarOpen"
-      class="app-layout__overlay"
-      aria-hidden="true"
-      @click="handleSidebarClose()"
+    <div v-if="isSidebarOpen"
+         class="app-layout__overlay"
+         aria-hidden="true"
+         @click="handleSidebarClose()"
     ></div>
 
     <div class="app-layout__workspace" :inert="isSidebarOpen">
-      <AppTopbar
-        ref="appTopbarComponent"
-        :is-sidebar-open="isSidebarOpen"
-        @toggle-sidebar="handleSidebarToggle"
+      <AppTopbar ref="appTopbarComponent"
+                 :is-sidebar-open="isSidebarOpen"
+                 @toggle-sidebar="handleSidebarToggle"
       />
 
       <main class="app-layout__main">

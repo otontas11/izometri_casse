@@ -40,9 +40,7 @@ const timestampHistoryTableMeta = {
 
 export default timestampHistoryTableMeta
 
-type TimestampHistoryTableStory = StoryObj<
-  typeof timestampHistoryTableMeta
->
+type TimestampHistoryTableStory = StoryObj<typeof timestampHistoryTableMeta>
 
 export const WithRecords: TimestampHistoryTableStory = {
   name: 'Kayıtlı',

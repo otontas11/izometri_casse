@@ -1,15 +1,14 @@
 <template>
-  <svg
-    class="app-icon"
-    :width="size"
-    :height="size"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1.8"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    aria-hidden="true"
+  <svg class="app-icon"
+       :width="size"
+       :height="size"
+       viewBox="0 0 24 24"
+       fill="none"
+       stroke="currentColor"
+       stroke-width="1.8"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       aria-hidden="true"
   >
     <path :d="selectedIconPath" />
   </svg>
@@ -46,7 +45,8 @@ const iconPaths: Record<AppIconName, string> = {
   profile: 'M20 21a8 8 0 0 0-16 0M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z',
   refresh: 'M20 7v5h-5M4 17v-5h5M18.5 9a7 7 0 0 0-12-2M5.5 15a7 7 0 0 0 12 2',
   search: 'M21 21l-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z',
-  signature: 'M4 19c3-1 4-4 6-8 1-2 2-3 3-3 2 0 1 4-1 6-1 2-2 4 0 4 1 0 2-2 3-3 1-1 2-1 2 1v2',
+  signature:
+    'M4 19c3-1 4-4 6-8 1-2 2-3 3-3 2 0 1 4-1 6-1 2-2 4 0 4 1 0 2-2 3-3 1-1 2-1 2 1v2',
   storage: 'M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9a4.5 4.5 0 0 0 1 9Z',
   timestamp: 'M12 21a9 9 0 1 0-9-9 9 9 0 0 0 9 9ZM12 7v5l3.5 2',
   trash: 'M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6',

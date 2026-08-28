@@ -1,27 +1,24 @@
 <template>
-  <aside
-    id="application-navigation"
-    ref="sidebarElement"
-    :class="['app-sidebar', { 'app-sidebar--open': isOpen }]"
-    :aria-label="t('layout.sidebar.ariaLabel')"
-    @keydown="handleSidebarKeydown"
+  <aside id="application-navigation"
+         ref="sidebarElement"
+         :class="['app-sidebar', { 'app-sidebar--open': isOpen }]"
+         :aria-label="t('layout.sidebar.ariaLabel')"
+         @keydown="handleSidebarKeydown"
   >
     <div class="app-sidebar__brand-row">
-      <RouterLink
-        class="app-sidebar__brand"
-        :to="{ name: 'dashboard' }"
-        :aria-label="t('layout.sidebar.homeAriaLabel')"
-        @click="emit('navigate')"
+      <RouterLink class="app-sidebar__brand"
+                  :to="{ name: 'dashboard' }"
+                  :aria-label="t('layout.sidebar.homeAriaLabel')"
+                  @click="emit('navigate')"
       >
         iz<span>imza</span>
       </RouterLink>
 
-      <button
-        ref="sidebarCloseButtonElement"
-        class="app-sidebar__close"
-        type="button"
-        :aria-label="t('layout.sidebar.closeAriaLabel')"
-        @click="emit('close')"
+      <button ref="sidebarCloseButtonElement"
+              class="app-sidebar__close"
+              type="button"
+              :aria-label="t('layout.sidebar.closeAriaLabel')"
+              @click="emit('close')"
       >
         <AppIcon name="close" :size="22" />
       </button>
@@ -32,16 +29,14 @@
       {{ t('layout.sidebar.context') }}
     </div>
 
-    <nav
-      class="app-sidebar__navigation"
-      :aria-label="t('layout.sidebar.navigationAriaLabel')"
+    <nav class="app-sidebar__navigation"
+         :aria-label="t('layout.sidebar.navigationAriaLabel')"
     >
-      <RouterLink
-        v-for="navigationItem in sidebarNavigationItems"
-        :key="navigationItem.routeName"
-        class="app-sidebar__link"
-        :to="{ name: navigationItem.routeName }"
-        @click="emit('navigate')"
+      <RouterLink v-for="navigationItem in sidebarNavigationItems"
+                  :key="navigationItem.routeName"
+                  class="app-sidebar__link"
+                  :to="{ name: navigationItem.routeName }"
+                  @click="emit('navigate')"
       >
         <AppIcon :name="navigationItem.icon" :size="21" />
         <span>{{ navigationItem.label }}</span>

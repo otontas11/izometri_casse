@@ -1,8 +1,7 @@
 <template>
-  <nav
-    v-if="totalItems > 0"
-    class="document-history-pagination"
-    :aria-label="t('documentHistory.pagination.ariaLabel')"
+  <nav v-if="totalItems > 0"
+       class="document-history-pagination"
+       :aria-label="t('documentHistory.pagination.ariaLabel')"
   >
     <p>
       {{
@@ -15,36 +14,33 @@
     </p>
 
     <div class="document-history-pagination__controls">
-      <button
-        type="button"
-        :disabled="isLoading || currentPage <= 1"
-        @click="handlePageChange(currentPage - 1)"
+      <button type="button"
+              :disabled="isLoading || currentPage <= 1"
+              @click="handlePageChange(currentPage - 1)"
       >
         {{ t('documentHistory.pagination.previous') }}
       </button>
 
-      <button
-        v-for="pageNumber in visiblePageNumbers"
-        :key="pageNumber"
-        type="button"
-        :class="{
-          'document-history-pagination__page-button--active':
-            pageNumber === currentPage,
-        }"
-        :aria-current="pageNumber === currentPage ? 'page' : undefined"
-        :aria-label="
-          t('documentHistory.pagination.pageAriaLabel', { page: pageNumber })
-        "
-        :disabled="isLoading"
-        @click="handlePageChange(pageNumber)"
+      <button v-for="pageNumber in visiblePageNumbers"
+              :key="pageNumber"
+              type="button"
+              :class="{
+                'document-history-pagination__page-button--active':
+                  pageNumber === currentPage,
+              }"
+              :aria-current="pageNumber === currentPage ? 'page' : undefined"
+              :aria-label="
+                t('documentHistory.pagination.pageAriaLabel', { page: pageNumber })
+              "
+              :disabled="isLoading"
+              @click="handlePageChange(pageNumber)"
       >
         {{ pageNumber }}
       </button>
 
-      <button
-        type="button"
-        :disabled="isLoading || currentPage >= totalPages"
-        @click="handlePageChange(currentPage + 1)"
+      <button type="button"
+              :disabled="isLoading || currentPage >= totalPages"
+              @click="handlePageChange(currentPage + 1)"
       >
         {{ t('documentHistory.pagination.next') }}
       </button>
@@ -80,10 +76,7 @@ const visiblePageNumbers = computed(() => {
     1,
     Math.min(props.currentPage - 2, lastPossibleStartPage),
   )
-  const visiblePageCount = Math.min(
-    maximumVisiblePageCount,
-    props.totalPages,
-  )
+  const visiblePageCount = Math.min(maximumVisiblePageCount, props.totalPages)
 
   return Array.from(
     { length: visiblePageCount },
@@ -92,9 +85,7 @@ const visiblePageNumbers = computed(() => {
 })
 
 const firstVisibleRecordNumber = computed(() =>
-  props.totalItems === 0
-    ? 0
-    : (props.currentPage - 1) * props.pageSize + 1,
+  props.totalItems === 0 ? 0 : (props.currentPage - 1) * props.pageSize + 1,
 )
 const lastVisibleRecordNumber = computed(() =>
   Math.min(props.currentPage * props.pageSize, props.totalItems),

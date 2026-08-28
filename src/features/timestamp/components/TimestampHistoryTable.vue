@@ -1,8 +1,7 @@
 <template>
-  <section
-    class="timestamp-history-table"
-    aria-labelledby="timestamp-history-table-title"
-    :aria-busy="isLoading"
+  <section class="timestamp-history-table"
+           aria-labelledby="timestamp-history-table-title"
+           :aria-busy="isLoading"
   >
     <header class="timestamp-history-table__header">
       <div>
@@ -22,11 +21,10 @@
               : t('timestamp.history.refresh')
           }}
         </button>
-        <RouterLink
-          :to="{
-            name: 'document-history',
-            query: { operations: 'timestamp' },
-          }"
+        <RouterLink :to="{
+          name: 'document-history',
+          query: { operations: 'timestamp' },
+        }"
         >
           {{ t('common.viewAll') }}
           <AppIcon name="arrow-right" :size="16" />
@@ -34,10 +32,9 @@
       </div>
     </header>
 
-    <div
-      v-if="errorMessage"
-      class="timestamp-history-table__error-notice"
-      role="alert"
+    <div v-if="errorMessage"
+         class="timestamp-history-table__error-notice"
+         role="alert"
     >
       <span aria-hidden="true">!</span>
       <p>{{ errorMessage }}</p>
@@ -46,20 +43,20 @@
       </button>
     </div>
 
-    <div
-      v-if="isLoading && timestampJobs.length === 0"
-      class="timestamp-history-table__loading-state"
-      :aria-label="t('timestamp.history.loadingAriaLabel')"
+    <div v-if="isLoading && timestampJobs.length === 0"
+         class="timestamp-history-table__loading-state"
+         :aria-label="t('timestamp.history.loadingAriaLabel')"
     >
       <span v-for="skeletonIndex in 3" :key="skeletonIndex"></span>
     </div>
 
-    <table
-      v-else-if="timestampJobs.length"
-      class="timestamp-history-table__content"
+    <table v-else-if="timestampJobs.length"
+           class="timestamp-history-table__content"
     >
       <caption class="visually-hidden">
-        {{ t('timestamp.history.caption') }}
+        {{
+          t('timestamp.history.caption')
+        }}
       </caption>
       <thead>
         <tr class="timestamp-history-table__column-headings">
@@ -70,14 +67,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="timestampJob in timestampJobs"
-          :key="timestampJob.id"
-          class="timestamp-history-table__row"
+        <tr v-for="timestampJob in timestampJobs"
+            :key="timestampJob.id"
+            class="timestamp-history-table__row"
         >
-          <td
-            class="timestamp-history-table__file"
-            :data-label="t('timestamp.history.file')"
+          <td class="timestamp-history-table__file"
+              :data-label="t('timestamp.history.file')"
           >
             <span aria-hidden="true">
               <AppIcon name="document" :size="20" />
@@ -92,29 +87,26 @@
           </td>
 
           <td :data-label="t('timestamp.history.status')">
-            <span
-              :class="[
-                'timestamp-history-table__status',
-                `timestamp-history-table__status--${timestampJob.status}`,
-              ]"
+            <span :class="[
+              'timestamp-history-table__status',
+              `timestamp-history-table__status--${timestampJob.status}`,
+            ]"
             >
               <i aria-hidden="true"></i>
               {{ t(timestampJobStatusTranslationKeys[timestampJob.status]) }}
             </span>
           </td>
 
-          <td
-            class="timestamp-history-table__date-cell"
-            :data-label="t('timestamp.history.transactionDate')"
+          <td class="timestamp-history-table__date-cell"
+              :data-label="t('timestamp.history.transactionDate')"
           >
             <time :datetime="timestampJob.createdAt">
               {{ formatDateTime(timestampJob.createdAt) }}
             </time>
           </td>
 
-          <td
-            class="timestamp-history-table__credit"
-            :data-label="t('timestamp.history.cost')"
+          <td class="timestamp-history-table__credit"
+              :data-label="t('timestamp.history.cost')"
           >
             {{ t('timestamp.history.creditCost', timestampJob.creditCost) }}
           </td>

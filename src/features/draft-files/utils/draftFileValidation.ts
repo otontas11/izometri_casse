@@ -23,25 +23,17 @@ export const DRAFT_FILE_INPUT_ACCEPT = [
   '.xml',
 ].join(',')
 
-const supportedDraftFileExtensions = new Set(
-  DRAFT_FILE_INPUT_ACCEPT.split(','),
-)
+const supportedDraftFileExtensions = new Set(DRAFT_FILE_INPUT_ACCEPT.split(','))
 
-type DraftFileValidationResult =
-  | { isValid: true }
-  | { errorMessage: string; isValid: false }
+type DraftFileValidationResult = { isValid: true } | { errorMessage: string; isValid: false }
 
 const getFileExtension = (fileName: string) => {
   const extensionSeparatorIndex = fileName.lastIndexOf('.')
 
-  return extensionSeparatorIndex >= 0
-    ? fileName.slice(extensionSeparatorIndex).toLowerCase()
-    : ''
+  return extensionSeparatorIndex >= 0 ? fileName.slice(extensionSeparatorIndex).toLowerCase() : ''
 }
 
-export const validateDraftFile = (
-  draftFile: File,
-): DraftFileValidationResult => {
+export const validateDraftFile = (draftFile: File): DraftFileValidationResult => {
   if (draftFile.size === 0) {
     return {
       errorMessage: translate('draftFiles.validation.emptyFile'),

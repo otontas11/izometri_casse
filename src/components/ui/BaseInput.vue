@@ -1,44 +1,41 @@
 <template>
-  <div
-    :class="[
-      'base-input',
-      {
-        'base-input--error': errorMessage,
-        'base-input--readonly': readonly,
-      },
-    ]"
+  <div :class="[
+    'base-input',
+    {
+      'base-input--error': errorMessage,
+      'base-input--readonly': readonly,
+    },
+  ]"
   >
     <label :for="id">
       {{ label }}
       <span v-if="required" aria-hidden="true">*</span>
     </label>
 
-    <input
-      :id="id"
-      :name="name"
-      :type="type"
-      :value="modelValue"
-      :placeholder="placeholder"
-      :autocomplete="autocomplete"
-      :inputmode="inputMode"
-      :maxlength="maximumLength"
-      :disabled="disabled"
-      :readonly="readonly"
-      :required="required"
-      :aria-invalid="errorMessage ? 'true' : undefined"
-      :aria-describedby="inputDescriptionIds"
-      @input="handleInput"
-      @blur="emit('blur')"
+    <input :id="id"
+           :name="name"
+           :type="type"
+           :value="modelValue"
+           :placeholder="placeholder"
+           :autocomplete="autocomplete"
+           :inputmode="inputMode"
+           :maxlength="maximumLength"
+           :disabled="disabled"
+           :readonly="readonly"
+           :required="required"
+           :aria-invalid="errorMessage ? 'true' : undefined"
+           :aria-describedby="inputDescriptionIds"
+           @input="handleInput"
+           @blur="emit('blur')"
     />
 
     <small v-if="hint" :id="`${id}-hint`" class="base-input__hint">
       {{ hint }}
     </small>
-    <small
-      v-if="errorMessage"
-      :id="`${id}-error`"
-      class="base-input__error-message"
-      role="alert"
+    <small v-if="errorMessage"
+           :id="`${id}-error`"
+           class="base-input__error-message"
+           role="alert"
     >
       {{ errorMessage }}
     </small>

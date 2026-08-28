@@ -57,30 +57,32 @@
       >
         <DashboardMetricCard :label="t('dashboard.metrics.signedDocuments')"
                              :metric-value="
-            formatDashboardNumber(dashboardSummary.totalSignedDocuments)
-          "
+                               formatDashboardNumber(dashboardSummary.totalSignedDocuments)
+                             "
                              icon="signature"
                              tone="navy"
         />
         <DashboardMetricCard :label="t('dashboard.metrics.archivedDocuments')"
                              :metric-value="
-            formatDashboardNumber(dashboardSummary.totalTimestampedDocuments)
-          "
+                               formatDashboardNumber(dashboardSummary.totalTimestampedDocuments)
+                             "
                              icon="archive"
                              tone="violet"
         />
         <DashboardMetricCard :label="t('dashboard.metrics.availableCredits')"
                              :metric-value="
-            formatDashboardNumber(dashboardSummary.remainingCredits)
-          "
+                               formatDashboardNumber(dashboardSummary.remainingCredits)
+                             "
                              icon="wallet"
                              tone="green"
         />
         <DashboardMetricCard :label="t('dashboard.metrics.archiveCapacity')"
-                             :metric-value="formatArchiveStorageSummary(
-            dashboardSummary.storageUsedMb,
-            dashboardSummary.storageLimitMb,
-          )"
+                             :metric-value="
+                               formatArchiveStorageSummary(
+                                 dashboardSummary.storageUsedMb,
+                                 dashboardSummary.storageLimitMb,
+                               )
+                             "
                              :progress="archiveStorageUsagePercentage"
                              icon="storage"
                              tone="blue"
@@ -100,24 +102,22 @@
       />
     </template>
 
-    <ArchivedDocumentPreviewDrawer
-        :archived-document="selectedDocumentForPreview"
-        :document-content="previewDocumentContent"
-        :error-message="documentPreviewErrorMessage"
-        :is-loading="isSelectedDocumentPreviewLoading"
-        :is-open="isDocumentPreviewDrawerOpen"
-        @close="handleDocumentPreviewDrawerClose"
-        @download="handleDocumentDownload"
-        @retry="handleDocumentPreview"
+    <ArchivedDocumentPreviewDrawer :archived-document="selectedDocumentForPreview"
+                                   :document-content="previewDocumentContent"
+                                   :error-message="documentPreviewErrorMessage"
+                                   :is-loading="isSelectedDocumentPreviewLoading"
+                                   :is-open="isDocumentPreviewDrawerOpen"
+                                   @close="handleDocumentPreviewDrawerClose"
+                                   @download="handleDocumentDownload"
+                                   @retry="handleDocumentPreview"
     />
 
-    <ArchivedDocumentDeleteModal
-        :archived-document="documentPendingDeletion"
-        :error-message="documentDeleteErrorMessage"
-        :is-deleting="isSelectedDocumentDeleting"
-        :is-open="isDocumentDeleteModalOpen"
-        @close="handleDocumentDeleteModalClose"
-        @confirm="handleDocumentDeleteConfirm"
+    <ArchivedDocumentDeleteModal :archived-document="documentPendingDeletion"
+                                 :error-message="documentDeleteErrorMessage"
+                                 :is-deleting="isSelectedDocumentDeleting"
+                                 :is-open="isDocumentDeleteModalOpen"
+                                 @close="handleDocumentDeleteModalClose"
+                                 @confirm="handleDocumentDeleteConfirm"
     />
   </section>
 </template>
@@ -214,14 +214,10 @@ const isInitialDashboardLoading = computed(
         (dashboardRequestStatus.value === 'idle' || isDashboardLoading.value),
 )
 const hasInitialDashboardError = computed(
-    () =>
-        !dashboardSummary.value && dashboardRequestStatus.value === 'error',
+    () => !dashboardSummary.value && dashboardRequestStatus.value === 'error',
 )
 const archiveStorageUsagePercentage = computed(() => {
-  if (
-      !dashboardSummary.value ||
-      dashboardSummary.value.storageLimitMb <= 0
-  ) {
+  if (!dashboardSummary.value || dashboardSummary.value.storageLimitMb <= 0) {
     return 0
   }
 

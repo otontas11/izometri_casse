@@ -1,17 +1,16 @@
 <template>
   <header class="app-topbar">
-    <button
-      ref="sidebarToggleButtonElement"
-      class="app-topbar__menu"
-      type="button"
-      aria-controls="application-navigation"
-      :aria-expanded="isSidebarOpen"
-      :aria-label="
-        isSidebarOpen
-          ? t('layout.topbar.closeNavigation')
-          : t('layout.topbar.openNavigation')
-      "
-      @click="emit('toggleSidebar')"
+    <button ref="sidebarToggleButtonElement"
+            class="app-topbar__menu"
+            type="button"
+            aria-controls="application-navigation"
+            :aria-expanded="isSidebarOpen"
+            :aria-label="
+              isSidebarOpen
+                ? t('layout.topbar.closeNavigation')
+                : t('layout.topbar.openNavigation')
+            "
+            @click="emit('toggleSidebar')"
     >
       <AppIcon name="menu" :size="23" />
     </button>
@@ -22,20 +21,19 @@
     </div>
 
     <div class="app-topbar__actions">
-      <div
-        :class="[
-          'app-topbar__credit-balance',
-          {
-            'app-topbar__credit-balance--low': hasLowRemainingCredits,
-          },
-        ]"
-        :aria-label="
-          t('layout.topbar.remainingCreditsAriaLabel', {
-            count: displayedRemainingCredits,
-          })
-        "
-        aria-live="polite"
-        role="status"
+      <div :class="[
+             'app-topbar__credit-balance',
+             {
+               'app-topbar__credit-balance--low': hasLowRemainingCredits,
+             },
+           ]"
+           :aria-label="
+             t('layout.topbar.remainingCreditsAriaLabel', {
+               count: displayedRemainingCredits,
+             })
+           "
+           aria-live="polite"
+           role="status"
       >
         <span class="app-topbar__credit-icon" aria-hidden="true">
           <AppIcon name="wallet" :size="19" />
@@ -83,9 +81,7 @@ const { dashboardRequestStatus, dashboardSummary } = storeToRefs(dashboardStore)
 const remainingCredits = computed(
   () => dashboardSummary.value?.remainingCredits ?? null,
 )
-const displayedRemainingCredits = computed(
-  () => remainingCredits.value ?? '—',
-)
+const displayedRemainingCredits = computed(() => remainingCredits.value ?? '—')
 const hasLowRemainingCredits = computed(
   () => remainingCredits.value !== null && remainingCredits.value <= 5,
 )

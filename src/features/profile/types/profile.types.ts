@@ -7,7 +7,4 @@ export interface UserProfile {
   avatarUrl: string | null
 }
 
-export type UpdateProfilePayload = Pick<
-  UserProfile,
-  'firstName' | 'lastName' | 'phone'
->
+export type UpdateProfilePayload = Pick<UserProfile, 'firstName' | 'lastName' | 'phone'>

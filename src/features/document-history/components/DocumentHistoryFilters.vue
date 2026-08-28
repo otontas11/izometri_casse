@@ -1,7 +1,6 @@
 <template>
-  <section
-    class="document-history-filters"
-    :aria-label="t('documentHistory.filters.ariaLabel')"
+  <section class="document-history-filters"
+           :aria-label="t('documentHistory.filters.ariaLabel')"
   >
     <div class="document-history-filters__field">
       <label for="document-history-file-search">
@@ -9,66 +8,61 @@
       </label>
       <div class="document-history-filters__control">
         <AppIcon name="search" :size="18" />
-        <input
-          id="document-history-file-search"
-          v-model="filterForm.fileNameSearch"
-          type="search"
-          maxlength="100"
-          :placeholder="t('documentHistory.filters.fileSearchPlaceholder')"
-          @input="handleFileNameSearchInput"
+        <input id="document-history-file-search"
+               v-model="filterForm.fileNameSearch"
+               type="search"
+               maxlength="100"
+               :placeholder="t('documentHistory.filters.fileSearchPlaceholder')"
+               @input="handleFileNameSearchInput"
         />
       </div>
     </div>
 
-    <BaseDatePicker
-      id="document-history-date"
-      :calendar-aria-label="t('documentHistory.filters.calendarAriaLabel')"
-      :clear-text="t('documentHistory.filters.clearDate')"
-      :label="t('documentHistory.filters.date')"
-      :model-value="filterForm.selectedDate"
-      :next-month-text="t('documentHistory.filters.nextMonth')"
-      :placeholder="t('documentHistory.filters.datePlaceholder')"
-      :previous-month-text="t('documentHistory.filters.previousMonth')"
-      :today-text="t('documentHistory.filters.today')"
-      @update:model-value="handleDateSelectionChange"
+    <BaseDatePicker id="document-history-date"
+                    :calendar-aria-label="t('documentHistory.filters.calendarAriaLabel')"
+                    :clear-text="t('documentHistory.filters.clearDate')"
+                    :label="t('documentHistory.filters.date')"
+                    :model-value="filterForm.selectedDate"
+                    :next-month-text="t('documentHistory.filters.nextMonth')"
+                    :placeholder="t('documentHistory.filters.datePlaceholder')"
+                    :previous-month-text="t('documentHistory.filters.previousMonth')"
+                    :today-text="t('documentHistory.filters.today')"
+                    @update:model-value="handleDateSelectionChange"
     />
 
-    <BaseMultiSelect
-      id="document-history-file-types"
-      :clear-text="t('documentHistory.filters.clearSelections')"
-      :label="t('documentHistory.filters.fileType')"
-      :model-value="filterForm.fileTypes"
-      :multiple-selection-text="
-        t('documentHistory.filters.selectedCount', {
-          count: filterForm.fileTypes.length,
-        })
-      "
-      :options="fileTypeOptions"
-      :placeholder="t('documentHistory.filters.allFileTypes')"
-      @update:model-value="handleFileTypeSelectionChange"
+    <BaseMultiSelect id="document-history-file-types"
+                     :clear-text="t('documentHistory.filters.clearSelections')"
+                     :label="t('documentHistory.filters.fileType')"
+                     :model-value="filterForm.fileTypes"
+                     :multiple-selection-text="
+                       t('documentHistory.filters.selectedCount', {
+                         count: filterForm.fileTypes.length,
+                       })
+                     "
+                     :options="fileTypeOptions"
+                     :placeholder="t('documentHistory.filters.allFileTypes')"
+                     @update:model-value="handleFileTypeSelectionChange"
     />
 
-    <BaseMultiSelect
-      id="document-history-operations"
-      :clear-text="t('documentHistory.filters.clearSelections')"
-      :label="t('documentHistory.filters.operation')"
-      :model-value="filterForm.operations"
-      :multiple-selection-text="
-        t('documentHistory.filters.selectedCount', {
-          count: filterForm.operations.length,
-        })
-      "
-      :options="operationOptions"
-      :placeholder="t('documentHistory.filters.allOperations')"
-      @update:model-value="handleOperationSelectionChange"
+    <BaseMultiSelect id="document-history-operations"
+                     :clear-text="t('documentHistory.filters.clearSelections')"
+                     :label="t('documentHistory.filters.operation')"
+                     :model-value="filterForm.operations"
+                     :multiple-selection-text="
+                       t('documentHistory.filters.selectedCount', {
+                         count: filterForm.operations.length,
+                       })
+                     "
+                     :options="operationOptions"
+                     :placeholder="t('documentHistory.filters.allOperations')"
+                     @update:model-value="handleOperationSelectionChange"
     />
 
     <div class="document-history-filters__actions">
-      <button
-        class="document-history-filters__reset-button"
-        type="button"
-        :disabled="!hasEnteredFilter"
-        @click="handleFiltersReset"
+      <button class="document-history-filters__reset-button"
+              type="button"
+              :disabled="!hasEnteredFilter"
+              @click="handleFiltersReset"
       >
         {{ t('documentHistory.filters.clear') }}
       </button>
@@ -184,9 +178,7 @@ const handleDateSelectionChange = (selectedDate: string) => {
 const handleFileTypeSelectionChange = (selectedValues: string[]) => {
   filterForm.fileTypes = selectedValues.filter(
     (selectedValue): selectedValue is DocumentFileTypeFilter =>
-      supportedDocumentFileTypes.has(
-        selectedValue as DocumentFileTypeFilter,
-      ),
+      supportedDocumentFileTypes.has(selectedValue as DocumentFileTypeFilter),
   )
   scheduleFilterChange()
 }

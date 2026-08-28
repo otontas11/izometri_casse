@@ -10,14 +10,9 @@ import { translate } from '@/locales'
 import type { ApiRequestStatus } from '@/types/api.types'
 
 import { timestampApi } from '../api/timestamp.api'
-import type {
-  TimestampFileItem,
-  TimestampJob,
-} from '../types/timestamp.types'
+import type { TimestampFileItem, TimestampJob } from '../types/timestamp.types'
 
-const createSelectedTimestampFileItem = (
-  selectedFile: File,
-): TimestampFileItem => ({
+const createSelectedTimestampFileItem = (selectedFile: File): TimestampFileItem => ({
   draftFileId: null,
   errorMessage: '',
   file: selectedFile,
@@ -28,9 +23,7 @@ const createSelectedTimestampFileItem = (
   status: 'selected',
 })
 
-const createUploadedTimestampFileItem = (
-  draftFile: DraftFile,
-): TimestampFileItem => ({
+const createUploadedTimestampFileItem = (draftFile: DraftFile): TimestampFileItem => ({
   draftFileId: draftFile.id,
   errorMessage: '',
   file: null,
@@ -53,16 +46,10 @@ export const useTimestampStore = defineStore('timestamp', () => {
   const timestampJobsLoadStatus = ref<ApiRequestStatus>('idle')
   const timestampHistoryErrorMessage = ref('')
 
-  const isTimestampActionInProgress = computed(
-    () => timestampActionStatus.value === 'loading',
-  )
-  const isTimestampHistoryLoading = computed(
-    () => timestampJobsLoadStatus.value === 'loading',
-  )
+  const isTimestampActionInProgress = computed(() => timestampActionStatus.value === 'loading')
+  const isTimestampHistoryLoading = computed(() => timestampJobsLoadStatus.value === 'loading')
   const canProcessTimestampFiles = computed(() =>
-    timestampFiles.value.some(
-      ({ status }) => status === 'uploaded' || status === 'process-error',
-    ),
+    timestampFiles.value.some(({ status }) => status === 'uploaded' || status === 'process-error')
   )
 
   const clearTimestampActionFeedback = () => {
@@ -71,22 +58,14 @@ export const useTimestampStore = defineStore('timestamp', () => {
     timestampActionSuccessMessage.value = ''
   }
 
-  const updateTimestampFileItem = (
-    timestampFileId: string,
-    updatedFields: Partial<TimestampFileItem>,
-  ) => {
-    timestampFiles.value = timestampFiles.value.map((timestampFileItem) =>
-      timestampFileItem.id === timestampFileId
-        ? { ...timestampFileItem, ...updatedFields }
-        : timestampFileItem,
+  const updateTimestampFileItem = (timestampFileId: string, updatedFields: Partial<TimestampFileItem>) => {
+    timestampFiles.value = timestampFiles.value.map(timestampFileItem =>
+      timestampFileItem.id === timestampFileId ? { ...timestampFileItem, ...updatedFields } : timestampFileItem
     )
   }
 
   const addRecentTimestampJob = (timestampJob: TimestampJob) => {
-    timestampJobs.value = [
-      timestampJob,
-      ...timestampJobs.value.filter(({ id }) => id !== timestampJob.id),
-    ]
+    timestampJobs.value = [timestampJob, ...timestampJobs.value.filter(({ id }) => id !== timestampJob.id)]
     timestampJobsLoadStatus.value = 'success'
     timestampHistoryErrorMessage.value = ''
   }
@@ -110,21 +89,15 @@ export const useTimestampStore = defineStore('timestamp', () => {
 
   const loadUploadedTimestampFiles = async () => {
     try {
-      const uploadedDraftFiles =
-        await draftFilesStore.fetchUploadedDraftFiles('timestamp')
+      const uploadedDraftFiles = await draftFilesStore.fetchUploadedDraftFiles('timestamp')
       const existingDraftFileIds = new Set(
-        timestampFiles.value
-          .map(({ draftFileId }) => draftFileId)
-          .filter((draftFileId): draftFileId is number => draftFileId !== null),
+        timestampFiles.value.map(({ draftFileId }) => draftFileId).filter((draftFileId): draftFileId is number => draftFileId !== null)
       )
       const restoredTimestampFiles = uploadedDraftFiles
         .filter(({ id }) => !existingDraftFileIds.has(id))
         .map(createUploadedTimestampFileItem)
 
-      timestampFiles.value = [
-        ...timestampFiles.value,
-        ...restoredTimestampFiles,
-      ]
+      timestampFiles.value = [...timestampFiles.value, ...restoredTimestampFiles]
     } catch (requestError) {
       timestampActionStatus.value = 'error'
       timestampActionErrorMessage.value = getApiErrorMessage(requestError)
@@ -139,7 +112,7 @@ export const useTimestampStore = defineStore('timestamp', () => {
     const validTimestampFiles: File[] = []
     const validationErrorMessages: string[] = []
 
-    newTimestampFiles.forEach((timestampFile) => {
+    newTimestampFiles.forEach(timestampFile => {
       const validationResult = validateDraftFile(timestampFile)
 
       if (validationResult.isValid) {
@@ -151,20 +124,16 @@ export const useTimestampStore = defineStore('timestamp', () => {
         translate('timestamp.validation.fileError', {
           fileName: timestampFile.name,
           message: validationResult.errorMessage,
-        }),
+        })
       )
     })
 
     if (validTimestampFiles.length > 0) {
-      timestampFiles.value = [
-        ...timestampFiles.value,
-        ...validTimestampFiles.map(createSelectedTimestampFileItem),
-      ]
+      timestampFiles.value = [...timestampFiles.value, ...validTimestampFiles.map(createSelectedTimestampFileItem)]
       clearTimestampActionFeedback()
     }
 
-    timestampFileValidationErrorMessage.value =
-      validationErrorMessages.join(' ')
+    timestampFileValidationErrorMessage.value = validationErrorMessages.join(' ')
 
     return validTimestampFiles.length > 0
   }
@@ -174,18 +143,14 @@ export const useTimestampStore = defineStore('timestamp', () => {
       return false
     }
 
-    const timestampFileItem = timestampFiles.value.find(
-      ({ id }) => id === timestampFileId,
-    )
+    const timestampFileItem = timestampFiles.value.find(({ id }) => id === timestampFileId)
 
     if (!timestampFileItem) {
       return false
     }
 
     if (timestampFileItem.draftFileId === null) {
-      timestampFiles.value = timestampFiles.value.filter(
-        ({ id }) => id !== timestampFileId,
-      )
+      timestampFiles.value = timestampFiles.value.filter(({ id }) => id !== timestampFileId)
       timestampFileValidationErrorMessage.value = ''
       clearTimestampActionFeedback()
       return true
@@ -198,17 +163,10 @@ export const useTimestampStore = defineStore('timestamp', () => {
     })
 
     try {
-      await draftFilesStore.deleteDraftFile(
-        timestampFileItem.draftFileId,
-        'timestamp',
-      )
-      timestampFiles.value = timestampFiles.value.filter(
-        ({ id }) => id !== timestampFileId,
-      )
+      await draftFilesStore.deleteDraftFile(timestampFileItem.draftFileId, 'timestamp')
+      timestampFiles.value = timestampFiles.value.filter(({ id }) => id !== timestampFileId)
       timestampActionStatus.value = 'success'
-      timestampActionSuccessMessage.value = translate(
-        'timestamp.feedback.draftDeleted',
-      )
+      timestampActionSuccessMessage.value = translate('timestamp.feedback.draftDeleted')
       await dashboardStore.fetchDashboardData()
       return true
     } catch (requestError) {
@@ -228,15 +186,11 @@ export const useTimestampStore = defineStore('timestamp', () => {
       return false
     }
 
-    const timestampFilesToUpload = timestampFiles.value.filter(
-      ({ status }) => status === 'selected' || status === 'upload-error',
-    )
+    const timestampFilesToUpload = timestampFiles.value.filter(({ status }) => status === 'selected' || status === 'upload-error')
 
     if (timestampFilesToUpload.length === 0) {
       timestampActionStatus.value = 'error'
-      timestampActionErrorMessage.value = translate(
-        'timestamp.feedback.selectFilesToUpload',
-      )
+      timestampActionErrorMessage.value = translate('timestamp.feedback.selectFilesToUpload')
       return false
     }
 
@@ -258,15 +212,11 @@ export const useTimestampStore = defineStore('timestamp', () => {
       })
 
       try {
-        const uploadedDraftFile = await draftFilesStore.uploadDraftFile(
-          timestampFileItem.file,
-          'timestamp',
-          (progressPercentage) => {
-            updateTimestampFileItem(timestampFileItem.id, {
-              progressPercentage,
-            })
-          },
-        )
+        const uploadedDraftFile = await draftFilesStore.uploadDraftFile(timestampFileItem.file, 'timestamp', progressPercentage => {
+          updateTimestampFileItem(timestampFileItem.id, {
+            progressPercentage,
+          })
+        })
 
         updateTimestampFileItem(timestampFileItem.id, {
           draftFileId: uploadedDraftFile.id,
@@ -295,22 +245,17 @@ export const useTimestampStore = defineStore('timestamp', () => {
     if (failedFileCount > 0) {
       timestampActionStatus.value = 'error'
       timestampActionErrorMessage.value = translate(
-        uploadedFileCount > 0
-          ? 'timestamp.feedback.uploadPartialFailure'
-          : 'timestamp.feedback.uploadFailure',
+        uploadedFileCount > 0 ? 'timestamp.feedback.uploadPartialFailure' : 'timestamp.feedback.uploadFailure',
         {
           failedCount: failedFileCount,
           uploadedCount: uploadedFileCount,
-        },
+        }
       )
       return false
     }
 
     timestampActionStatus.value = 'success'
-    timestampActionSuccessMessage.value = translate(
-      'timestamp.feedback.uploadSuccess',
-      { count: uploadedFileCount },
-    )
+    timestampActionSuccessMessage.value = translate('timestamp.feedback.uploadSuccess', { count: uploadedFileCount })
     return true
   }
 
@@ -329,22 +274,15 @@ export const useTimestampStore = defineStore('timestamp', () => {
       return false
     }
 
-    const timestampFilesToProcess = timestampFiles.value.filter(
-      ({ status }) => status === 'uploaded' || status === 'process-error',
-    )
+    const timestampFilesToProcess = timestampFiles.value.filter(({ status }) => status === 'uploaded' || status === 'process-error')
 
     if (timestampFilesToProcess.length === 0) {
       timestampActionStatus.value = 'error'
-      timestampActionErrorMessage.value = translate(
-        'timestamp.feedback.uploadFilesBeforeTimestamping',
-      )
+      timestampActionErrorMessage.value = translate('timestamp.feedback.uploadFilesBeforeTimestamping')
       return false
     }
 
-    if (
-      dashboardStore.dashboardSummary &&
-      dashboardStore.dashboardSummary.remainingCredits < 1
-    ) {
+    if (dashboardStore.dashboardSummary && dashboardStore.dashboardSummary.remainingCredits < 1) {
       reportInsufficientTimestampCredits()
       return false
     }
@@ -360,10 +298,7 @@ export const useTimestampStore = defineStore('timestamp', () => {
         continue
       }
 
-      if (
-        dashboardStore.dashboardSummary &&
-        dashboardStore.dashboardSummary.remainingCredits < 1
-      ) {
+      if (dashboardStore.dashboardSummary && dashboardStore.dashboardSummary.remainingCredits < 1) {
         updateTimestampFileItem(timestampFileItem.id, {
           errorMessage: translate('errors.insufficientCredits'),
           status: 'process-error',
@@ -379,23 +314,12 @@ export const useTimestampStore = defineStore('timestamp', () => {
       })
 
       try {
-        const timestampTransaction =
-          await timestampApi.createTimestampTransaction(
-            timestampFileItem.draftFileId,
-          )
+        const timestampTransaction = await timestampApi.createTimestampTransaction(timestampFileItem.draftFileId)
 
-        dashboardStore.synchronizeDashboardData(
-          timestampTransaction.dashboardSummary,
-          timestampTransaction.recentDocuments,
-        )
+        dashboardStore.synchronizeDashboardData(timestampTransaction.dashboardSummary, timestampTransaction.recentDocuments)
         addRecentTimestampJob(timestampTransaction.timestampJob)
-        draftFilesStore.removeProcessedDraftFile(
-          timestampFileItem.draftFileId,
-          'timestamp',
-        )
-        timestampFiles.value = timestampFiles.value.filter(
-          ({ id }) => id !== timestampFileItem.id,
-        )
+        draftFilesStore.removeProcessedDraftFile(timestampFileItem.draftFileId, 'timestamp')
+        timestampFiles.value = timestampFiles.value.filter(({ id }) => id !== timestampFileItem.id)
         completedFileCount += 1
       } catch (requestError) {
         updateTimestampFileItem(timestampFileItem.id, {
@@ -421,10 +345,7 @@ export const useTimestampStore = defineStore('timestamp', () => {
     }
 
     timestampActionStatus.value = 'success'
-    timestampActionSuccessMessage.value = translate(
-      'timestamp.feedback.batchSuccess',
-      { count: completedFileCount },
-    )
+    timestampActionSuccessMessage.value = translate('timestamp.feedback.batchSuccess', { count: completedFileCount })
     return true
   }
 

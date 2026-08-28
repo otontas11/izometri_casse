@@ -31,16 +31,7 @@ export interface DashboardSummary {
 export type DocumentOperation = 'signature' | 'timestamp'
 type DocumentStatus = 'completed' | 'failed' | 'processing'
 export type DraftFileStatus = 'processed' | 'uploaded'
-export type DocumentFileTypeFilter =
-  | 'pdf'
-  | 'xml'
-  | 'word'
-  | 'excel'
-  | 'eyp'
-  | 'udf'
-  | 'office'
-  | 'text'
-  | 'image'
+export type DocumentFileTypeFilter = 'pdf' | 'xml' | 'word' | 'excel' | 'eyp' | 'udf' | 'office' | 'text' | 'image'
 
 export interface DraftFile {
   createdAt: string

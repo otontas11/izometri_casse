@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+storybook-static/
+.wrangler/
+worker/.wrangler/
+worker/worker-configuration.d.ts
+**/*.vue
