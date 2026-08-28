@@ -55,6 +55,8 @@
       "openAriaLabel": "Open user menu",
       "closeAriaLabel": "Close user menu",
       "profile": "Profile and security",
+      "componentLibrary": "Storybook Library",
+      "componentLibraryAriaLabel": "Open the Storybook Library in a new tab",
       "logout": "Secure logout"
     },
     "login": {

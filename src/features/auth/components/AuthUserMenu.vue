@@ -33,6 +33,14 @@
       <RouterLink :to="{ name: 'profile' }" @click="closeUserMenu">
         {{ t('auth.userMenu.profile') }}
       </RouterLink>
+      <a :href="storybookUrl"
+         target="_blank"
+         rel="noopener noreferrer"
+         :aria-label="t('auth.userMenu.componentLibraryAriaLabel')"
+         @click="closeUserMenu"
+      >
+        {{ t('auth.userMenu.componentLibrary') }}
+      </a>
       <button type="button" @click="handleLogout">
         {{ t('auth.userMenu.logout') }}
       </button>
@@ -60,6 +68,7 @@ const userMenuElement = ref<HTMLElement | null>(null)
 const userMenuTriggerElement = ref<HTMLButtonElement | null>(null)
 const userMenuPopoverElement = ref<HTMLElement | null>(null)
 const { t } = useI18n({ useScope: 'global' })
+const storybookUrl = 'https://izimza-storybook-phi.vercel.app'
 
 const userMenuDisplayName = computed(
   () =>

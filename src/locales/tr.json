@@ -55,6 +55,8 @@
       "openAriaLabel": "Kullanıcı menüsünü aç",
       "closeAriaLabel": "Kullanıcı menüsünü kapat",
       "profile": "Profil ve güvenlik",
+      "componentLibrary": "Storybook Kütüphanesi",
+      "componentLibraryAriaLabel": "Storybook Kütüphanesini yeni sekmede aç",
       "logout": "Güvenli çıkış"
     },
     "login": {
