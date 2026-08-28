@@ -2,6 +2,7 @@
 import { computed, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import AppIcon from '@/components/common/AppIcon.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 
 import type {
@@ -32,6 +33,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   cancel: []
+  edit: []
   submit: [profileUpdates: UpdateProfilePayload]
 }>()
 
@@ -172,13 +174,19 @@ watch(locale, () => {
         <small>{{ t('profile.form.eyebrow') }}</small>
         <h2 id="profile-form-title">{{ t('profile.form.title') }}</h2>
       </div>
-      <span :class="{ 'profile-form__mode--editing': isEditing }">
+      <button
+        class="profile-form__edit-button"
+        type="button"
+        :disabled="isEditing"
+        @click="emit('edit')"
+      >
+        <AppIcon name="profile" :size="18" />
         {{
           isEditing
-            ? t('profile.form.editingMode')
-            : t('profile.form.viewingMode')
+            ? t('profile.identity.editing')
+            : t('profile.identity.edit')
         }}
-      </span>
+      </button>
     </header>
 
     <p class="profile-form__description">
@@ -240,7 +248,6 @@ watch(locale, () => {
         :label="t('profile.form.email')"
         autocomplete="email"
         readonly
-        :hint="t('profile.form.emailHint')"
       />
     </div>
 
@@ -318,19 +325,36 @@ watch(locale, () => {
   letter-spacing: -0.025em;
 }
 
-.profile-form__header > span {
+.profile-form__edit-button {
+  display: inline-flex;
   flex: 0 0 auto;
-  padding: 0.38rem 0.65rem;
-  color: var(--color-text-secondary);
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.65rem;
+  padding: 0.65rem 0.9rem;
+  color: var(--color-text-inverse);
   font-size: var(--font-size-small);
   font-weight: 500;
-  background: var(--color-surface-subtle);
-  border-radius: 999px;
+  cursor: pointer;
+  background: var(--color-brand-950);
+  border-radius: var(--radius-sm);
+  transition:
+    background-color var(--transition-fast),
+    transform var(--transition-fast),
+    opacity var(--transition-fast);
 }
 
-.profile-form__header > .profile-form__mode--editing {
-  color: var(--color-primary-600);
+.profile-form__edit-button:hover:not(:disabled) {
+  background: var(--color-primary-600);
+  transform: translateY(-1px);
+}
+
+.profile-form__edit-button:disabled {
+  color: var(--color-primary-700);
+  cursor: default;
   background: var(--color-primary-100);
+  opacity: 0.72;
 }
 
 .profile-form__description {
@@ -461,6 +485,10 @@ watch(locale, () => {
   .profile-form__header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .profile-form__edit-button {
+    width: 100%;
   }
 }
 </style>

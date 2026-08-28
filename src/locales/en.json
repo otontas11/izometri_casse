@@ -337,9 +337,7 @@
       "updateError": "Profile information could not be updated.",
       "eyebrow": "Account center",
       "title": "My Profile",
-      "description": "Manage your personal information and review your account security status at a glance.",
-      "identitySecurity": "Identity security",
-      "protectedByAuth0": "Protected by Auth0",
+      "description": "Manage the personal information used in your transaction records and account communications.",
       "preparing": "Preparing your profile",
       "loadingDescription": "Your account information is being loaded securely.",
       "loadErrorTitle": "Profile information could not be loaded",
@@ -357,14 +355,11 @@
     "form": {
       "eyebrow": "Personal details",
       "title": "Personal information",
-      "editingMode": "Editing mode",
-      "viewingMode": "Viewing mode",
       "description": "Manage the information used in your transaction records and account communications.",
       "firstName": "First name",
       "lastName": "Last name",
       "phone": "Phone number",
       "email": "Email address",
-      "emailHint": "This field is managed through your Auth0 identity.",
       "saveNote": "Changes are applied only after you select Save.",
       "saving": "Saving…",
       "save": "Save changes"
@@ -375,19 +370,6 @@
       "nameCharacters": "{fieldLabel} may contain only letters, spaces, hyphens, and apostrophes.",
       "phoneRequired": "Phone number is required.",
       "phoneInvalid": "Enter a valid phone number. Example: +90 555 123 45 67."
-    },
-    "security": {
-      "eyebrow": "Security",
-      "title": "Identity provider",
-      "description": "Your session and identity information are protected by Auth0 through OAuth 2.0 and OpenID Connect.",
-      "session": "Session",
-      "active": "Active",
-      "checking": "Checking",
-      "email": "Email",
-      "verified": "Verified",
-      "verificationPending": "Verification pending",
-      "identitySystem": "Identity system",
-      "note": "Password and email changes are managed directly through your identity provider for security."
     },
     "feedback": {
       "updated": "Your profile information was updated."

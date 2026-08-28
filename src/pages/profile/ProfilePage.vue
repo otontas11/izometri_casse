@@ -8,7 +8,6 @@ import AppIcon from '@/components/common/AppIcon.vue'
 import { useToast } from '@/composables/useToast'
 import ProfileForm from '@/features/profile/components/ProfileForm.vue'
 import ProfileIdentityCard from '@/features/profile/components/ProfileIdentityCard.vue'
-import ProfileSecurityPanel from '@/features/profile/components/ProfileSecurityPanel.vue'
 import { useProfileStore } from '@/features/profile/stores/profile.store'
 import type { UpdateProfilePayload } from '@/features/profile/types/profile.types'
 import { getApplicationLocaleCode } from '@/locales'
@@ -24,7 +23,7 @@ const {
   profileSaveSuccessMessage,
   userProfile,
 } = storeToRefs(profileStore)
-const { isAuthenticated, user: authenticatedUser } = useAuth0()
+const { user: authenticatedUser } = useAuth0()
 const { showErrorToast, showSuccessToast } = useToast()
 const { t } = useI18n({ useScope: 'global' })
 
@@ -112,16 +111,6 @@ onMounted(() => {
         <h1 id="profile-page-title">{{ t('profile.page.title') }}</h1>
         <p>{{ t('profile.page.description') }}</p>
       </div>
-
-      <div class="profile-page__security-summary">
-        <span aria-hidden="true">
-          <AppIcon name="signature" :size="21" />
-        </span>
-        <div>
-          <small>{{ t('profile.page.identitySecurity') }}</small>
-          <strong>{{ t('profile.page.protectedByAuth0') }}</strong>
-        </div>
-      </div>
     </header>
 
     <div
@@ -163,9 +152,7 @@ onMounted(() => {
         :display-name="profileDisplayName"
         :email-address="profileEmailAddress"
         :initials="profileInitials"
-        :is-editing="isProfileEditing"
         :is-email-verified="isProfileEmailVerified"
-        @edit="handleProfileEditRequest"
       />
 
       <p
@@ -189,22 +176,16 @@ onMounted(() => {
         </button>
       </p>
 
-      <div class="profile-page__content-grid">
-        <ProfileForm
-          :email-address="profileEmailAddress"
-          :is-editing="isProfileEditing"
-          :is-saving="isProfileSaving"
-          :save-error-message="profileSaveErrorMessage"
-          :user-profile="userProfile"
-          @cancel="handleProfileEditCancel"
-          @submit="handleProfileUpdate"
-        />
-
-        <ProfileSecurityPanel
-          :is-authenticated="isAuthenticated"
-          :is-email-verified="isProfileEmailVerified"
-        />
-      </div>
+      <ProfileForm
+        :email-address="profileEmailAddress"
+        :is-editing="isProfileEditing"
+        :is-saving="isProfileSaving"
+        :save-error-message="profileSaveErrorMessage"
+        :user-profile="userProfile"
+        @cancel="handleProfileEditCancel"
+        @edit="handleProfileEditRequest"
+        @submit="handleProfileUpdate"
+      />
     </template>
   </section>
 </template>

@@ -2,19 +2,12 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import AppIcon from '@/components/common/AppIcon.vue'
-
 const props = defineProps<{
   avatarUrl: string
   displayName: string
   emailAddress: string
   initials: string
-  isEditing: boolean
   isEmailVerified: boolean
-}>()
-
-const emit = defineEmits<{
-  edit: []
 }>()
 
 const { t } = useI18n({ useScope: 'global' })
@@ -66,17 +59,6 @@ watch(
       </span>
     </div>
 
-    <button
-      class="profile-identity-card__edit-button"
-      type="button"
-      :disabled="isEditing"
-      @click="emit('edit')"
-    >
-      <AppIcon name="profile" :size="18" />
-      {{
-        isEditing ? t('profile.identity.editing') : t('profile.identity.edit')
-      }}
-    </button>
   </section>
 </template>
 
@@ -84,7 +66,7 @@ watch(
 .profile-identity-card {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 1.25rem;
   align-items: center;
   padding: clamp(1.25rem, 3vw, 1.75rem);
@@ -213,46 +195,6 @@ watch(
     var(--color-warning) 45%,
     var(--color-text-inverse)
   );
-}
-
-.profile-identity-card__edit-button {
-  position: relative;
-  z-index: 1;
-  display: inline-flex;
-  gap: 0.55rem;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.75rem;
-  padding: 0.7rem 1rem;
-  color: var(--color-brand-950);
-  font-size: var(--font-size-small);
-  font-weight: 500;
-  cursor: pointer;
-  background: var(--color-surface-raised);
-  border-radius: var(--radius-sm);
-  transition:
-    transform var(--transition-fast),
-    opacity var(--transition-fast);
-}
-
-.profile-identity-card__edit-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
-.profile-identity-card__edit-button:disabled {
-  cursor: default;
-  opacity: 0.62;
-}
-
-@media (max-width: 700px) {
-  .profile-identity-card {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .profile-identity-card__edit-button {
-    grid-column: 1 / -1;
-    width: 100%;
-  }
 }
 
 @media (max-width: 440px) {

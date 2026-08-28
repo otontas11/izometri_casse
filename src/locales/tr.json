@@ -337,9 +337,7 @@
       "updateError": "Profil bilgileri güncellenemedi.",
       "eyebrow": "Hesap merkezi",
       "title": "Profilim",
-      "description": "Kişisel bilgilerinizi yönetin ve hesabınızın güvenlik durumunu tek bakışta takip edin.",
-      "identitySecurity": "Kimlik güvenliği",
-      "protectedByAuth0": "Auth0 ile korunuyor",
+      "description": "İşlem kayıtlarınızda ve hesap iletişiminde kullanılan kişisel bilgilerinizi yönetin.",
       "preparing": "Profiliniz hazırlanıyor",
       "loadingDescription": "Hesap bilgileriniz güvenli şekilde yükleniyor.",
       "loadErrorTitle": "Profil bilgileri yüklenemedi",
@@ -357,14 +355,11 @@
     "form": {
       "eyebrow": "Kişisel alan",
       "title": "Kişisel bilgiler",
-      "editingMode": "Düzenleme modu",
-      "viewingMode": "Görüntüleme modu",
       "description": "İşlem kayıtlarınızda ve hesap iletişiminde kullanılacak bilgilerinizi yönetin.",
       "firstName": "Ad",
       "lastName": "Soyad",
       "phone": "Telefon numarası",
       "email": "E-posta adresi",
-      "emailHint": "Bu alan Auth0 kimliğiniz üzerinden yönetilir.",
       "saveNote": "Değişiklikler yalnızca “Kaydet” seçildiğinde uygulanır.",
       "saving": "Kaydediliyor…",
       "save": "Değişiklikleri kaydet"
@@ -375,19 +370,6 @@
       "nameCharacters": "{fieldLabel} yalnızca harf, boşluk, tire ve kesme işareti içerebilir.",
       "phoneRequired": "Telefon numarası alanı zorunludur.",
       "phoneInvalid": "Geçerli bir telefon numarası girin. Örnek: +90 555 123 45 67."
-    },
-    "security": {
-      "eyebrow": "Güvenlik",
-      "title": "Kimlik sağlayıcısı",
-      "description": "Oturumunuz ve kimlik bilgileriniz OAuth 2.0 / OpenID Connect akışıyla Auth0 tarafından korunur.",
-      "session": "Oturum",
-      "active": "Aktif",
-      "checking": "Kontrol ediliyor",
-      "email": "E-posta",
-      "verified": "Doğrulandı",
-      "verificationPending": "Doğrulama bekleniyor",
-      "identitySystem": "Kimlik sistemi",
-      "note": "Şifre ve e-posta değişiklikleri güvenlik nedeniyle doğrudan kimlik sağlayıcınız üzerinden yönetilir."
     },
     "feedback": {
       "updated": "Profil bilgileriniz güncellendi."
