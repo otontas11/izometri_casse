@@ -49,7 +49,6 @@
 
     <TimestampFileWorkspace
       :can-process="canStartTimestampTransaction"
-      :can-upload="canUploadTimestampFiles"
       :file-validation-error-message="timestampFileValidationErrorMessage"
       :is-busy="isTimestampActionInProgress"
       :timestamp-files="timestampFiles"
@@ -95,7 +94,6 @@ const { dashboardRequestStatus, dashboardSummary } =
   storeToRefs(dashboardStore)
 const {
   canProcessTimestampFiles,
-  canUploadTimestampFiles,
   isTimestampActionInProgress,
   isTimestampHistoryLoading,
   timestampActionErrorMessage,
@@ -123,8 +121,15 @@ const canStartTimestampTransaction = computed(
     canProcessTimestampFiles.value && hasAvailableTimestampCredits.value,
 )
 
-const handleTimestampFilesAdded = (timestampFiles: File[]) => {
-  timestampStore.addTimestampFiles(timestampFiles)
+const handleTimestampFilesAdded = async (selectedTimestampFiles: File[]) => {
+  const wereTimestampFilesAdded =
+    timestampStore.addTimestampFiles(selectedTimestampFiles)
+
+  if (!wereTimestampFilesAdded) {
+    return
+  }
+
+  await handleTimestampUploadRequest()
 }
 
 const handleTimestampFileRemoval = (timestampFileId: string) => {
@@ -193,7 +198,7 @@ const handleTimestampHistoryRefresh = () => {
   void timestampStore.fetchTimestampJobs()
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (dashboardRequestStatus.value === 'idle') {
     void dashboardStore.fetchDashboardData()
   }
@@ -202,7 +207,15 @@ onMounted(() => {
     void timestampStore.fetchTimestampJobs()
   }
 
-  void timestampStore.loadUploadedTimestampFiles()
+  const hasSelectedTimestampFiles = timestampFiles.value.some(
+    ({ status }) => status === 'selected',
+  )
+
+  if (hasSelectedTimestampFiles) {
+    await handleTimestampUploadRequest()
+  }
+
+  await timestampStore.loadUploadedTimestampFiles()
 })
 </script>
 

@@ -46,7 +46,6 @@
     </p>
 
     <SignatureFileWorkspace :can-process="canStartSignatureTransaction"
-                            :can-upload="canUploadSignatureFiles"
                             :file-validation-error-message="signatureFileValidationErrorMessage"
                             :is-busy="isSignatureActionInProgress"
                             :signature-files="signatureFiles"
@@ -90,7 +89,6 @@ const {dashboardRequestStatus, dashboardSummary} =
     storeToRefs(dashboardStore)
 const {
   canProcessSignatureFiles,
-  canUploadSignatureFiles,
   isRecentSignaturesLoading,
   isSignatureActionInProgress,
   recentSignedDocuments,
@@ -118,8 +116,16 @@ const canStartSignatureTransaction = computed(
         hasAvailableSignatureCredits.value,
 )
 
-const handleSignatureFilesAdded = (signatureFiles: File[]) => {
-  signatureStore.addSignatureFiles(signatureFiles)
+const handleSignatureFilesAdded = async (selectedSignatureFiles: File[]) => {
+  const wereSignatureFilesAdded = signatureStore.addSignatureFiles(
+    selectedSignatureFiles,
+  )
+
+  if (!wereSignatureFilesAdded) {
+    return
+  }
+
+  await handleSignatureUploadRequest()
 }
 
 const handleSignatureFileRemoval = (signatureFileId: string) => {
@@ -186,13 +192,22 @@ const handleRecentSignaturesRetry = () => {
   void signatureStore.loadRecentSignedDocuments()
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (dashboardRequestStatus.value === 'idle') {
     void dashboardStore.fetchDashboardData()
   }
 
-  void signatureStore.loadUploadedSignatureFiles()
   void signatureStore.loadRecentSignedDocuments()
+
+  const hasSelectedSignatureFiles = signatureFiles.value.some(
+    ({ status }) => status === 'selected',
+  )
+
+  if (hasSelectedSignatureFiles) {
+    await handleSignatureUploadRequest()
+  }
+
+  await signatureStore.loadUploadedSignatureFiles()
 })
 </script>
 

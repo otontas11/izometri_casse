@@ -59,11 +59,6 @@ export const useTimestampStore = defineStore('timestamp', () => {
   const isTimestampHistoryLoading = computed(
     () => timestampJobsLoadStatus.value === 'loading',
   )
-  const canUploadTimestampFiles = computed(() =>
-    timestampFiles.value.some(
-      ({ status }) => status === 'selected' || status === 'upload-error',
-    ),
-  )
   const canProcessTimestampFiles = computed(() =>
     timestampFiles.value.some(
       ({ status }) => status === 'uploaded' || status === 'process-error',
@@ -246,7 +241,6 @@ export const useTimestampStore = defineStore('timestamp', () => {
     }
 
     timestampActionStatus.value = 'loading'
-    timestampFileValidationErrorMessage.value = ''
     timestampActionErrorMessage.value = ''
     timestampActionSuccessMessage.value = ''
     let uploadedFileCount = 0
@@ -437,7 +431,6 @@ export const useTimestampStore = defineStore('timestamp', () => {
   return {
     addTimestampFiles,
     canProcessTimestampFiles,
-    canUploadTimestampFiles,
     clearTimestampActionFeedback,
     fetchTimestampJobs,
     isTimestampActionInProgress,

@@ -176,16 +176,25 @@
       </ul>
     </section>
 
-    <div class="signature-file-workspace__actions">
+    <div
+      :class="[
+        'signature-file-workspace__actions',
+        {
+          'signature-file-workspace__actions--with-retry':
+            hasSignatureUploadError,
+        },
+      ]"
+    >
       <button
+        v-if="hasSignatureUploadError"
         class="signature-file-workspace__upload-button"
         type="button"
-        :disabled="!canUpload || isBusy"
+        :disabled="isBusy"
         :aria-busy="isBusy"
         @click="emit('request-upload')"
       >
-        <AppIcon name="upload" :size="21" />
-        {{ t('signature.workspace.uploadFiles') }}
+        <AppIcon name="refresh" :size="21" />
+        {{ t('signature.workspace.retryUpload') }}
       </button>
 
       <button
@@ -219,7 +228,6 @@ import { formatFileSize } from '@/utils/formatters'
 
 const props = defineProps<{
   canProcess: boolean
-  canUpload: boolean
   fileValidationErrorMessage: string
   isBusy: boolean
   signatureFiles: SignatureFileItem[]
@@ -238,6 +246,9 @@ const isFileDraggedOver = ref(false)
 
 const maximumFileSizeLabel = computed(() =>
   formatFileSize(MAX_DRAFT_FILE_SIZE_BYTES),
+)
+const hasSignatureUploadError = computed(() =>
+  props.signatureFiles.some(({ status }) => status === 'upload-error'),
 )
 const signatureFileInputDescriptionIds = computed(() =>
   [

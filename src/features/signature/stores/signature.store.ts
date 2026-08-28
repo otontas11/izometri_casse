@@ -59,11 +59,6 @@ export const useSignatureStore = defineStore('signature', () => {
   const isRecentSignaturesLoading = computed(
     () => recentSignaturesRequestStatus.value === 'loading',
   )
-  const canUploadSignatureFiles = computed(() =>
-    signatureFiles.value.some(
-      ({ status }) => status === 'selected' || status === 'upload-error',
-    ),
-  )
   const canProcessSignatureFiles = computed(() =>
     signatureFiles.value.some(
       ({ status }) => status === 'uploaded' || status === 'process-error',
@@ -316,7 +311,6 @@ export const useSignatureStore = defineStore('signature', () => {
     }
 
     signatureActionStatus.value = 'loading'
-    signatureFileValidationErrorMessage.value = ''
     signatureActionErrorMessage.value = ''
     signatureActionSuccessMessage.value = ''
     let uploadedFileCount = 0
@@ -507,7 +501,6 @@ export const useSignatureStore = defineStore('signature', () => {
   return {
     addSignatureFiles,
     canProcessSignatureFiles,
-    canUploadSignatureFiles,
     clearSignaturePage,
     isSignatureActionInProgress,
     isRecentSignaturesLoading,
