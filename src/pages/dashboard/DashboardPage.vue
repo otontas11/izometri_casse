@@ -3,7 +3,7 @@
     <header class="dashboard-page__header">
       <div>
         <h1 id="dashboard-page-title">
-          {{ t('dashboard.page.greeting', {name: authenticatedUserFirstName}) }}
+          {{ t('dashboard.page.greeting', {name: dashboardGreetingName}) }}
         </h1>
         <p class="dashboard-page__introduction">
           {{ t('dashboard.page.introduction') }}
@@ -139,10 +139,12 @@ import RecentDocumentsTable from '@/features/dashboard/components/RecentDocument
 import {useDashboardStore} from '@/features/dashboard/stores/dashboard.store'
 import type {ArchivedDocument} from '@/features/dashboard/types/dashboard.types'
 import {useDraftFilesStore} from '@/features/draft-files/stores/draftFiles.store'
+import {useProfileStore} from '@/features/profile/stores/profile.store'
 import {getApplicationLocaleCode} from '@/locales'
 
 const dashboardStore = useDashboardStore()
 const draftFilesStore = useDraftFilesStore()
+const profileStore = useProfileStore()
 const {
   dashboardErrorMessage,
   dashboardRequestStatus,
@@ -157,6 +159,7 @@ const {
   recentDocuments,
 } = storeToRefs(dashboardStore)
 const {latestUploadedDraftFile} = storeToRefs(draftFilesStore)
+const {profileFullName, profileLoadStatus} = storeToRefs(profileStore)
 const {user: authenticatedUser} = useAuth0()
 const {showErrorToast, showSuccessToast} = useToast()
 const {t} = useI18n({useScope: 'global'})
@@ -168,22 +171,20 @@ const formatDashboardNumber = (dashboardNumber: number) =>
     new Intl.NumberFormat(getApplicationLocaleCode(), {
       maximumFractionDigits: 1,
     }).format(dashboardNumber)
-const authenticatedUserFirstName = computed(() => {
-  const authProfileNameCandidates = [
+const dashboardGreetingName = computed(() => {
+  const userNameCandidates = [
+    profileFullName.value,
     authenticatedUser.value?.given_name,
     authenticatedUser.value?.name,
     authenticatedUser.value?.nickname,
     authenticatedUser.value?.email,
   ]
-  const authenticatedUserDisplayName = authProfileNameCandidates.find(
-      (authProfileName): authProfileName is string =>
-          typeof authProfileName === 'string' && authProfileName.trim().length > 0,
+  const userDisplayName = userNameCandidates.find(
+      (userName): userName is string =>
+          typeof userName === 'string' && userName.trim().length > 0,
   )
 
-  return (
-      authenticatedUserDisplayName?.trim().split(/\s+/)[0] ??
-      t('dashboard.page.userFallback')
-  )
+  return userDisplayName?.trim() ?? t('dashboard.page.userFallback')
 })
 const authenticatedUserEmailAddress = computed(() => {
   const auth0EmailAddress = authenticatedUser.value?.email
@@ -362,6 +363,10 @@ const handleDocumentDeleteConfirm = async () => {
 onMounted(() => {
   if (dashboardRequestStatus.value === 'idle') {
     void dashboardStore.fetchDashboardData()
+  }
+
+  if (profileLoadStatus.value === 'idle') {
+    void profileStore.fetchUserProfile()
   }
 
   void fetchPendingDraftFiles()

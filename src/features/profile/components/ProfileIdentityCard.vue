@@ -13,7 +13,7 @@
     <div class="profile-identity-card__details">
       <small>{{ t('profile.identity.account') }}</small>
       <h2 id="profile-identity-title">{{ displayName }}</h2>
-      <p>{{ emailAddress }}</p>
+      <p class="profile-identity-card__email-address">{{ emailAddress }}</p>
 
       <span
         :class="[
@@ -23,6 +23,11 @@
               !isEmailVerified,
           },
         ]"
+        :aria-describedby="
+          !isEmailVerified
+            ? 'profile-identity-verification-description'
+            : undefined
+        "
       >
         <span aria-hidden="true">{{ isEmailVerified ? '✓' : '!' }}</span>
         {{
@@ -31,8 +36,15 @@
             : t('profile.identity.verificationPending')
         }}
       </span>
-    </div>
 
+      <p
+        v-if="!isEmailVerified"
+        id="profile-identity-verification-description"
+        class="profile-identity-card__verification-description"
+      >
+        {{ t('profile.identity.verificationPendingDescription') }}
+      </p>
+    </div>
   </section>
 </template>
 
@@ -149,13 +161,21 @@ watch(
   white-space: nowrap;
 }
 
-.profile-identity-card__details > p {
+.profile-identity-card__email-address {
   margin-top: 0.3rem;
   overflow: hidden;
   color: color-mix(in srgb, var(--color-text-inverse) 70%, transparent);
   font-size: 0.76rem;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.profile-identity-card__verification-description {
+  max-width: 40rem;
+  margin-top: 0.65rem;
+  color: color-mix(in srgb, var(--color-text-inverse) 78%, transparent);
+  font-size: var(--font-size-small);
+  line-height: 1.55;
 }
 
 .profile-identity-card__verification-status {

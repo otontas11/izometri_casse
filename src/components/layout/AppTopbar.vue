@@ -22,10 +22,29 @@
     </div>
 
     <div class="app-topbar__actions">
-      <span class="app-topbar__quota" aria-live="polite">
-        <small>{{ t('layout.topbar.remainingCredits') }}</small>
-        <strong>{{ dashboardSummary?.remainingCredits ?? '—' }}</strong>
-      </span>
+      <div
+        :class="[
+          'app-topbar__credit-balance',
+          {
+            'app-topbar__credit-balance--low': hasLowRemainingCredits,
+          },
+        ]"
+        :aria-label="
+          t('layout.topbar.remainingCreditsAriaLabel', {
+            count: displayedRemainingCredits,
+          })
+        "
+        aria-live="polite"
+        role="status"
+      >
+        <span class="app-topbar__credit-icon" aria-hidden="true">
+          <AppIcon name="wallet" :size="19" />
+        </span>
+        <span class="app-topbar__credit-details">
+          <small>{{ t('layout.topbar.remainingCredits') }}</small>
+          <strong>{{ displayedRemainingCredits }}</strong>
+        </span>
+      </div>
       <LanguageSwitcher class="app-topbar__language-switcher" />
       <AuthUserMenu />
     </div>
@@ -33,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 
@@ -61,6 +80,15 @@ defineExpose({ focusSidebarToggleButton })
 
 const dashboardStore = useDashboardStore()
 const { dashboardRequestStatus, dashboardSummary } = storeToRefs(dashboardStore)
+const remainingCredits = computed(
+  () => dashboardSummary.value?.remainingCredits ?? null,
+)
+const displayedRemainingCredits = computed(
+  () => remainingCredits.value ?? '—',
+)
+const hasLowRemainingCredits = computed(
+  () => remainingCredits.value !== null && remainingCredits.value <= 5,
+)
 
 onMounted(() => {
   if (dashboardRequestStatus.value === 'idle') {
@@ -118,27 +146,54 @@ onMounted(() => {
   margin-left: auto;
 }
 
-.app-topbar__quota {
+.app-topbar__credit-balance {
   display: flex;
-  gap: 0.625rem;
+  gap: 0.7rem;
   align-items: center;
-  min-height: 2.5rem;
-  padding: 0.45rem 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.8rem 0.35rem 0.4rem;
+  color: var(--color-text-inverse);
+  background: linear-gradient(
+    135deg,
+    var(--color-brand-950),
+    var(--color-brand-800)
+  );
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0.35rem 0.85rem rgb(16 42 67 / 18%);
+}
+
+.app-topbar__credit-balance--low {
+  background: linear-gradient(135deg, #92400e, var(--color-warning));
+}
+
+.app-topbar__credit-icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
   color: var(--color-brand-950);
   background: var(--color-accent-100);
-  border: 1px solid rgb(15 159 132 / 16%);
-  border-radius: 999px;
+  border-radius: 0.65rem;
+  place-items: center;
 }
 
-.app-topbar__quota small {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-small);
+.app-topbar__credit-details {
+  display: grid;
+  gap: 0.05rem;
+  min-width: 4.9rem;
+}
+
+.app-topbar__credit-details small {
+  color: rgb(255 255 255 / 72%);
+  font-size: 0.65rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
-.app-topbar__quota strong {
-  color: var(--color-success);
-  font-size: 0.875rem;
+.app-topbar__credit-details strong {
+  color: var(--color-text-inverse);
+  font-size: 1rem;
+  line-height: 1;
 }
 
 @media (max-width: 63.99rem) {
@@ -149,7 +204,7 @@ onMounted(() => {
 
 @media (max-width: 35.99rem) {
   .app-topbar__context,
-  .app-topbar__quota small {
+  .app-topbar__credit-details small {
     display: none;
   }
 
@@ -161,10 +216,13 @@ onMounted(() => {
     gap: 0.5rem;
   }
 
-  .app-topbar__quota {
-    min-width: 2.5rem;
-    justify-content: center;
-    padding-inline: 0.75rem;
+  .app-topbar__credit-balance {
+    gap: 0.45rem;
+    padding-right: 0.65rem;
+  }
+
+  .app-topbar__credit-details {
+    min-width: auto;
   }
 }
 </style>

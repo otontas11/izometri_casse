@@ -41,7 +41,8 @@
       "openNavigation": "Navigasyonu aç",
       "closeNavigation": "Navigasyonu kapat",
       "context": "Güvenli dijital işlemler",
-      "remainingCredits": "Kalan kontör"
+      "remainingCredits": "Kalan kontör",
+      "remainingCreditsAriaLabel": "Kalan kontör: {count}"
     }
   },
   "notifications": {
@@ -427,7 +428,8 @@
     "identity": {
       "account": "İzİmza hesabı",
       "emailVerified": "E-posta doğrulandı",
-      "verificationPending": "Doğrulama bekleniyor",
+      "verificationPending": "E-posta doğrulaması bekleniyor",
+      "verificationPendingDescription": "Doğrulamayı tamamlamak için gelen kutunuzdaki doğrulama bağlantısını kontrol edin.",
       "editing": "Düzenleniyor",
       "edit": "Bilgileri düzenle"
     },

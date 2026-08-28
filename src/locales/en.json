@@ -41,7 +41,8 @@
       "openNavigation": "Open navigation",
       "closeNavigation": "Close navigation",
       "context": "Secure digital transactions",
-      "remainingCredits": "Remaining credits"
+      "remainingCredits": "Remaining credits",
+      "remainingCreditsAriaLabel": "Remaining credits: {count}"
     }
   },
   "notifications": {
@@ -427,7 +428,8 @@
     "identity": {
       "account": "İzİmza account",
       "emailVerified": "Email verified",
-      "verificationPending": "Verification pending",
+      "verificationPending": "Email verification pending",
+      "verificationPendingDescription": "Check your inbox for the verification link to complete verification.",
       "editing": "Editing",
       "edit": "Edit information"
     },
