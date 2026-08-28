@@ -1,9 +1,18 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
+import { useAuth0 } from '@auth0/auth0-vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
+import { useToast } from '@/composables/useToast'
+import ArchivedDocumentDeleteModal from '@/features/dashboard/components/ArchivedDocumentDeleteModal.vue'
+import ArchivedDocumentPreviewDrawer from '@/features/dashboard/components/ArchivedDocumentPreviewDrawer.vue'
+import { useDashboardStore } from '@/features/dashboard/stores/dashboard.store'
+import type {
+  ArchivedDocument,
+  DocumentOperation,
+} from '@/features/dashboard/types/dashboard.types'
 import DocumentHistoryFilters from '@/features/document-history/components/DocumentHistoryFilters.vue'
 import DocumentHistoryPagination from '@/features/document-history/components/DocumentHistoryPagination.vue'
 import DocumentHistoryTable from '@/features/document-history/components/DocumentHistoryTable.vue'
@@ -14,7 +23,6 @@ import {
   type DocumentHistoryFilters as DocumentHistoryFilterValues,
   type DocumentHistoryRequest,
 } from '@/features/document-history/types/documentHistory.types'
-import type { DocumentOperation } from '@/features/dashboard/types/dashboard.types'
 
 const DOCUMENT_HISTORY_PAGE_SIZE = 10
 const selectedDatePattern = /^\d{4}-\d{2}-\d{2}$/
@@ -26,7 +34,16 @@ const validDocumentOperations = new Set<DocumentOperation>([
   'timestamp',
 ])
 
+const dashboardStore = useDashboardStore()
 const documentHistoryStore = useDocumentHistoryStore()
+const {
+  deletingDocumentId,
+  documentDeleteErrorMessage,
+  documentDownloadErrorMessage,
+  documentPreviewErrorMessage,
+  downloadingDocumentId,
+  previewingDocumentId,
+} = storeToRefs(dashboardStore)
 const {
   archivedDocuments,
   documentHistoryErrorMessage,
@@ -35,10 +52,15 @@ const {
 } = storeToRefs(documentHistoryStore)
 const route = useRoute()
 const router = useRouter()
+const { user: authenticatedUser } = useAuth0()
+const { showErrorToast, showSuccessToast } = useToast()
 const { t } = useI18n({ useScope: 'global' })
 const selectedFilters = ref<DocumentHistoryFilterValues>(
   createEmptyDocumentHistoryFilters(),
 )
+const selectedDocumentForPreview = ref<ArchivedDocument | null>(null)
+const documentPendingDeletion = ref<ArchivedDocument | null>(null)
+const previewDocumentContent = shallowRef<Blob | null>(null)
 
 function createEmptyDocumentHistoryFilters(): DocumentHistoryFilterValues {
   return {
@@ -160,7 +182,35 @@ const hasActiveFilters = computed(
     selectedFilters.value.operations.length > 0,
 )
 
-const fetchSelectedDocumentHistory = () => {
+const authenticatedUserEmailAddress = computed(() => {
+  const auth0EmailAddress = authenticatedUser.value?.email
+
+  return typeof auth0EmailAddress === 'string' && auth0EmailAddress.trim()
+    ? auth0EmailAddress.trim()
+    : t('dashboard.recentDocuments.registeredEmailAddress')
+})
+
+const isDocumentPreviewDrawerOpen = computed(
+  () => selectedDocumentForPreview.value !== null,
+)
+
+const isDocumentDeleteModalOpen = computed(
+  () => documentPendingDeletion.value !== null,
+)
+
+const isSelectedDocumentDeleting = computed(
+  () =>
+    documentPendingDeletion.value !== null &&
+    deletingDocumentId.value === documentPendingDeletion.value.id,
+)
+
+const isSelectedDocumentPreviewLoading = computed(
+  () =>
+    selectedDocumentForPreview.value !== null &&
+    previewingDocumentId.value === selectedDocumentForPreview.value.id,
+)
+
+const fetchSelectedDocumentHistory = async () => {
   const documentHistoryRequest = createDocumentHistoryRequestFromRoute()
   selectedFilters.value = {
     fileNameSearch: documentHistoryRequest.fileNameSearch,
@@ -168,7 +218,7 @@ const fetchSelectedDocumentHistory = () => {
     operations: [...documentHistoryRequest.operations],
     selectedDate: documentHistoryRequest.selectedDate,
   }
-  void documentHistoryStore.fetchDocumentHistory(documentHistoryRequest)
+  await documentHistoryStore.fetchDocumentHistory(documentHistoryRequest)
 }
 
 const handleFiltersChange = async (
@@ -202,10 +252,146 @@ const handlePageChange = async (pageNumber: number) => {
 }
 
 const handleDocumentHistoryRetry = () => {
-  fetchSelectedDocumentHistory()
+  void fetchSelectedDocumentHistory()
 }
 
-watch(() => route.fullPath, fetchSelectedDocumentHistory, { immediate: true })
+const saveDocumentContent = (
+  documentContent: Blob,
+  documentFileName: string,
+) => {
+  const documentObjectUrl = URL.createObjectURL(documentContent)
+  const documentDownloadLink = document.createElement('a')
+  documentDownloadLink.href = documentObjectUrl
+  documentDownloadLink.download = documentFileName
+  document.body.append(documentDownloadLink)
+  documentDownloadLink.click()
+  documentDownloadLink.remove()
+  window.setTimeout(() => URL.revokeObjectURL(documentObjectUrl), 0)
+}
+
+const handleDocumentDownload = async (archivedDocument: ArchivedDocument) => {
+  const documentContent = await dashboardStore.downloadArchivedDocument(
+    archivedDocument.id,
+  )
+
+  if (!documentContent) {
+    showErrorToast(
+      documentDownloadErrorMessage.value ||
+        t('dashboard.recentDocuments.downloadFailed'),
+    )
+    return
+  }
+
+  saveDocumentContent(documentContent, archivedDocument.name)
+  showSuccessToast(
+    t('dashboard.recentDocuments.downloadRequested', {
+      fileName: archivedDocument.name,
+    }),
+  )
+}
+
+const handleDocumentPreview = async (archivedDocument: ArchivedDocument) => {
+  selectedDocumentForPreview.value = archivedDocument
+  previewDocumentContent.value = null
+
+  const documentContent = await dashboardStore.previewArchivedDocument(
+    archivedDocument.id,
+  )
+
+  if (
+    selectedDocumentForPreview.value?.id !== archivedDocument.id ||
+    !documentContent
+  ) {
+    return
+  }
+
+  previewDocumentContent.value = documentContent
+}
+
+const handleDocumentPreviewDrawerClose = () => {
+  selectedDocumentForPreview.value = null
+  previewDocumentContent.value = null
+}
+
+const handleDocumentEmailSend = (archivedDocument: ArchivedDocument) => {
+  showSuccessToast(
+    t('dashboard.recentDocuments.emailSentSimulation', {
+      emailAddress: authenticatedUserEmailAddress.value,
+      fileName: archivedDocument.name,
+    }),
+  )
+}
+
+const handleDocumentDeleteRequest = (archivedDocument: ArchivedDocument) => {
+  dashboardStore.clearDocumentDeleteError()
+  documentPendingDeletion.value = archivedDocument
+}
+
+const handleDocumentDeleteModalClose = () => {
+  if (isSelectedDocumentDeleting.value) {
+    return
+  }
+
+  dashboardStore.clearDocumentDeleteError()
+  documentPendingDeletion.value = null
+}
+
+const refreshDocumentHistoryAfterDeletion = async (
+  wasOnlyDocumentOnCurrentPage: boolean,
+) => {
+  const currentPageNumber = documentHistoryPagination.value.currentPage
+
+  if (wasOnlyDocumentOnCurrentPage && currentPageNumber > 1) {
+    await router.replace({
+      name: 'document-history',
+      query: createDocumentHistoryRouteQuery(
+        selectedFilters.value,
+        currentPageNumber - 1,
+      ),
+    })
+    return
+  }
+
+  await fetchSelectedDocumentHistory()
+}
+
+const handleDocumentDeleteConfirm = async () => {
+  const archivedDocument = documentPendingDeletion.value
+
+  if (!archivedDocument || isSelectedDocumentDeleting.value) {
+    return
+  }
+
+  const wasOnlyDocumentOnCurrentPage = archivedDocuments.value.length === 1
+  const isDocumentDeleted = await dashboardStore.deleteArchivedDocument(
+    archivedDocument.id,
+  )
+
+  if (!isDocumentDeleted) {
+    return
+  }
+
+  documentPendingDeletion.value = null
+
+  if (selectedDocumentForPreview.value?.id === archivedDocument.id) {
+    handleDocumentPreviewDrawerClose()
+  }
+
+  await refreshDocumentHistoryAfterDeletion(wasOnlyDocumentOnCurrentPage)
+  showSuccessToast(
+    t('dashboard.recentDocuments.deleteSucceeded', {
+      fileName: archivedDocument.name,
+    }),
+  )
+}
+
+watch(
+  () => route.fullPath,
+  () => {
+    void fetchSelectedDocumentHistory()
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -231,11 +417,18 @@ watch(() => route.fullPath, fetchSelectedDocumentHistory, { immediate: true })
 
     <DocumentHistoryTable
       :archived-documents="archivedDocuments"
+      :deleting-document-id="deletingDocumentId"
+      :downloading-document-id="downloadingDocumentId"
       :error-message="documentHistoryErrorMessage"
       :has-active-filters="hasActiveFilters"
       :is-loading="isDocumentHistoryLoading"
+      :previewing-document-id="previewingDocumentId"
       :total-document-count="documentHistoryPagination.totalItems"
+      @delete="handleDocumentDeleteRequest"
+      @download="handleDocumentDownload"
+      @preview="handleDocumentPreview"
       @retry="handleDocumentHistoryRetry"
+      @send-email="handleDocumentEmailSend"
     />
 
     <DocumentHistoryPagination
@@ -246,6 +439,26 @@ watch(() => route.fullPath, fetchSelectedDocumentHistory, { immediate: true })
       :total-items="documentHistoryPagination.totalItems"
       :total-pages="documentHistoryPagination.totalPages"
       @change="handlePageChange"
+    />
+
+    <ArchivedDocumentPreviewDrawer
+      :archived-document="selectedDocumentForPreview"
+      :document-content="previewDocumentContent"
+      :error-message="documentPreviewErrorMessage"
+      :is-loading="isSelectedDocumentPreviewLoading"
+      :is-open="isDocumentPreviewDrawerOpen"
+      @close="handleDocumentPreviewDrawerClose"
+      @download="handleDocumentDownload"
+      @retry="handleDocumentPreview"
+    />
+
+    <ArchivedDocumentDeleteModal
+      :archived-document="documentPendingDeletion"
+      :error-message="documentDeleteErrorMessage"
+      :is-deleting="isSelectedDocumentDeleting"
+      :is-open="isDocumentDeleteModalOpen"
+      @close="handleDocumentDeleteModalClose"
+      @confirm="handleDocumentDeleteConfirm"
     />
   </section>
 </template>
