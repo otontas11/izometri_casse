@@ -46,7 +46,6 @@
   line-height: 1.6;
 }
 
-.dashboard-page__refresh-button,
 .dashboard-page__warning-notice button,
 .dashboard-page__error-state button {
   display: inline-flex;
@@ -67,16 +66,10 @@
     transform var(--transition-fast);
 }
 
-.dashboard-page__refresh-button:hover:not(:disabled),
 .dashboard-page__warning-notice button:hover,
 .dashboard-page__error-state button:hover {
   border-color: var(--color-accent-600);
   transform: translateY(-1px);
-}
-
-.dashboard-page__refresh-button:disabled {
-  cursor: wait;
-  opacity: 0.65;
 }
 
 .dashboard-page__warning-notice {
@@ -196,10 +189,6 @@
     display: grid;
     gap: 1.25rem;
     align-items: start;
-  }
-
-  .dashboard-page__refresh-button {
-    width: fit-content;
   }
 
   .dashboard-page__metrics,

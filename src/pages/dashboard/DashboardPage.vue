@@ -10,18 +10,10 @@
         </p>
       </div>
 
-      <button :disabled="isDashboardLoading"
-              class="dashboard-page__refresh-button"
-              type="button"
-              @click="handleDashboardRefresh"
-      >
-        <AppIcon :size="18" name="refresh"/>
-        {{
-          isDashboardLoading
-              ? t('dashboard.page.refreshing')
-              : t('dashboard.page.refreshData')
-        }}
-      </button>
+      <PendingTransactionCard
+          v-if="latestUploadedDraftFile"
+          :draft-file="latestUploadedDraftFile"
+      />
     </header>
 
     <div v-if="dashboardErrorMessage && dashboardSummary"
@@ -137,18 +129,20 @@ import {useAuth0} from '@auth0/auth0-vue'
 import {storeToRefs} from 'pinia'
 import {useI18n} from 'vue-i18n'
 
-import AppIcon from '@/components/common/AppIcon.vue'
 import {useToast} from '@/composables/useToast'
 import ArchivedDocumentDeleteModal from '@/features/dashboard/components/ArchivedDocumentDeleteModal.vue'
 import ArchivedDocumentPreviewDrawer from '@/features/dashboard/components/ArchivedDocumentPreviewDrawer.vue'
 import DashboardMetricCard from '@/features/dashboard/components/DashboardMetricCard.vue'
 import DashboardQuickActionsPanel from '@/features/dashboard/components/DashboardQuickActionsPanel.vue'
+import PendingTransactionCard from '@/features/dashboard/components/PendingTransactionCard.vue'
 import RecentDocumentsTable from '@/features/dashboard/components/RecentDocumentsTable.vue'
 import {useDashboardStore} from '@/features/dashboard/stores/dashboard.store'
 import type {ArchivedDocument} from '@/features/dashboard/types/dashboard.types'
+import {useDraftFilesStore} from '@/features/draft-files/stores/draftFiles.store'
 import {getApplicationLocaleCode} from '@/locales'
 
 const dashboardStore = useDashboardStore()
+const draftFilesStore = useDraftFilesStore()
 const {
   dashboardErrorMessage,
   dashboardRequestStatus,
@@ -162,6 +156,7 @@ const {
   previewingDocumentId,
   recentDocuments,
 } = storeToRefs(dashboardStore)
+const {latestUploadedDraftFile} = storeToRefs(draftFilesStore)
 const {user: authenticatedUser} = useAuth0()
 const {showErrorToast, showSuccessToast} = useToast()
 const {t} = useI18n({useScope: 'global'})
@@ -246,6 +241,13 @@ const formatArchiveStorageSummary = (
 
 const handleDashboardRefresh = () => {
   void dashboardStore.fetchDashboardData()
+}
+
+const fetchPendingDraftFiles = async () => {
+  await Promise.allSettled([
+    draftFilesStore.fetchUploadedDraftFiles('signature'),
+    draftFilesStore.fetchUploadedDraftFiles('timestamp'),
+  ])
 }
 
 const saveDocumentContent = (
@@ -361,6 +363,8 @@ onMounted(() => {
   if (dashboardRequestStatus.value === 'idle') {
     void dashboardStore.fetchDashboardData()
   }
+
+  void fetchPendingDraftFiles()
 })
 </script>
 

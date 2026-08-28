@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
+import BaseDatePicker from '@/components/ui/BaseDatePicker.vue'
 import BaseMultiSelect from '@/components/ui/BaseMultiSelect.vue'
 import type { DocumentOperation } from '@/features/dashboard/types/dashboard.types'
 
@@ -12,7 +13,7 @@ import {
   type DocumentHistoryFilters,
 } from '../types/documentHistory.types'
 
-const FILE_NAME_SEARCH_DEBOUNCE_MILLISECONDS = 500
+const FILTER_CHANGE_DEBOUNCE_MILLISECONDS = 500
 const supportedDocumentFileTypes = new Set<DocumentFileTypeFilter>(
   documentFileTypeFilters,
 )
@@ -36,7 +37,7 @@ const filterForm = reactive<DocumentHistoryFilters>({
   fileTypes: [...props.filters.fileTypes],
   operations: [...props.filters.operations],
 })
-let fileNameSearchDebounceId: number | null = null
+let filterChangeDebounceId: number | null = null
 
 const fileTypeOptions = computed(() => [
   { label: t('documentHistory.fileTypes.pdf'), value: 'pdf' },
@@ -67,13 +68,13 @@ const hasEnteredFilter = computed(
     filterForm.operations.length > 0,
 )
 
-const clearFileNameSearchDebounce = () => {
-  if (fileNameSearchDebounceId === null) {
+const clearScheduledFilterChange = () => {
+  if (filterChangeDebounceId === null) {
     return
   }
 
-  window.clearTimeout(fileNameSearchDebounceId)
-  fileNameSearchDebounceId = null
+  window.clearTimeout(filterChangeDebounceId)
+  filterChangeDebounceId = null
 }
 
 const emitFilterChange = () => {
@@ -85,23 +86,21 @@ const emitFilterChange = () => {
   })
 }
 
-const handleFileNameSearchInput = () => {
-  clearFileNameSearchDebounce()
-  fileNameSearchDebounceId = window.setTimeout(() => {
-    fileNameSearchDebounceId = null
+const scheduleFilterChange = () => {
+  clearScheduledFilterChange()
+  filterChangeDebounceId = window.setTimeout(() => {
+    filterChangeDebounceId = null
     emitFilterChange()
-  }, FILE_NAME_SEARCH_DEBOUNCE_MILLISECONDS)
+  }, FILTER_CHANGE_DEBOUNCE_MILLISECONDS)
 }
 
-const handleDateChange = () => {
-  clearFileNameSearchDebounce()
-  emitFilterChange()
+const handleFileNameSearchInput = () => {
+  scheduleFilterChange()
 }
 
-const handleDateClear = () => {
-  clearFileNameSearchDebounce()
-  filterForm.selectedDate = ''
-  emitFilterChange()
+const handleDateSelectionChange = (selectedDate: string) => {
+  filterForm.selectedDate = selectedDate
+  scheduleFilterChange()
 }
 
 const handleFileTypeSelectionChange = (selectedValues: string[]) => {
@@ -111,6 +110,7 @@ const handleFileTypeSelectionChange = (selectedValues: string[]) => {
         selectedValue as DocumentFileTypeFilter,
       ),
   )
+  scheduleFilterChange()
 }
 
 const handleOperationSelectionChange = (selectedValues: string[]) => {
@@ -118,22 +118,18 @@ const handleOperationSelectionChange = (selectedValues: string[]) => {
     (selectedValue): selectedValue is DocumentOperation =>
       supportedDocumentOperations.has(selectedValue as DocumentOperation),
   )
-}
-
-const handleMultiSelectSelectionComplete = () => {
-  clearFileNameSearchDebounce()
-  emitFilterChange()
+  scheduleFilterChange()
 }
 
 const handleFiltersReset = () => {
-  clearFileNameSearchDebounce()
+  clearScheduledFilterChange()
   emit('reset')
 }
 
 watch(
   () => props.filters,
   (updatedFilters) => {
-    clearFileNameSearchDebounce()
+    clearScheduledFilterChange()
     Object.assign(filterForm, {
       ...updatedFilters,
       fileTypes: [...updatedFilters.fileTypes],
@@ -143,7 +139,7 @@ watch(
   { deep: true },
 )
 
-onBeforeUnmount(clearFileNameSearchDebounce)
+onBeforeUnmount(clearScheduledFilterChange)
 </script>
 
 <template>
@@ -168,40 +164,18 @@ onBeforeUnmount(clearFileNameSearchDebounce)
       </div>
     </div>
 
-    <div class="document-history-filters__field">
-      <label for="document-history-date">
-        {{ t('documentHistory.filters.date') }}
-      </label>
-      <div
-        :class="[
-          'document-history-filters__control',
-          'document-history-filters__control--date',
-          {
-            'document-history-filters__control--date-selected':
-              filterForm.selectedDate,
-          },
-        ]"
-      >
-        <span class="document-history-filters__date-icon" aria-hidden="true">
-          <AppIcon name="calendar" :size="17" />
-        </span>
-        <input
-          id="document-history-date"
-          v-model="filterForm.selectedDate"
-          type="date"
-          @change="handleDateChange"
-        />
-        <button
-          v-if="filterForm.selectedDate"
-          class="document-history-filters__date-clear-button"
-          type="button"
-          :aria-label="t('documentHistory.filters.clearDateAriaLabel')"
-          @click="handleDateClear"
-        >
-          <AppIcon name="close" :size="15" />
-        </button>
-      </div>
-    </div>
+    <BaseDatePicker
+      id="document-history-date"
+      :calendar-aria-label="t('documentHistory.filters.calendarAriaLabel')"
+      :clear-text="t('documentHistory.filters.clearDate')"
+      :label="t('documentHistory.filters.date')"
+      :model-value="filterForm.selectedDate"
+      :next-month-text="t('documentHistory.filters.nextMonth')"
+      :placeholder="t('documentHistory.filters.datePlaceholder')"
+      :previous-month-text="t('documentHistory.filters.previousMonth')"
+      :today-text="t('documentHistory.filters.today')"
+      @update:model-value="handleDateSelectionChange"
+    />
 
     <BaseMultiSelect
       id="document-history-file-types"
@@ -215,7 +189,6 @@ onBeforeUnmount(clearFileNameSearchDebounce)
       "
       :options="fileTypeOptions"
       :placeholder="t('documentHistory.filters.allFileTypes')"
-      @selection-complete="handleMultiSelectSelectionComplete"
       @update:model-value="handleFileTypeSelectionChange"
     />
 
@@ -231,7 +204,6 @@ onBeforeUnmount(clearFileNameSearchDebounce)
       "
       :options="operationOptions"
       :placeholder="t('documentHistory.filters.allOperations')"
-      @selection-complete="handleMultiSelectSelectionComplete"
       @update:model-value="handleOperationSelectionChange"
     />
 

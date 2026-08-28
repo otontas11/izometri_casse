@@ -184,7 +184,6 @@ const handleFiltersChange = async (
   })
 
   if (nextRoute.fullPath === route.fullPath) {
-    fetchSelectedDocumentHistory()
     return
   }
 

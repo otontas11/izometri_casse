@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import type { ApiRequestStatus } from '@/types/api.types'
@@ -29,6 +29,36 @@ const createInitialLoadStatuses = (): Record<
 export const useDraftFilesStore = defineStore('draftFiles', () => {
   const uploadedDraftFiles = ref(createEmptyDraftFileCollection())
   const draftFilesLoadStatus = ref(createInitialLoadStatuses())
+  const latestUploadedDraftFile = computed(() => {
+    const allUploadedDraftFiles = [
+      ...uploadedDraftFiles.value.signature,
+      ...uploadedDraftFiles.value.timestamp,
+    ]
+
+    return allUploadedDraftFiles.reduce<DraftFile | null>(
+      (latestDraftFile, uploadedDraftFile) => {
+        if (!latestDraftFile) {
+          return uploadedDraftFile
+        }
+
+        const latestDraftFileCreationTime = Date.parse(
+          latestDraftFile.createdAt,
+        )
+        const uploadedDraftFileCreationTime = Date.parse(
+          uploadedDraftFile.createdAt,
+        )
+        const isUploadedDraftFileNewer =
+          uploadedDraftFileCreationTime > latestDraftFileCreationTime ||
+          (uploadedDraftFileCreationTime === latestDraftFileCreationTime &&
+            uploadedDraftFile.id > latestDraftFile.id)
+
+        return isUploadedDraftFileNewer
+          ? uploadedDraftFile
+          : latestDraftFile
+      },
+      null,
+    )
+  })
 
   const fetchUploadedDraftFiles = async (
     intendedOperation: DraftFileOperation,
@@ -96,6 +126,7 @@ export const useDraftFilesStore = defineStore('draftFiles', () => {
   return {
     deleteDraftFile,
     fetchUploadedDraftFiles,
+    latestUploadedDraftFile,
     removeProcessedDraftFile,
     uploadedDraftFiles,
     uploadDraftFile,

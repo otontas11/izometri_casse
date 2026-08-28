@@ -96,8 +96,6 @@
       "userFallback": "İzİmza user",
       "greeting": "Hello, {name}",
       "introduction": "Your digital transaction summary and secure tools are all here.",
-      "refreshing": "Refreshing…",
-      "refreshData": "Refresh data",
       "loadingAriaLabel": "Loading dashboard data",
       "loadErrorTitle": "Transaction center could not be loaded",
       "retry": "Try again",
@@ -115,6 +113,13 @@
       "fastestAction": "Fastest action",
       "title": "Sign Now",
       "description": "Select your files and continue with the signing steps. File selection automatically takes you to the Sign page."
+    },
+    "pendingTransaction": {
+      "title": "You have a pending transaction",
+      "signature": "Signature draft",
+      "timestamp": "Timestamp draft",
+      "continue": "Continue",
+      "openAriaLabel": "Continue the {operation} transaction for {fileName}"
     },
     "recentDocuments": {
       "downloadRequested": "A download request was created for {fileName}.",
@@ -343,7 +348,12 @@
       "fileSearch": "Search files",
       "fileSearchPlaceholder": "Enter a file name",
       "date": "Date",
-      "clearDateAriaLabel": "Clear selected date",
+      "datePlaceholder": "Select a date",
+      "calendarAriaLabel": "Document date selection",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "today": "Today",
+      "clearDate": "Clear date",
       "fileType": "File type",
       "allFileTypes": "All file types",
       "operation": "Operation type",

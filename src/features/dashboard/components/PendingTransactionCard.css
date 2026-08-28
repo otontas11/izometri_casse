@@ -1,0 +1,109 @@
+.pending-transaction-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  width: min(24rem, 100%);
+  min-height: 4.75rem;
+  padding: 0.7rem 0.8rem;
+  color: inherit;
+  text-decoration: none;
+  background: linear-gradient(
+    135deg,
+    var(--color-surface-raised) 35%,
+    #fff3cf 145%
+  );
+  border: 1px solid #f6d991;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.pending-transaction-card:hover,
+.pending-transaction-card:focus-visible {
+  border-color: var(--color-warning);
+  box-shadow: 0 10px 24px rgb(180 83 9 / 12%);
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.pending-transaction-card__icon {
+  display: grid;
+  width: 2.65rem;
+  height: 2.65rem;
+  place-items: center;
+  color: var(--color-warning);
+  background: #fff3cf;
+  border-radius: 0.75rem;
+}
+
+.pending-transaction-card__content {
+  display: grid;
+  min-width: 0;
+}
+
+.pending-transaction-card__content > small {
+  color: var(--color-warning);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.pending-transaction-card__content > strong {
+  margin-top: 0.18rem;
+  overflow: hidden;
+  color: var(--color-brand-950);
+  font-size: 0.8rem;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pending-transaction-card__details {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  min-width: 0;
+  margin-top: 0.22rem;
+  color: var(--color-text-secondary);
+  font-size: 0.65rem;
+  font-weight: 650;
+}
+
+.pending-transaction-card__details span {
+  color: var(--color-brand-800);
+  font-weight: 800;
+}
+
+.pending-transaction-card__details time::before {
+  margin-right: 0.35rem;
+  content: '·';
+}
+
+.pending-transaction-card__continue {
+  display: grid;
+  gap: 0.2rem;
+  justify-items: end;
+  color: var(--color-warning);
+}
+
+.pending-transaction-card__continue small {
+  font-size: 0.62rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+@media (max-width: 47.99rem) {
+  .pending-transaction-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 24rem) {
+  .pending-transaction-card__continue small {
+    display: none;
+  }
+}

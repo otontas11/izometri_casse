@@ -96,8 +96,6 @@
       "userFallback": "İzİmza kullanıcısı",
       "greeting": "Merhaba, {name}",
       "introduction": "Dijital işlemlerinizin özeti ve güvenli işlem araçlarınız burada.",
-      "refreshing": "Yenileniyor…",
-      "refreshData": "Verileri yenile",
       "loadingAriaLabel": "Dashboard verileri yükleniyor",
       "loadErrorTitle": "İşlem merkezi yüklenemedi",
       "retry": "Yeniden dene",
@@ -115,6 +113,13 @@
       "fastestAction": "En hızlı işlem",
       "title": "Hemen İmzala",
       "description": "Dosyalarınızı seçtikten sonra imzalama adımlarına devam edin. Dosya seçimi sizi otomatik olarak İmzala ekranına götürür."
+    },
+    "pendingTransaction": {
+      "title": "Devam eden işleminiz var",
+      "signature": "İmzalama taslağı",
+      "timestamp": "Zaman damgası taslağı",
+      "continue": "Devam et",
+      "openAriaLabel": "{fileName} dosyasının {operation} işlemine devam et"
     },
     "recentDocuments": {
       "downloadRequested": "{fileName} için indirme isteği oluşturuldu.",
@@ -343,7 +348,12 @@
       "fileSearch": "Dosya ara",
       "fileSearchPlaceholder": "Dosya adı yazın",
       "date": "Tarih",
-      "clearDateAriaLabel": "Seçili tarihi temizle",
+      "datePlaceholder": "Tarih seçin",
+      "calendarAriaLabel": "Belge tarihi seçimi",
+      "previousMonth": "Önceki ay",
+      "nextMonth": "Sonraki ay",
+      "today": "Bugün",
+      "clearDate": "Tarihi temizle",
       "fileType": "Dosya tipi",
       "allFileTypes": "Tüm dosya tipleri",
       "operation": "İşlem türü",

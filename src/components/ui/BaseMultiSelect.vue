@@ -25,7 +25,6 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  'selection-complete': []
   'update:modelValue': [selectedValues: string[]]
 }>()
 
@@ -33,8 +32,6 @@ const isDropdownOpen = ref(false)
 const multiSelectElement = ref<HTMLElement | null>(null)
 const optionsPanelElement = ref<HTMLElement | null>(null)
 const triggerElement = ref<HTMLButtonElement | null>(null)
-const selectedValuesWhenOpened = ref<string[]>([])
-const hasPendingSelectionChange = ref(false)
 
 const labelElementId = computed(() => `${props.id}-label`)
 const optionsPanelId = computed(() => `${props.id}-options`)
@@ -65,22 +62,11 @@ const getCheckboxElements = () =>
     ) ?? [],
   )
 
-const haveSameSelectedValues = (
-  firstSelectedValues: string[],
-  secondSelectedValues: string[],
-) =>
-  firstSelectedValues.length === secondSelectedValues.length &&
-  firstSelectedValues.every((selectedValue) =>
-    secondSelectedValues.includes(selectedValue),
-  )
-
 const openDropdown = () => {
   if (props.disabled || isDropdownOpen.value) {
     return
   }
 
-  selectedValuesWhenOpened.value = [...props.modelValue]
-  hasPendingSelectionChange.value = false
   isDropdownOpen.value = true
 }
 
@@ -90,11 +76,6 @@ const closeDropdown = () => {
   }
 
   isDropdownOpen.value = false
-
-  if (hasPendingSelectionChange.value) {
-    hasPendingSelectionChange.value = false
-    emit('selection-complete')
-  }
 }
 
 const closeDropdownAndRestoreTriggerFocus = async () => {
@@ -145,10 +126,6 @@ const handleOptionToggle = (optionValue: string) => {
     ? props.modelValue.filter((selectedValue) => selectedValue !== optionValue)
     : [...props.modelValue, optionValue]
 
-  hasPendingSelectionChange.value = !haveSameSelectedValues(
-    selectedValuesWhenOpened.value,
-    updatedSelectedValues,
-  )
   emit('update:modelValue', updatedSelectedValues)
 }
 
@@ -184,8 +161,6 @@ const handleCheckboxKeydown = (keyboardEvent: KeyboardEvent) => {
 }
 
 const handleSelectionClear = () => {
-  hasPendingSelectionChange.value =
-    selectedValuesWhenOpened.value.length > 0
   emit('update:modelValue', [])
 }
 
