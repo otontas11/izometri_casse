@@ -101,13 +101,19 @@ onBeforeUnmount(() => {
           {{ t('dashboard.recentDocuments.title') }}
         </h2>
       </div>
-      <span>
-        {{
-          t('dashboard.recentDocuments.recordCount', {
-            count: archivedDocuments.length,
-          })
-        }}
-      </span>
+      <div class="recent-documents-table__heading-actions">
+        <span>
+          {{
+            t('dashboard.recentDocuments.recordCount', {
+              count: archivedDocuments.length,
+            })
+          }}
+        </span>
+        <RouterLink :to="{ name: 'document-history' }">
+          {{ t('common.viewAll') }}
+          <AppIcon name="arrow-right" :size="16" />
+        </RouterLink>
+      </div>
     </header>
 
     <table
@@ -320,10 +326,33 @@ onBeforeUnmount(() => {
   letter-spacing: -0.025em;
 }
 
-.recent-documents-table__heading > span {
+.recent-documents-table__heading-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.recent-documents-table__heading-actions > span {
   color: var(--color-text-secondary);
   font-size: var(--font-size-small);
   font-weight: 700;
+}
+
+.recent-documents-table__heading-actions > a {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  padding: 0.55rem 0.7rem;
+  color: var(--color-brand-950);
+  font-size: var(--font-size-small);
+  font-weight: 800;
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.recent-documents-table__heading-actions > a:hover {
+  border-color: var(--color-primary-600);
 }
 
 .recent-documents-table__content {
@@ -601,7 +630,7 @@ onBeforeUnmount(() => {
     align-items: start;
   }
 
-  .recent-documents-table__heading > span,
+  .recent-documents-table__heading-actions > span,
   .recent-documents-table__column-headings {
     display: none;
   }

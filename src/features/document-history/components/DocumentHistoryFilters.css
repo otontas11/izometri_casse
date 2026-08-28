@@ -1,0 +1,99 @@
+.document-history-filters {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1.5fr) repeat(3, minmax(9rem, 1fr)) auto;
+  gap: 1rem;
+  align-items: end;
+  padding: 1.25rem;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.document-history-filters__field {
+  display: grid;
+  min-width: 0;
+  gap: 0.45rem;
+}
+
+.document-history-filters__field label {
+  color: var(--color-brand-950);
+  font-size: var(--font-size-small);
+  font-weight: 800;
+}
+
+.document-history-filters__field input,
+.document-history-filters__field select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+  color: var(--color-brand-950);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition-fast);
+}
+
+.document-history-filters__field input:hover,
+.document-history-filters__field select:hover,
+.document-history-filters__field input:focus,
+.document-history-filters__field select:focus {
+  border-color: var(--color-primary-600);
+}
+
+.document-history-filters__field input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.document-history-filters__actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.document-history-filters__actions button {
+  min-height: 2.75rem;
+  padding: 0.65rem 0.85rem;
+  font-size: var(--font-size-small);
+  font-weight: 800;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.document-history-filters__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.document-history-filters__reset-button {
+  color: var(--color-text-secondary);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+}
+
+.document-history-filters__submit-button {
+  color: var(--color-text-inverse);
+  background: var(--color-brand-950);
+}
+
+@media (max-width: 79.99rem) {
+  .document-history-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .document-history-filters__actions {
+    justify-content: flex-end;
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 39.99rem) {
+  .document-history-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .document-history-filters__actions {
+    display: grid;
+    grid-column: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

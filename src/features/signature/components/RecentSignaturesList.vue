@@ -10,13 +10,24 @@
           {{ t('signature.recentSignatures.title') }}
         </h2>
       </div>
-      <strong>
-        {{
-          t('signature.recentSignatures.recordCount', {
-            count: signedDocuments.length,
-          })
-        }}
-      </strong>
+      <div class="recent-signatures-list__header-actions">
+        <strong>
+          {{
+            t('signature.recentSignatures.recordCount', {
+              count: signedDocuments.length,
+            })
+          }}
+        </strong>
+        <RouterLink
+          :to="{
+            name: 'document-history',
+            query: { operation: 'signature' },
+          }"
+        >
+          {{ t('common.viewAll') }}
+          <AppIcon name="arrow-right" :size="16" />
+        </RouterLink>
+      </div>
     </header>
 
     <p
@@ -109,6 +120,7 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
+import { RouterLink } from 'vue-router'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import type { ArchivedDocument } from '@/features/dashboard/types/dashboard.types'

@@ -3,6 +3,7 @@ import {
   deleteOwnedDocumentRecord,
   deleteUploadedDraftFileRecord,
   fetchDashboardSummary,
+  fetchDocumentHistory,
   fetchOwnedDocument,
   fetchProcessableDraftFile,
   fetchRecentDocuments,
@@ -23,6 +24,8 @@ import type {
   ArchivedDocumentDeletionResponse,
   AuthenticatedUser,
   DocumentDatabaseRecord,
+  DocumentFileTypeFilter,
+  DocumentHistoryRequest,
   DocumentOperation,
   SignatureTransactionResponse,
   TimestampTransactionResponse,
@@ -32,6 +35,10 @@ import type {
 const MAX_DOCUMENT_FILE_SIZE_BYTES = 25 * 1024 * 1024
 const DOCUMENT_TRANSACTION_CREDIT_COST = 1
 const RECENT_DOCUMENT_LIMIT = 5
+const DEFAULT_DOCUMENT_HISTORY_PAGE_SIZE = 10
+const MAXIMUM_DOCUMENT_HISTORY_PAGE_NUMBER = 1_000_000
+const MAXIMUM_DOCUMENT_HISTORY_PAGE_SIZE = 50
+const MAXIMUM_DOCUMENT_SEARCH_LENGTH = 100
 const PROFILE_NAME_MINIMUM_LENGTH = 2
 const PROFILE_NAME_MAXIMUM_LENGTH = 50
 const profileNamePattern = /^[\p{L}\p{M}]+(?:[ '\-’][\p{L}\p{M}]+)*$/u
@@ -55,6 +62,17 @@ const supportedDraftFileExtensions = new Set([
   '.ubl',
   '.webp',
   '.xml',
+])
+const supportedDocumentFileTypeFilters = new Set<DocumentFileTypeFilter>([
+  'excel',
+  'eyp',
+  'image',
+  'office',
+  'pdf',
+  'text',
+  'udf',
+  'word',
+  'xml',
 ])
 
 interface DocumentTransactionConfiguration {
@@ -121,6 +139,133 @@ const getOptionalDocumentOperation = (requestUrl: URL) => {
   }
 
   return requestedDocumentOperation
+}
+
+const getPositiveIntegerQueryParameter = (
+  requestUrl: URL,
+  parameterName: string,
+  defaultValue: number,
+  maximumValue: number,
+) => {
+  const queryParameter = requestUrl.searchParams.get(parameterName)
+
+  if (queryParameter === null) {
+    return defaultValue
+  }
+
+  const parsedQueryParameter = Number(queryParameter)
+
+  if (
+    !Number.isSafeInteger(parsedQueryParameter) ||
+    parsedQueryParameter < 1
+  ) {
+    throw new WorkerApiError(
+      422,
+      'INVALID_DOCUMENT_HISTORY_PAGINATION',
+      'Belge geçmişi için geçerli bir sayfa seçin.',
+    )
+  }
+
+  return Math.min(parsedQueryParameter, maximumValue)
+}
+
+const getOptionalDocumentHistoryDate = (
+  requestUrl: URL,
+  parameterName: 'createdBefore' | 'createdFrom',
+) => {
+  const requestedDate = requestUrl.searchParams.get(parameterName)
+
+  if (requestedDate === null) {
+    return undefined
+  }
+
+  const parsedDate = new Date(requestedDate)
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    throw new WorkerApiError(
+      422,
+      'INVALID_DOCUMENT_HISTORY_DATE',
+      'Belge geçmişi için geçerli bir tarih seçin.',
+    )
+  }
+
+  return parsedDate.toISOString()
+}
+
+const getOptionalDocumentFileType = (requestUrl: URL) => {
+  const requestedFileType = requestUrl.searchParams.get('fileType')
+
+  if (requestedFileType === null) {
+    return undefined
+  }
+
+  if (
+    !supportedDocumentFileTypeFilters.has(
+      requestedFileType as DocumentFileTypeFilter,
+    )
+  ) {
+    throw new WorkerApiError(
+      422,
+      'INVALID_DOCUMENT_FILE_TYPE',
+      'Belgeler için geçerli bir dosya türü seçin.',
+    )
+  }
+
+  return requestedFileType as DocumentFileTypeFilter
+}
+
+const getDocumentHistoryRequest = (
+  requestUrl: URL,
+): DocumentHistoryRequest => {
+  const fileNameSearch = requestUrl.searchParams.get('search')?.trim()
+
+  if (
+    fileNameSearch &&
+    fileNameSearch.length > MAXIMUM_DOCUMENT_SEARCH_LENGTH
+  ) {
+    throw new WorkerApiError(
+      422,
+      'DOCUMENT_SEARCH_TOO_LONG',
+      'Dosya araması 100 karakterden uzun olamaz.',
+    )
+  }
+
+  const createdBefore = getOptionalDocumentHistoryDate(
+    requestUrl,
+    'createdBefore',
+  )
+  const createdFrom = getOptionalDocumentHistoryDate(
+    requestUrl,
+    'createdFrom',
+  )
+
+  if (createdBefore && createdFrom && createdBefore <= createdFrom) {
+    throw new WorkerApiError(
+      422,
+      'INVALID_DOCUMENT_HISTORY_DATE_RANGE',
+      'Belge geçmişi için geçerli bir tarih aralığı seçin.',
+    )
+  }
+
+  return {
+    createdBefore,
+    createdFrom,
+    fileNameSearch: fileNameSearch || undefined,
+    fileType: getOptionalDocumentFileType(requestUrl),
+    operation: getOptionalDocumentOperation(requestUrl),
+    page: getPositiveIntegerQueryParameter(
+      requestUrl,
+      'page',
+      1,
+      MAXIMUM_DOCUMENT_HISTORY_PAGE_NUMBER,
+    ),
+    pageSize: getPositiveIntegerQueryParameter(
+      requestUrl,
+      'pageSize',
+      DEFAULT_DOCUMENT_HISTORY_PAGE_SIZE,
+      MAXIMUM_DOCUMENT_HISTORY_PAGE_SIZE,
+    ),
+  }
 }
 
 const readProfileUpdatePayload = async (
@@ -646,6 +791,15 @@ export const routeAuthenticatedRequest = async (
       getOptionalDocumentOperation(requestUrl),
     )
     return createJsonResponse(recentDocuments, 200, corsHeaders)
+  }
+
+  if (request.method === 'GET' && requestPathname === '/document-history') {
+    const documentHistory = await fetchDocumentHistory(
+      environment.DATABASE,
+      authenticatedUser.userId,
+      getDocumentHistoryRequest(requestUrl),
+    )
+    return createJsonResponse(documentHistory, 200, corsHeaders)
   }
 
   if (request.method === 'GET' && requestPathname === '/timestampJobs') {

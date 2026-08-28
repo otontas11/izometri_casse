@@ -10,7 +10,8 @@
   "common": {
     "appName": "İzİmza",
     "retry": "Try again",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "viewAll": "View all"
   },
   "routes": {
     "login": "Sign In",
@@ -19,6 +20,7 @@
     "dashboard": "Dashboard",
     "signature": "Sign",
     "timestamp": "Timestamp",
+    "documentHistory": "Document History",
     "profile": "Profile and Security"
   },
   "layout": {
@@ -328,6 +330,63 @@
       "partialFailure": "{completedCount} files were timestamped and used {completedCount} credits; {failedCount} files could not be processed.",
       "batchFailure": "{count} files could not be timestamped. Review the errors on the file cards and try again.",
       "transactionFailed": "The timestamp transaction could not be completed. Please try again."
+    }
+  },
+  "documentHistory": {
+    "page": {
+      "eyebrow": "Digital archive",
+      "title": "Document history",
+      "description": "Filter and review your completed signature and timestamp transactions."
+    },
+    "filters": {
+      "fileSearch": "Search files",
+      "fileSearchPlaceholder": "Enter a file name",
+      "date": "Date",
+      "fileType": "File type",
+      "allFileTypes": "All file types",
+      "operation": "Operation type",
+      "allOperations": "All operations",
+      "clear": "Clear",
+      "apply": "Filter",
+      "filtering": "Filtering…"
+    },
+    "fileTypes": {
+      "pdf": "PDF",
+      "xml": "XML",
+      "word": "Word",
+      "excel": "Excel",
+      "eyp": "EYP",
+      "udf": "UDF",
+      "office": "Office Files (.docx, .xlsx, .pptx)",
+      "text": "Text Files (.txt)",
+      "image": "Image Files (.jpg, .png, etc.)"
+    },
+    "operations": {
+      "signature": "Sign",
+      "timestamp": "Timestamp"
+    },
+    "table": {
+      "eyebrow": "Transaction records",
+      "title": "Completed documents",
+      "recordCount": "{count} records",
+      "loading": "Loading document history",
+      "errorTitle": "Document history could not be loaded",
+      "caption": "Completed signature and timestamp documents",
+      "document": "Document",
+      "operation": "Operation",
+      "date": "Date",
+      "size": "Size",
+      "emptyTitle": "No completed documents yet",
+      "emptyDescription": "Your document will appear here after your first signature or timestamp transaction is completed.",
+      "filteredEmptyTitle": "No documents match the filters",
+      "filteredEmptyDescription": "Change the filters and try again."
+    },
+    "pagination": {
+      "ariaLabel": "Document history pages",
+      "summary": "Records {firstRecord}-{lastRecord} of {totalRecords}",
+      "previous": "Previous",
+      "next": "Next",
+      "pageAriaLabel": "Go to page {page}"
     }
   },
   "profile": {

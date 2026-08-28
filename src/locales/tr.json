@@ -10,7 +10,8 @@
   "common": {
     "appName": "İzİmza",
     "retry": "Tekrar dene",
-    "cancel": "Vazgeç"
+    "cancel": "Vazgeç",
+    "viewAll": "Tümünü gör"
   },
   "routes": {
     "login": "Giriş",
@@ -19,6 +20,7 @@
     "dashboard": "Anasayfa",
     "signature": "İmzala",
     "timestamp": "Zaman Damgala",
+    "documentHistory": "Belge Geçmişi",
     "profile": "Profil ve Güvenlik"
   },
   "layout": {
@@ -328,6 +330,63 @@
       "partialFailure": "{completedCount} dosya zaman damgalandı ve {completedCount} kontör kullanıldı; {failedCount} dosya işlenemedi.",
       "batchFailure": "{count} dosya zaman damgalanamadı. Dosya kartlarındaki hataları kontrol edip tekrar deneyin.",
       "transactionFailed": "Zaman damgalama işlemi tamamlanamadı. Lütfen tekrar deneyin."
+    }
+  },
+  "documentHistory": {
+    "page": {
+      "eyebrow": "Dijital arşiv",
+      "title": "Belge geçmişi",
+      "description": "Tamamlanan imzalama ve zaman damgalama işlemlerinizi filtreleyerek inceleyin."
+    },
+    "filters": {
+      "fileSearch": "Dosya ara",
+      "fileSearchPlaceholder": "Dosya adı yazın",
+      "date": "Tarih",
+      "fileType": "Dosya tipi",
+      "allFileTypes": "Tüm dosya tipleri",
+      "operation": "İşlem türü",
+      "allOperations": "Tüm işlemler",
+      "clear": "Temizle",
+      "apply": "Filtrele",
+      "filtering": "Filtreleniyor…"
+    },
+    "fileTypes": {
+      "pdf": "PDF",
+      "xml": "XML",
+      "word": "Word",
+      "excel": "Excel",
+      "eyp": "EYP",
+      "udf": "UDF",
+      "office": "Ofis Dosyaları (.docx, .xlsx, .pptx)",
+      "text": "Metin Dosyaları (.txt)",
+      "image": "Görsel Dosyaları (.jpg, .png vb.)"
+    },
+    "operations": {
+      "signature": "İmzala",
+      "timestamp": "Zaman Damgala"
+    },
+    "table": {
+      "eyebrow": "İşlem kayıtları",
+      "title": "Tamamlanan belgeler",
+      "recordCount": "{count} kayıt",
+      "loading": "Belge geçmişi yükleniyor",
+      "errorTitle": "Belge geçmişi yüklenemedi",
+      "caption": "Tamamlanan imzalama ve zaman damgalama belgeleri",
+      "document": "Belge",
+      "operation": "İşlem",
+      "date": "Tarih",
+      "size": "Boyut",
+      "emptyTitle": "Henüz tamamlanan belge yok",
+      "emptyDescription": "İlk imzalama veya zaman damgalama işleminiz tamamlandığında belgeniz burada görünür.",
+      "filteredEmptyTitle": "Filtrelere uygun belge bulunamadı",
+      "filteredEmptyDescription": "Filtreleri değiştirerek tekrar deneyin."
+    },
+    "pagination": {
+      "ariaLabel": "Belge geçmişi sayfaları",
+      "summary": "{totalRecords} kaydın {firstRecord}-{lastRecord} arası",
+      "previous": "Önceki",
+      "next": "Sonraki",
+      "pageAriaLabel": "{page}. sayfaya git"
     }
   },
   "profile": {

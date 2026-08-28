@@ -46,6 +46,13 @@ export const applicationRoutes: RouteRecordRaw[] = [
         meta: { titleKey: 'routes.timestamp' },
       },
       {
+        path: 'documents',
+        name: 'document-history',
+        component: () =>
+          import('@/pages/document-history/DocumentHistoryPage.vue'),
+        meta: { titleKey: 'routes.documentHistory' },
+      },
+      {
         path: 'settings/profile',
         name: 'profile',
         component: () => import('@/pages/profile/ProfilePage.vue'),

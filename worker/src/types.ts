@@ -31,6 +31,16 @@ export interface DashboardSummary {
 export type DocumentOperation = 'signature' | 'timestamp'
 type DocumentStatus = 'completed' | 'failed' | 'processing'
 export type DraftFileStatus = 'processed' | 'uploaded'
+export type DocumentFileTypeFilter =
+  | 'pdf'
+  | 'xml'
+  | 'word'
+  | 'excel'
+  | 'eyp'
+  | 'udf'
+  | 'office'
+  | 'text'
+  | 'image'
 
 export interface DraftFile {
   createdAt: string
@@ -78,6 +88,26 @@ export interface ArchivedDocumentDeletionResponse {
   recentDocuments: ArchivedDocument[]
 }
 
+export interface DocumentHistoryRequest {
+  createdBefore?: string
+  createdFrom?: string
+  fileNameSearch?: string
+  fileType?: DocumentFileTypeFilter
+  operation?: DocumentOperation
+  page: number
+  pageSize: number
+}
+
+export interface DocumentHistoryResponse {
+  items: ArchivedDocument[]
+  pagination: {
+    currentPage: number
+    pageSize: number
+    totalItems: number
+    totalPages: number
+  }
+}
+
 export interface ProfileDatabaseRecord {
   auth0_user_id: string
   avatar_url: string | null
@@ -123,4 +153,8 @@ export interface DashboardDatabaseRecord {
   storage_limit_bytes: number
   storage_used_bytes: number
   timestamped_document_count: number
+}
+
+export interface DocumentHistoryCountDatabaseRecord {
+  total_count: number
 }

@@ -28,6 +28,31 @@ const supportedDraftFileExtensions = new Set([
   '.webp',
   '.xml',
 ])
+const documentFileTypeExtensions = {
+  excel: ['.xls', '.xlsx'],
+  eyp: ['.eyp'],
+  image: [
+    '.avif',
+    '.bmp',
+    '.gif',
+    '.heic',
+    '.heif',
+    '.ico',
+    '.jpeg',
+    '.jpg',
+    '.png',
+    '.svg',
+    '.tif',
+    '.tiff',
+    '.webp',
+  ],
+  office: ['.docx', '.xlsx', '.pptx'],
+  pdf: ['.pdf'],
+  text: ['.txt'],
+  udf: ['.udf'],
+  word: ['.doc', '.docx'],
+  xml: ['.xml', '.ubl'],
+}
 
 const jsonServerApplication = jsonServer.create()
 const defaultDatabasePath = path.join(__dirname, 'db.json')
@@ -370,6 +395,96 @@ const deleteArchivedDocument = (documentId) => {
 
 jsonServerApplication.use(jsonServer.defaults())
 jsonServerApplication.use(jsonServer.bodyParser)
+
+jsonServerApplication.get('/document-history', (request, response) => {
+  const pageNumber = Number(String(request.query.page || '1'))
+  const pageSize = Math.min(
+    50,
+    Number(String(request.query.pageSize || '10')),
+  )
+  const fileNameSearch = String(request.query.search || '')
+    .trim()
+    .toLocaleLowerCase('tr-TR')
+  const selectedFileType = String(request.query.fileType || '')
+  const selectedOperation = String(request.query.operation || '')
+  const createdFrom = String(request.query.createdFrom || '')
+  const createdBefore = String(request.query.createdBefore || '')
+  const hasValidPagination =
+    Number.isSafeInteger(pageNumber) &&
+    pageNumber > 0 &&
+    Number.isSafeInteger(pageSize) &&
+    pageSize > 0
+
+  if (!hasValidPagination) {
+    response.status(422).json({
+      error: 'INVALID_DOCUMENT_HISTORY_PAGINATION',
+      message: 'Belge geçmişi için geçerli bir sayfa seçin.',
+    })
+    return
+  }
+
+  if (
+    fileNameSearch.length > 100 ||
+    (selectedOperation && !isDocumentOperation(selectedOperation)) ||
+    (selectedFileType && !documentFileTypeExtensions[selectedFileType]) ||
+    (createdFrom && Number.isNaN(Date.parse(createdFrom))) ||
+    (createdBefore && Number.isNaN(Date.parse(createdBefore))) ||
+    (createdFrom &&
+      createdBefore &&
+      Date.parse(createdBefore) <= Date.parse(createdFrom))
+  ) {
+    response.status(422).json({
+      error: 'INVALID_DOCUMENT_HISTORY_FILTER',
+      message: 'Belge geçmişi filtrelerini kontrol edip tekrar deneyin.',
+    })
+    return
+  }
+
+  const selectedFileExtensions = selectedFileType
+    ? documentFileTypeExtensions[selectedFileType]
+    : []
+  const filteredDocuments = database
+    .get('documents')
+    .value()
+    .filter((archivedDocument) => {
+      const normalizedFileName = archivedDocument.name.toLocaleLowerCase('tr-TR')
+      const documentCreationTime = Date.parse(archivedDocument.createdAt)
+
+      return (
+        (!archivedDocument.status || archivedDocument.status === 'completed') &&
+        (!fileNameSearch || normalizedFileName.includes(fileNameSearch)) &&
+        (!selectedOperation ||
+          archivedDocument.operation === selectedOperation) &&
+        (!selectedFileType ||
+          selectedFileExtensions.some((fileExtension) =>
+            normalizedFileName.endsWith(fileExtension),
+          )) &&
+        (!createdFrom || documentCreationTime >= Date.parse(createdFrom)) &&
+        (!createdBefore || documentCreationTime < Date.parse(createdBefore))
+      )
+    })
+    .sort(
+      (firstDocument, secondDocument) =>
+        new Date(secondDocument.createdAt).getTime() -
+          new Date(firstDocument.createdAt).getTime() ||
+        secondDocument.id - firstDocument.id,
+    )
+  const totalDocumentCount = filteredDocuments.length
+  const documentOffset = (pageNumber - 1) * pageSize
+
+  response.json({
+    items: filteredDocuments.slice(
+      documentOffset,
+      documentOffset + pageSize,
+    ),
+    pagination: {
+      currentPage: pageNumber,
+      pageSize,
+      totalItems: totalDocumentCount,
+      totalPages: Math.ceil(totalDocumentCount / pageSize),
+    },
+  })
+})
 
 jsonServerApplication.get('/draft-files', (request, response) => {
   const intendedOperation = request.query.operation

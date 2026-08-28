@@ -5,6 +5,10 @@ import type {
   DashboardDatabaseRecord,
   DashboardSummary,
   DocumentDatabaseRecord,
+  DocumentFileTypeFilter,
+  DocumentHistoryCountDatabaseRecord,
+  DocumentHistoryRequest,
+  DocumentHistoryResponse,
   DocumentOperation,
   DraftFile,
   DraftFileDatabaseRecord,
@@ -17,6 +21,31 @@ import type {
 const BYTES_PER_MEGABYTE = 1024 * 1024
 const DEFAULT_REMAINING_CREDITS = 20
 const DEFAULT_STORAGE_LIMIT_BYTES = 1024 * BYTES_PER_MEGABYTE
+const documentFileTypeExtensions: Record<DocumentFileTypeFilter, string[]> = {
+  excel: ['.xls', '.xlsx'],
+  eyp: ['.eyp'],
+  image: [
+    '.avif',
+    '.bmp',
+    '.gif',
+    '.heic',
+    '.heif',
+    '.ico',
+    '.jpeg',
+    '.jpg',
+    '.png',
+    '.svg',
+    '.tif',
+    '.tiff',
+    '.webp',
+  ],
+  office: ['.docx', '.xlsx', '.pptx'],
+  pdf: ['.pdf'],
+  text: ['.txt'],
+  udf: ['.udf'],
+  word: ['.doc', '.docx'],
+  xml: ['.xml', '.ubl'],
+}
 
 const mapProfileDatabaseRecord = (
   profileRecord: ProfileDatabaseRecord,
@@ -244,6 +273,92 @@ export const fetchRecentDocuments = async (
     await recentDocumentsStatement.all<DocumentDatabaseRecord>()
 
   return documentRecords.map(mapArchivedDocument)
+}
+
+export const fetchDocumentHistory = async (
+  database: D1Database,
+  authenticatedUserId: string,
+  documentHistoryRequest: DocumentHistoryRequest,
+): Promise<DocumentHistoryResponse> => {
+  const documentConditions = [
+    'auth0_user_id = ?',
+    "status = 'completed'",
+  ]
+  const conditionBindings: unknown[] = [authenticatedUserId]
+
+  if (documentHistoryRequest.fileNameSearch) {
+    documentConditions.push('INSTR(LOWER(file_name), LOWER(?)) > 0')
+    conditionBindings.push(documentHistoryRequest.fileNameSearch)
+  }
+
+  if (documentHistoryRequest.createdFrom) {
+    documentConditions.push('created_at >= ?')
+    conditionBindings.push(documentHistoryRequest.createdFrom)
+  }
+
+  if (documentHistoryRequest.createdBefore) {
+    documentConditions.push('created_at < ?')
+    conditionBindings.push(documentHistoryRequest.createdBefore)
+  }
+
+  if (documentHistoryRequest.operation) {
+    documentConditions.push('operation = ?')
+    conditionBindings.push(documentHistoryRequest.operation)
+  }
+
+  if (documentHistoryRequest.fileType) {
+    const fileTypeExtensions =
+      documentFileTypeExtensions[documentHistoryRequest.fileType]
+    const fileTypeConditions = fileTypeExtensions.map(
+      () => 'LOWER(file_name) LIKE ?',
+    )
+
+    documentConditions.push(`(${fileTypeConditions.join(' OR ')})`)
+    conditionBindings.push(
+      ...fileTypeExtensions.map((fileExtension) => `%${fileExtension}`),
+    )
+  }
+
+  const documentConditionsSql = documentConditions.join(' AND ')
+  const documentOffset =
+    (documentHistoryRequest.page - 1) * documentHistoryRequest.pageSize
+  const documentCountStatement = database
+    .prepare(
+      `SELECT COUNT(*) AS total_count
+      FROM documents
+      WHERE ${documentConditionsSql}`,
+    )
+    .bind(...conditionBindings)
+  const documentRecordsStatement = database
+    .prepare(
+      `SELECT *
+      FROM documents
+      WHERE ${documentConditionsSql}
+      ORDER BY created_at DESC, id DESC
+      LIMIT ? OFFSET ?`,
+    )
+    .bind(
+      ...conditionBindings,
+      documentHistoryRequest.pageSize,
+      documentOffset,
+    )
+  const [documentCountRecord, documentRecordsResult] = await Promise.all([
+    documentCountStatement.first<DocumentHistoryCountDatabaseRecord>(),
+    documentRecordsStatement.all<DocumentDatabaseRecord>(),
+  ])
+  const totalDocumentCount = Number(documentCountRecord?.total_count ?? 0)
+
+  return {
+    items: documentRecordsResult.results.map(mapArchivedDocument),
+    pagination: {
+      currentPage: documentHistoryRequest.page,
+      pageSize: documentHistoryRequest.pageSize,
+      totalItems: totalDocumentCount,
+      totalPages: Math.ceil(
+        totalDocumentCount / documentHistoryRequest.pageSize,
+      ),
+    },
+  }
 }
 
 export const fetchTimestampJobs = async (

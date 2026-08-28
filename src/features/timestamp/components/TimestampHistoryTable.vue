@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { RouterLink } from 'vue-router'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import type {
@@ -41,14 +42,25 @@ const timestampJobStatusTranslationKeys: Record<TimestampJobStatus, string> = {
         <p>{{ t('timestamp.history.description') }}</p>
       </div>
 
-      <button type="button" :disabled="isLoading" @click="emit('retry')">
-        <AppIcon name="refresh" :size="17" />
-        {{
-          isLoading
-            ? t('timestamp.history.refreshing')
-            : t('timestamp.history.refresh')
-        }}
-      </button>
+      <div class="timestamp-history-table__header-actions">
+        <button type="button" :disabled="isLoading" @click="emit('retry')">
+          <AppIcon name="refresh" :size="17" />
+          {{
+            isLoading
+              ? t('timestamp.history.refreshing')
+              : t('timestamp.history.refresh')
+          }}
+        </button>
+        <RouterLink
+          :to="{
+            name: 'document-history',
+            query: { operation: 'timestamp' },
+          }"
+        >
+          {{ t('common.viewAll') }}
+          <AppIcon name="arrow-right" :size="16" />
+        </RouterLink>
+      </div>
     </header>
 
     <div
@@ -198,7 +210,14 @@ const timestampJobStatusTranslationKeys: Record<TimestampJobStatus, string> = {
   line-height: 1.5;
 }
 
-.timestamp-history-table__header button,
+.timestamp-history-table__header-actions {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.timestamp-history-table__header-actions button,
+.timestamp-history-table__header-actions a,
 .timestamp-history-table__error-notice button {
   display: inline-flex;
   flex: 0 0 auto;
@@ -214,18 +233,20 @@ const timestampJobStatusTranslationKeys: Record<TimestampJobStatus, string> = {
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+  text-decoration: none;
   transition:
     border-color var(--transition-fast),
     transform var(--transition-fast);
 }
 
-.timestamp-history-table__header button:hover:not(:disabled),
+.timestamp-history-table__header-actions button:hover:not(:disabled),
+.timestamp-history-table__header-actions a:hover,
 .timestamp-history-table__error-notice button:hover:not(:disabled) {
   border-color: var(--color-accent-600);
   transform: translateY(-1px);
 }
 
-.timestamp-history-table__header button:disabled,
+.timestamp-history-table__header-actions button:disabled,
 .timestamp-history-table__error-notice button:disabled {
   cursor: wait;
   opacity: 0.65;
@@ -502,8 +523,8 @@ const timestampJobStatusTranslationKeys: Record<TimestampJobStatus, string> = {
     align-items: start;
   }
 
-  .timestamp-history-table__header button {
-    width: fit-content;
+  .timestamp-history-table__header-actions {
+    flex-wrap: wrap;
   }
 
   .timestamp-history-table__error-notice {
