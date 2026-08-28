@@ -8,79 +8,69 @@
 | Storybook | [izimza-storybook-phi.vercel.app](https://izimza-storybook-phi.vercel.app)     |
 | API       | [Cloudflare Worker](https://izimza-case-api.storycolor-cdn.workers.dev/health) |
 
-## Neler yapıldı?
+## Projede neler var?
 
-- Auth0 ile giriş, çıkış, korumalı sayfalar ve şifre sıfırlama
+- Auth0 ile giriş, çıkış ve korumalı sayfalar
 - Dashboard, imzalama, zaman damgalama, belge geçmişi ve profil sayfaları
-- Çoklu dosya seçimi, otomatik yükleme ve yükleme ilerleme bilgisi
+- Çoklu dosya seçimi, otomatik yükleme ve ilerleme bilgisi
 - Belge önizleme, indirme, silme ve e-posta ile gönderme akışları
 - Arama, tarih, dosya türü ve işlem türü filtreleri
-- Form doğrulama, hata mesajları, toast bildirimleri ve skeleton ekranları
+- Form doğrulama, hata yönetimi, toast bildirimleri ve skeleton ekranları
 - Türkçe ve İngilizce dil desteği
-- Mobil, tablet ve masaüstü uyumlu arayüz
+- Mobil, tablet ve masaüstü uyumlu tasarım
 
-## Kullanılan teknolojiler
+## Teknolojiler
 
-- Vue 3 Composition API ve TypeScript
-- Pinia, Vue Router ve Axios
-- Auth0 OAuth 2.0 / OpenID Connect
-- Cloudflare Workers, D1 ve R2
-- JSON Server
-- Vue I18n, Vitest ve Vue Test Utils
-- Storybook, ESLint, Prettier ve Husky
-- Vite ve Vercel
+| Teknoloji                 | Projedeki görevi                                   |
+| ------------------------- | -------------------------------------------------- |
+| Vue 3 + TypeScript        | Composition API ile tip güvenli arayüz geliştirme  |
+| Pinia                     | Feature bazlı state yönetimi                       |
+| Vue Router                | Sayfa yönlendirmeleri ve auth guard                |
+| Axios                     | API istekleri, access token ve ortak hata yönetimi |
+| Auth0                     | OAuth 2.0 / OpenID Connect authentication          |
+| Cloudflare Worker         | Uygulamanın API katmanı                            |
+| D1 + R2                   | Kayıtların ve dosyaların saklanması                |
+| Storybook                 | Componentleri bağımsız inceleme                    |
+| Vitest                    | Component testleri                                 |
+| ESLint + Prettier + Husky | Kod ve commit standartları                         |
 
-## Nasıl çalışıyor?
+## Mimari
+
+Proje **feature-based mimari** ile yapılandırıldı. Dashboard, imzalama, zaman damgalama ve profil gibi her iş alanı; kendi componentlerini, Pinia store'unu, API fonksiyonlarını ve TypeScript tiplerini `features` altında birlikte tutar.
+
+Uygulamadaki temel istek akışı şöyledir:
 
 ```text
-Kullanıcı
-   ↓
-Vue 3 uygulaması · Vercel
-   ├── Auth0 → giriş ve access token
-   └── Axios → API istekleri
-                    ↓
-             Cloudflare Worker
-               ├── Auth0 token doğrulama
-               ├── D1 → kayıtlar
-               └── R2 → dosyalar
+Page → Pinia Store → Feature API → Axios → Cloudflare Worker → D1 / R2
+                                      ↑
+                               Auth0 access token
 ```
 
-Axios bütün frontend API isteklerinin ortak noktasıdır..
-
-Hem lokal geliştirmede hem production ortamında ana backend Cloudflare Worker'dır. 
-JSON Server yalnızca case kapsamında tutuldu, isteğe bağlı fake API eklendi.
-`npm run api` çalıştırılmadığı ve API adresi `localhost:3001` yapılmadığı sürece mock veriler kullanılmaz.
-
-## Proje yapısı
+API çağrıları Vue componentlerinin içinde yapılmaz. Bu sayede sayfalar daha küçük kalır ve iş kuralları tek yerde yönetilir.
 
 ```text
 src/
-├── pages/          Route karşılığı sayfalar
-├── features/       İş alanına özel component, store, API ve tipler
-├── components/     Ortak UI ve layout componentleri
-├── api/            Axios ve ortak hata yönetimi
-├── router/         Route tanımları ve auth guard
-├── stores/         Global Pinia modülleri
-├── locales/        Türkçe ve İngilizce çeviriler
-└── styles/         Design token ve global stiller
+├── pages/        Sayfalar
+├── features/     Feature componentleri, store, API ve tipler
+├── components/   Ortak UI ve layout componentleri
+├── api/          Axios ve ortak hata yönetimi
+├── router/       Route ve auth guard
+└── locales/      Türkçe ve İngilizce çeviriler
 
-worker/
-├── src/            Cloudflare Worker API
-└── migrations/     D1 migration dosyaları
+worker/           Cloudflare API ve D1 migrationları
+mock/             İsteğe bağlı JSON Server fake API
 ```
-
-Sayfalar yalnızca ekran akışını kurar. API çağrıları, Pinia state'i ve TypeScript tipleri ilgili feature klasöründe birlikte tutulur.
 
 ## Kurulum
 
-Node.js 20 veya üzeri ve npm gereklidir.
+Node.js `20.19+` ve npm gereklidir.
 
 ```bash
 npm ci
 cp .env.example .env.local
 ```
 
-`.env.local` dosyasını kendi Auth0 bilgilerinizle doldurun:
+`.env.local` dosyasındaki Auth0 alanlarını doldurun:
 
 ```env
 VITE_API_BASE_URL=https://izimza-case-api.storycolor-cdn.workers.dev
@@ -90,63 +80,35 @@ VITE_AUTH0_AUDIENCE=https://izimza-case-api
 VITE_AUTH0_DATABASE_CONNECTION=Username-Password-Authentication
 ```
 
-`VITE_` ile başlayan değerler tarayıcıya açıktır; bu alanlara secret yazılmamalıdır.
-
-Auth0 uygulamasında şu adreslere izin verin:
-
-```text
-Callback URL:  http://localhost:5173/auth/callback
-Logout URL:    http://localhost:5173
-Web Origin:    http://localhost:5173
-```
-
-Ardından uygulamayı başlatın:
+Auth0 callback adresi `http://localhost:5173/auth/callback`, logout ve web origin adresi ise `http://localhost:5173` olmalıdır.
 
 ```bash
 npm run dev
 ```
 
-### Worker'ı lokalde çalıştırmak
+Worker'ı lokalde çalıştırmak için `npm run worker:migrate:local` ve `npm run worker:dev` komutlarını kullanın. Bu durumda API adresi `http://localhost:8787` olmalıdır.
+
+Ana geliştirme ve production akışı Cloudflare Worker kullanır. JSON Server yalnızca isteğe bağlıdır; `VITE_API_BASE_URL=http://localhost:3001` ayarlandıktan sonra `npm run api` ile başlatılır.
+
+## Temel komutlar
 
 ```bash
-cp worker/.dev.vars.example worker/.dev.vars
-npm run worker:migrate:local
-npm run worker:dev
+npm run dev          # Frontend
+npm run build        # Kontroller ve production build
+npm test             # Vitest
+npm run storybook    # Storybook
+npm run check        # Format, lint ve TypeScript kontrolü
 ```
 
-Bu durumda `VITE_API_BASE_URL=http://localhost:8787` kullanılmalıdır.
+## İş kuralları ve notlar
 
-### İsteğe bağlı JSON Server
-
-Fake API'yi denemek isterseniz API adresini `http://localhost:3001` yapıp ayrı bir terminalde şu komutu çalıştırın:
-
-```bash
-npm run api
-```
-
-## Komutlar
-
-| Komut                | Ne yapar?                                    |
-| -------------------- | -------------------------------------------- |
-| `npm run dev`        | Frontend'i başlatır                          |
-| `npm run api`        | İsteğe bağlı JSON Server'ı başlatır          |
-| `npm run worker:dev` | Worker'ı lokalde başlatır                    |
-| `npm run build`      | Kontrolleri ve production build'i çalıştırır |
-| `npm test`           | Vitest testlerini çalıştırır                 |
-| `npm run storybook`  | Storybook'u `localhost:6006` üzerinde açar   |
-| `npm run check`      | Format, lint ve TypeScript kontrolü yapar    |
-
-## İş kuralları
-
-- Yüklenen dosya önce taslak olarak kaydedilir; bu aşamada kontör düşmez.
+- Dosya önce taslak olarak kaydedilir; yükleme sırasında kontör düşmez.
 - İmzalanan veya zaman damgalanan her dosya için 1 kontör kullanılır.
 - İmzalama ve zaman damgalama sayıları ayrı tutulur.
 - Dosya boyutu en fazla 25 MB olabilir.
 - PDF, Word, XML, UBL ve yaygın görsel formatları desteklenir.
 - Kullanıcı yalnızca kendi profil, taslak ve belge kayıtlarına erişebilir.
 
-## Notlar
+Gerçek elektronik imza ve SMS sağlayıcısı kullanılmadığı için 6 haneli doğrulama kodu simüle edilir. “E-posta ile gönder” işlemi de kullanıcı geri bildirimi üretir ancak gerçek e-posta göndermez.
 
-Gerçek elektronik imza ve SMS sağlayıcısı kullanılmadığı için 6 haneli doğrulama kodu simüle edilir. “E-posta ile gönder” işlemi de bildirim gösterir ancak gerçek e-posta göndermez.
-
-Vitest şu anda `BaseInput` componentinin veri iletişimini ve erişilebilir hata gösterimini kontrol eder. UI componentleri ayrıca Storybook üzerinden bağımsız olarak incelenebilir.
+Vitest şu anda `BaseInput` componentinin veri iletişimini ve erişilebilir hata gösterimini kontrol eder. Dashboard kartı, profil formu ve zaman damgası geçmişi Storybook üzerinden ayrıca incelenebilir.
