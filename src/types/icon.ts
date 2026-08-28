@@ -1,6 +1,8 @@
 export type AppIconName =
   | 'archive'
   | 'arrow-right'
+  | 'calendar'
+  | 'chevron-down'
   | 'close'
   | 'dashboard'
   | 'document'
@@ -11,6 +13,7 @@ export type AppIconName =
   | 'more-horizontal'
   | 'profile'
   | 'refresh'
+  | 'search'
   | 'signature'
   | 'storage'
   | 'timestamp'

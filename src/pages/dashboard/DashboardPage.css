@@ -34,7 +34,7 @@
 .dashboard-page__header h1 {
   margin-top: 0.45rem;
   color: var(--color-brand-950);
-  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-size: clamp(1.65rem, 3vw, 2.35rem);
   line-height: 1;
   letter-spacing: -0.055em;
 }

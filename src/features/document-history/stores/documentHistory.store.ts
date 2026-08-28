@@ -25,6 +25,7 @@ export const useDocumentHistoryStore = defineStore('document-history', () => {
   })
   const documentHistoryRequestStatus = ref<ApiRequestStatus>('idle')
   const documentHistoryErrorMessage = ref('')
+  let latestDocumentHistoryRequestId = 0
 
   const isDocumentHistoryLoading = computed(
     () => documentHistoryRequestStatus.value === 'loading',
@@ -33,9 +34,8 @@ export const useDocumentHistoryStore = defineStore('document-history', () => {
   const fetchDocumentHistory = async (
     documentHistoryRequest: DocumentHistoryRequest,
   ) => {
-    if (isDocumentHistoryLoading.value) {
-      return
-    }
+    const currentDocumentHistoryRequestId =
+      ++latestDocumentHistoryRequestId
 
     documentHistoryRequestStatus.value = 'loading'
     documentHistoryErrorMessage.value = ''
@@ -44,10 +44,22 @@ export const useDocumentHistoryStore = defineStore('document-history', () => {
       const documentHistoryResponse =
         await documentHistoryApi.fetchDocumentHistory(documentHistoryRequest)
 
+      if (
+        currentDocumentHistoryRequestId !== latestDocumentHistoryRequestId
+      ) {
+        return
+      }
+
       archivedDocuments.value = documentHistoryResponse.items
       documentHistoryPagination.value = documentHistoryResponse.pagination
       documentHistoryRequestStatus.value = 'success'
     } catch (requestError) {
+      if (
+        currentDocumentHistoryRequestId !== latestDocumentHistoryRequestId
+      ) {
+        return
+      }
+
       documentHistoryRequestStatus.value = 'error'
       documentHistoryErrorMessage.value = getApiErrorMessage(requestError)
     }

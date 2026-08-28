@@ -339,16 +339,18 @@
       "description": "Filter and review your completed signature and timestamp transactions."
     },
     "filters": {
+      "ariaLabel": "Document history filters",
       "fileSearch": "Search files",
       "fileSearchPlaceholder": "Enter a file name",
       "date": "Date",
+      "clearDateAriaLabel": "Clear selected date",
       "fileType": "File type",
       "allFileTypes": "All file types",
       "operation": "Operation type",
       "allOperations": "All operations",
-      "clear": "Clear",
-      "apply": "Filter",
-      "filtering": "Filtering…"
+      "clear": "Clear all filters",
+      "clearSelections": "Clear selections",
+      "selectedCount": "{count} selected"
     },
     "fileTypes": {
       "pdf": "PDF",

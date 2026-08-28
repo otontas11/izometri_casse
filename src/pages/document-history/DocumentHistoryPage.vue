@@ -21,6 +21,10 @@ const selectedDatePattern = /^\d{4}-\d{2}-\d{2}$/
 const validDocumentFileTypes = new Set<DocumentFileTypeFilter>(
   documentFileTypeFilters,
 )
+const validDocumentOperations = new Set<DocumentOperation>([
+  'signature',
+  'timestamp',
+])
 
 const documentHistoryStore = useDocumentHistoryStore()
 const {
@@ -39,8 +43,8 @@ const selectedFilters = ref<DocumentHistoryFilterValues>(
 function createEmptyDocumentHistoryFilters(): DocumentHistoryFilterValues {
   return {
     fileNameSearch: '',
-    fileType: '',
-    operation: '',
+    fileTypes: [],
+    operations: [],
     selectedDate: '',
   }
 }
@@ -56,27 +60,43 @@ const getRoutePageNumber = (routeQueryValue: unknown) => {
     : 1
 }
 
-const getRouteDocumentOperation = (
+const getRouteFilterValues = (
   routeQueryValue: unknown,
-): DocumentOperation | '' => {
-  const requestedOperation = getRouteQueryText(routeQueryValue)
+  legacyRouteQueryValue: unknown,
+) => {
+  const requestedFilterValues =
+    getRouteQueryText(routeQueryValue) ||
+    getRouteQueryText(legacyRouteQueryValue)
 
-  return requestedOperation === 'signature' || requestedOperation === 'timestamp'
-    ? requestedOperation
-    : ''
+  return [
+    ...new Set(
+      requestedFilterValues
+        .split(',')
+        .map((requestedFilterValue) => requestedFilterValue.trim())
+        .filter(Boolean),
+    ),
+  ]
 }
 
-const getRouteDocumentFileType = (
+const getRouteDocumentOperations = (
   routeQueryValue: unknown,
-): DocumentFileTypeFilter | '' => {
-  const requestedFileType = getRouteQueryText(routeQueryValue)
-
-  return validDocumentFileTypes.has(
-    requestedFileType as DocumentFileTypeFilter,
+  legacyRouteQueryValue: unknown,
+): DocumentOperation[] =>
+  getRouteFilterValues(routeQueryValue, legacyRouteQueryValue).filter(
+    (requestedOperation): requestedOperation is DocumentOperation =>
+      validDocumentOperations.has(requestedOperation as DocumentOperation),
   )
-    ? (requestedFileType as DocumentFileTypeFilter)
-    : ''
-}
+
+const getRouteDocumentFileTypes = (
+  routeQueryValue: unknown,
+  legacyRouteQueryValue: unknown,
+): DocumentFileTypeFilter[] =>
+  getRouteFilterValues(routeQueryValue, legacyRouteQueryValue).filter(
+    (requestedFileType): requestedFileType is DocumentFileTypeFilter =>
+      validDocumentFileTypes.has(
+        requestedFileType as DocumentFileTypeFilter,
+      ),
+  )
 
 const getRouteSelectedDate = (routeQueryValue: unknown) => {
   const requestedDate = getRouteQueryText(routeQueryValue)
@@ -100,8 +120,14 @@ const getRouteSelectedDate = (routeQueryValue: unknown) => {
 
 const createDocumentHistoryRequestFromRoute = (): DocumentHistoryRequest => ({
   fileNameSearch: getRouteQueryText(route.query.search).slice(0, 100),
-  fileType: getRouteDocumentFileType(route.query.fileType),
-  operation: getRouteDocumentOperation(route.query.operation),
+  fileTypes: getRouteDocumentFileTypes(
+    route.query.fileTypes,
+    route.query.fileType,
+  ),
+  operations: getRouteDocumentOperations(
+    route.query.operations,
+    route.query.operation,
+  ),
   page: getRoutePageNumber(route.query.page),
   pageSize: DOCUMENT_HISTORY_PAGE_SIZE,
   selectedDate: getRouteSelectedDate(route.query.date),
@@ -117,33 +143,35 @@ const createDocumentHistoryRouteQuery = (
   ...(documentHistoryFilters.selectedDate
     ? { date: documentHistoryFilters.selectedDate }
     : {}),
-  ...(documentHistoryFilters.fileType
-    ? { fileType: documentHistoryFilters.fileType }
+  ...(documentHistoryFilters.fileTypes.length > 0
+    ? { fileTypes: documentHistoryFilters.fileTypes.join(',') }
     : {}),
-  ...(documentHistoryFilters.operation
-    ? { operation: documentHistoryFilters.operation }
+  ...(documentHistoryFilters.operations.length > 0
+    ? { operations: documentHistoryFilters.operations.join(',') }
     : {}),
   ...(pageNumber > 1 ? { page: String(pageNumber) } : {}),
 })
 
-const hasActiveFilters = computed(() =>
-  Object.values(selectedFilters.value).some((filterValue) =>
-    Boolean(filterValue),
-  ),
+const hasActiveFilters = computed(
+  () =>
+    Boolean(selectedFilters.value.fileNameSearch) ||
+    Boolean(selectedFilters.value.selectedDate) ||
+    selectedFilters.value.fileTypes.length > 0 ||
+    selectedFilters.value.operations.length > 0,
 )
 
 const fetchSelectedDocumentHistory = () => {
   const documentHistoryRequest = createDocumentHistoryRequestFromRoute()
   selectedFilters.value = {
     fileNameSearch: documentHistoryRequest.fileNameSearch,
-    fileType: documentHistoryRequest.fileType,
-    operation: documentHistoryRequest.operation,
+    fileTypes: [...documentHistoryRequest.fileTypes],
+    operations: [...documentHistoryRequest.operations],
     selectedDate: documentHistoryRequest.selectedDate,
   }
   void documentHistoryStore.fetchDocumentHistory(documentHistoryRequest)
 }
 
-const handleFiltersApply = async (
+const handleFiltersChange = async (
   documentHistoryFilters: DocumentHistoryFilterValues,
 ) => {
   const nextRouteQuery = createDocumentHistoryRouteQuery(
@@ -160,11 +188,11 @@ const handleFiltersApply = async (
     return
   }
 
-  await router.push(nextRoute)
+  await router.replace(nextRoute)
 }
 
 const handleFiltersReset = async () => {
-  await handleFiltersApply(createEmptyDocumentHistoryFilters())
+  await handleFiltersChange(createEmptyDocumentHistoryFilters())
 }
 
 const handlePageChange = async (pageNumber: number) => {
@@ -198,8 +226,7 @@ watch(() => route.fullPath, fetchSelectedDocumentHistory, { immediate: true })
 
     <DocumentHistoryFilters
       :filters="selectedFilters"
-      :is-loading="isDocumentHistoryLoading"
-      @apply="handleFiltersApply"
+      @change="handleFiltersChange"
       @reset="handleFiltersReset"
     />
 

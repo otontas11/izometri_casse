@@ -192,16 +192,42 @@ const getOptionalDocumentHistoryDate = (
   return parsedDate.toISOString()
 }
 
-const getOptionalDocumentFileType = (requestUrl: URL) => {
-  const requestedFileType = requestUrl.searchParams.get('fileType')
+const getDocumentHistoryFilterValues = (
+  requestUrl: URL,
+  parameterName: 'fileTypes' | 'operations',
+  legacyParameterName: 'fileType' | 'operation',
+) => {
+  const requestedFilterValues =
+    requestUrl.searchParams.get(parameterName) ??
+    requestUrl.searchParams.get(legacyParameterName)
 
-  if (requestedFileType === null) {
-    return undefined
+  if (requestedFilterValues === null) {
+    return []
   }
 
+  return [
+    ...new Set(
+      requestedFilterValues
+        .split(',')
+        .map((requestedFilterValue) => requestedFilterValue.trim())
+        .filter(Boolean),
+    ),
+  ]
+}
+
+const getOptionalDocumentFileTypes = (requestUrl: URL) => {
+  const requestedFileTypes = getDocumentHistoryFilterValues(
+    requestUrl,
+    'fileTypes',
+    'fileType',
+  )
+
   if (
-    !supportedDocumentFileTypeFilters.has(
-      requestedFileType as DocumentFileTypeFilter,
+    requestedFileTypes.some(
+      (requestedFileType) =>
+        !supportedDocumentFileTypeFilters.has(
+          requestedFileType as DocumentFileTypeFilter,
+        ),
     )
   ) {
     throw new WorkerApiError(
@@ -211,7 +237,33 @@ const getOptionalDocumentFileType = (requestUrl: URL) => {
     )
   }
 
-  return requestedFileType as DocumentFileTypeFilter
+  return requestedFileTypes.length > 0
+    ? (requestedFileTypes as DocumentFileTypeFilter[])
+    : undefined
+}
+
+const getOptionalDocumentOperations = (requestUrl: URL) => {
+  const requestedOperations = getDocumentHistoryFilterValues(
+    requestUrl,
+    'operations',
+    'operation',
+  )
+
+  if (
+    requestedOperations.some(
+      (requestedOperation) => !isDocumentOperation(requestedOperation),
+    )
+  ) {
+    throw new WorkerApiError(
+      422,
+      'INVALID_DOCUMENT_OPERATION',
+      'Belgeler için geçerli bir işlem seçin.',
+    )
+  }
+
+  return requestedOperations.length > 0
+    ? (requestedOperations as DocumentOperation[])
+    : undefined
 }
 
 const getDocumentHistoryRequest = (
@@ -251,8 +303,8 @@ const getDocumentHistoryRequest = (
     createdBefore,
     createdFrom,
     fileNameSearch: fileNameSearch || undefined,
-    fileType: getOptionalDocumentFileType(requestUrl),
-    operation: getOptionalDocumentOperation(requestUrl),
+    fileTypes: getOptionalDocumentFileTypes(requestUrl),
+    operations: getOptionalDocumentOperations(requestUrl),
     page: getPositiveIntegerQueryParameter(
       requestUrl,
       'page',

@@ -21,7 +21,7 @@
         <RouterLink
           :to="{
             name: 'document-history',
-            query: { operation: 'signature' },
+            query: { operations: 'signature' },
           }"
         >
           {{ t('common.viewAll') }}

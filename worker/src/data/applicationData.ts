@@ -301,14 +301,26 @@ export const fetchDocumentHistory = async (
     conditionBindings.push(documentHistoryRequest.createdBefore)
   }
 
-  if (documentHistoryRequest.operation) {
-    documentConditions.push('operation = ?')
-    conditionBindings.push(documentHistoryRequest.operation)
+  if (documentHistoryRequest.operations?.length) {
+    const operationPlaceholders = documentHistoryRequest.operations.map(
+      () => '?',
+    )
+
+    documentConditions.push(
+      `operation IN (${operationPlaceholders.join(', ')})`,
+    )
+    conditionBindings.push(...documentHistoryRequest.operations)
   }
 
-  if (documentHistoryRequest.fileType) {
-    const fileTypeExtensions =
-      documentFileTypeExtensions[documentHistoryRequest.fileType]
+  if (documentHistoryRequest.fileTypes?.length) {
+    const fileTypeExtensions = [
+      ...new Set(
+        documentHistoryRequest.fileTypes.flatMap(
+          (documentFileType) =>
+            documentFileTypeExtensions[documentFileType],
+        ),
+      ),
+    ]
     const fileTypeConditions = fileTypeExtensions.map(
       () => 'LOWER(file_name) LIKE ?',
     )

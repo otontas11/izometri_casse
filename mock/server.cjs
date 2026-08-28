@@ -96,6 +96,28 @@ const getFileExtension = (fileName) => {
 const isDocumentOperation = (operationCandidate) =>
   operationCandidate === 'signature' || operationCandidate === 'timestamp'
 
+const getDocumentHistoryFilterValues = (
+  requestedFilterValues,
+  legacyRequestedFilterValue,
+) => {
+  const selectedQueryValue =
+    requestedFilterValues ?? legacyRequestedFilterValue ?? ''
+  const selectedQueryValues = Array.isArray(selectedQueryValue)
+    ? selectedQueryValue
+    : [selectedQueryValue]
+
+  return [
+    ...new Set(
+      selectedQueryValues
+        .flatMap((selectedQueryEntry) =>
+          String(selectedQueryEntry).split(','),
+        )
+        .map((selectedFilterValue) => selectedFilterValue.trim())
+        .filter(Boolean),
+    ),
+  ]
+}
+
 const isSupportedDraftFileName = (fileName) =>
   supportedDraftFileExtensions.has(getFileExtension(fileName))
 
@@ -405,8 +427,14 @@ jsonServerApplication.get('/document-history', (request, response) => {
   const fileNameSearch = String(request.query.search || '')
     .trim()
     .toLocaleLowerCase('tr-TR')
-  const selectedFileType = String(request.query.fileType || '')
-  const selectedOperation = String(request.query.operation || '')
+  const selectedFileTypes = getDocumentHistoryFilterValues(
+    request.query.fileTypes,
+    request.query.fileType,
+  )
+  const selectedOperations = getDocumentHistoryFilterValues(
+    request.query.operations,
+    request.query.operation,
+  )
   const createdFrom = String(request.query.createdFrom || '')
   const createdBefore = String(request.query.createdBefore || '')
   const hasValidPagination =
@@ -425,8 +453,12 @@ jsonServerApplication.get('/document-history', (request, response) => {
 
   if (
     fileNameSearch.length > 100 ||
-    (selectedOperation && !isDocumentOperation(selectedOperation)) ||
-    (selectedFileType && !documentFileTypeExtensions[selectedFileType]) ||
+    selectedOperations.some(
+      (selectedOperation) => !isDocumentOperation(selectedOperation),
+    ) ||
+    selectedFileTypes.some(
+      (selectedFileType) => !documentFileTypeExtensions[selectedFileType],
+    ) ||
     (createdFrom && Number.isNaN(Date.parse(createdFrom))) ||
     (createdBefore && Number.isNaN(Date.parse(createdBefore))) ||
     (createdFrom &&
@@ -440,9 +472,13 @@ jsonServerApplication.get('/document-history', (request, response) => {
     return
   }
 
-  const selectedFileExtensions = selectedFileType
-    ? documentFileTypeExtensions[selectedFileType]
-    : []
+  const selectedFileExtensions = [
+    ...new Set(
+      selectedFileTypes.flatMap(
+        (selectedFileType) => documentFileTypeExtensions[selectedFileType],
+      ),
+    ),
+  ]
   const filteredDocuments = database
     .get('documents')
     .value()
@@ -453,9 +489,9 @@ jsonServerApplication.get('/document-history', (request, response) => {
       return (
         (!archivedDocument.status || archivedDocument.status === 'completed') &&
         (!fileNameSearch || normalizedFileName.includes(fileNameSearch)) &&
-        (!selectedOperation ||
-          archivedDocument.operation === selectedOperation) &&
-        (!selectedFileType ||
+        (selectedOperations.length === 0 ||
+          selectedOperations.includes(archivedDocument.operation)) &&
+        (selectedFileTypes.length === 0 ||
           selectedFileExtensions.some((fileExtension) =>
             normalizedFileName.endsWith(fileExtension),
           )) &&

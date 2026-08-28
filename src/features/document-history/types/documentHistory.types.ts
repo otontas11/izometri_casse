@@ -20,8 +20,8 @@ export type DocumentFileTypeFilter =
 
 export interface DocumentHistoryFilters {
   fileNameSearch: string
-  fileType: DocumentFileTypeFilter | ''
-  operation: DocumentOperation | ''
+  fileTypes: DocumentFileTypeFilter[]
+  operations: DocumentOperation[]
   selectedDate: string
 }
 

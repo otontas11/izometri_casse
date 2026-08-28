@@ -339,16 +339,18 @@
       "description": "Tamamlanan imzalama ve zaman damgalama işlemlerinizi filtreleyerek inceleyin."
     },
     "filters": {
+      "ariaLabel": "Belge geçmişi filtreleri",
       "fileSearch": "Dosya ara",
       "fileSearchPlaceholder": "Dosya adı yazın",
       "date": "Tarih",
+      "clearDateAriaLabel": "Seçili tarihi temizle",
       "fileType": "Dosya tipi",
       "allFileTypes": "Tüm dosya tipleri",
       "operation": "İşlem türü",
       "allOperations": "Tüm işlemler",
-      "clear": "Temizle",
-      "apply": "Filtrele",
-      "filtering": "Filtreleniyor…"
+      "clear": "Tüm filtreleri temizle",
+      "clearSelections": "Seçimleri temizle",
+      "selectedCount": "{count} seçim"
     },
     "fileTypes": {
       "pdf": "PDF",

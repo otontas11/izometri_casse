@@ -40,8 +40,10 @@ const fetchDocumentHistory = async (
     await axiosInstance.get<DocumentHistoryResponse>('/document-history', {
       params: {
         ...selectedDateBoundaries,
-        fileType: documentHistoryRequest.fileType || undefined,
-        operation: documentHistoryRequest.operation || undefined,
+        fileTypes:
+          documentHistoryRequest.fileTypes.join(',') || undefined,
+        operations:
+          documentHistoryRequest.operations.join(',') || undefined,
         page: documentHistoryRequest.page,
         pageSize: documentHistoryRequest.pageSize,
         search: documentHistoryRequest.fileNameSearch.trim() || undefined,

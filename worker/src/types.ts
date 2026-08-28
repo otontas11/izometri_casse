@@ -92,8 +92,8 @@ export interface DocumentHistoryRequest {
   createdBefore?: string
   createdFrom?: string
   fileNameSearch?: string
-  fileType?: DocumentFileTypeFilter
-  operation?: DocumentOperation
+  fileTypes?: DocumentFileTypeFilter[]
+  operations?: DocumentOperation[]
   page: number
   pageSize: number
 }

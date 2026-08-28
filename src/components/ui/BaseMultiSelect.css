@@ -1,0 +1,194 @@
+.base-multi-select {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  gap: 0.45rem;
+}
+
+.base-multi-select--open {
+  z-index: 30;
+}
+
+.base-multi-select__label {
+  color: var(--color-brand-950);
+  font-size: var(--font-size-small);
+  font-weight: 800;
+}
+
+.base-multi-select__trigger {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0.55rem;
+  align-items: center;
+  width: 100%;
+  min-height: 2.85rem;
+  padding: 0.6rem 0.7rem 0.6rem 0.8rem;
+  color: var(--color-brand-950);
+  text-align: left;
+  cursor: pointer;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 3%);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.base-multi-select__trigger:hover,
+.base-multi-select__trigger:focus-visible,
+.base-multi-select--open .base-multi-select__trigger {
+  border-color: var(--color-accent-600);
+  box-shadow: 0 0 0 3px rgb(15 159 132 / 10%);
+  outline: none;
+}
+
+.base-multi-select__trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.base-multi-select__summary {
+  overflow: hidden;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.base-multi-select__summary--placeholder {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.base-multi-select__selection-count {
+  display: grid;
+  min-width: 1.45rem;
+  height: 1.45rem;
+  padding-inline: 0.35rem;
+  place-items: center;
+  color: var(--color-primary-700);
+  font-size: 0.66rem;
+  font-weight: 900;
+  background: var(--color-primary-100);
+  border-radius: 999px;
+}
+
+.base-multi-select__chevron {
+  color: var(--color-text-secondary);
+  transition: transform var(--transition-fast);
+}
+
+.base-multi-select--open .base-multi-select__chevron {
+  transform: rotate(180deg);
+}
+
+.base-multi-select__panel {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  left: 0;
+  z-index: 40;
+  display: grid;
+  width: max(100%, 16rem);
+  max-height: 20rem;
+  padding: 0.45rem;
+  overflow-y: auto;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.base-multi-select__option {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  width: 100%;
+  min-height: 2.65rem;
+  padding: 0.55rem 0.65rem;
+  color: var(--color-brand-950);
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: transparent;
+  border-radius: 0.6rem;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.base-multi-select__option:hover {
+  background: var(--color-surface-subtle);
+}
+
+.base-multi-select__option--selected {
+  color: var(--color-primary-700);
+  background: var(--color-primary-100);
+}
+
+.base-multi-select__option-label {
+  cursor: default;
+  user-select: none;
+}
+
+.base-multi-select__checkbox {
+  display: grid;
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0;
+  place-items: center;
+  color: var(--color-text-inverse);
+  font-size: 0.68rem;
+  font-weight: 900;
+  cursor: pointer;
+  background: var(--color-surface-raised);
+  border: 1.5px solid var(--color-border);
+  border-radius: 0.3rem;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.base-multi-select__checkbox:hover,
+.base-multi-select__checkbox:focus-visible {
+  border-color: var(--color-accent-600);
+  box-shadow: 0 0 0 3px rgb(11 122 105 / 12%);
+  outline: none;
+}
+
+.base-multi-select__option--selected .base-multi-select__checkbox {
+  background: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+}
+
+.base-multi-select__footer {
+  padding: 0.45rem 0.35rem 0.1rem;
+  margin-top: 0.3rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.base-multi-select__footer button {
+  width: 100%;
+  min-height: 2.25rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  font-weight: 800;
+  cursor: pointer;
+  background: transparent;
+  border-radius: 0.5rem;
+}
+
+.base-multi-select__footer button:hover,
+.base-multi-select__footer button:focus-visible {
+  color: var(--color-brand-950);
+  background: var(--color-surface-subtle);
+  outline: none;
+}
+
+@media (max-width: 39.99rem) {
+  .base-multi-select__panel {
+    width: 100%;
+  }
+}

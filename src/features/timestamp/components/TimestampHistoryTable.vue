@@ -54,7 +54,7 @@ const timestampJobStatusTranslationKeys: Record<TimestampJobStatus, string> = {
         <RouterLink
           :to="{
             name: 'document-history',
-            query: { operation: 'timestamp' },
+            query: { operations: 'timestamp' },
           }"
         >
           {{ t('common.viewAll') }}
