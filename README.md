@@ -63,7 +63,7 @@ mock/             İsteğe bağlı JSON Server fake API
 
 ## Kurulum
 
-Node.js `20.19+` ve npm gereklidir.
+Node.js `24.x` ve npm gereklidir.
 
 ```bash
 npm ci
