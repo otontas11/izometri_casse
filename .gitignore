@@ -2,6 +2,7 @@ node_modules/
 dist/
 coverage/
 storybook-static/
+.vercel/
 .wrangler/
 worker/.wrangler/
 worker/.dev.vars

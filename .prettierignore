@@ -2,7 +2,9 @@ node_modules/
 dist/
 coverage/
 storybook-static/
+.vercel/
 .wrangler/
 worker/.wrangler/
 worker/worker-configuration.d.ts
+vercel.json
 **/*.vue
