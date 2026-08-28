@@ -364,6 +364,15 @@
       "saving": "Kaydediliyor…",
       "save": "Değişiklikleri kaydet"
     },
+    "passwordReset": {
+      "eyebrow": "Hesap erişimi",
+      "title": "Şifre değiştir",
+      "description": "{emailAddress} adresine güvenli bir şifre değiştirme bağlantısı gönderilir.",
+      "sendLink": "Şifre değiştirme bağlantısı gönder",
+      "sending": "Bağlantı gönderiliyor…",
+      "requestSuccess": "Şifre değiştirme bağlantısı e-posta adresinize gönderildi.",
+      "requestError": "Şifre değiştirme bağlantısı gönderilemedi. Lütfen tekrar deneyin."
+    },
     "validation": {
       "required": "{fieldLabel} alanı zorunludur.",
       "nameLength": "{fieldLabel} {minimumLength}-{maximumLength} karakter arasında olmalıdır.",

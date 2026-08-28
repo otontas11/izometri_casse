@@ -364,6 +364,15 @@
       "saving": "Saving…",
       "save": "Save changes"
     },
+    "passwordReset": {
+      "eyebrow": "Account access",
+      "title": "Change password",
+      "description": "A secure password change link will be sent to {emailAddress}.",
+      "sendLink": "Send password change link",
+      "sending": "Sending link…",
+      "requestSuccess": "A password change link was sent to your email address.",
+      "requestError": "The password change link could not be sent. Please try again."
+    },
     "validation": {
       "required": "{fieldLabel} is required.",
       "nameLength": "{fieldLabel} must be between {minimumLength} and {maximumLength} characters.",

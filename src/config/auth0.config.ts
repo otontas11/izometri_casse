@@ -15,10 +15,19 @@ export const isAuth0Configured = Boolean(
     !isPlaceholderEnvironmentValue(environmentConfig.auth0ClientId),
 )
 
+export const isAuth0PasswordResetConfigured = Boolean(
+  isAuth0Configured &&
+    environmentConfig.auth0DatabaseConnection &&
+    !isPlaceholderEnvironmentValue(
+      environmentConfig.auth0DatabaseConnection,
+    ),
+)
+
 export const auth0Config = {
   audience: environmentConfig.auth0Audience,
   callbackUri: `${window.location.origin}/auth/callback`,
   clientId: environmentConfig.auth0ClientId,
+  databaseConnection: environmentConfig.auth0DatabaseConnection,
   domain: normalizedAuth0Domain,
   logoutUri: window.location.origin,
 } as const

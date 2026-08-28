@@ -6,8 +6,11 @@ import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/common/AppIcon.vue'
 import { useToast } from '@/composables/useToast'
+import { isAuth0PasswordResetConfigured } from '@/config/auth0.config'
+import { authApi } from '@/features/auth/api/auth.api'
 import ProfileForm from '@/features/profile/components/ProfileForm.vue'
 import ProfileIdentityCard from '@/features/profile/components/ProfileIdentityCard.vue'
+import ProfilePasswordResetPanel from '@/features/profile/components/ProfilePasswordResetPanel.vue'
 import { useProfileStore } from '@/features/profile/stores/profile.store'
 import type { UpdateProfilePayload } from '@/features/profile/types/profile.types'
 import { getApplicationLocaleCode } from '@/locales'
@@ -28,6 +31,7 @@ const { showErrorToast, showSuccessToast } = useToast()
 const { t } = useI18n({ useScope: 'global' })
 
 const isProfileEditing = ref(false)
+const isPasswordResetEmailRequestInProgress = ref(false)
 
 const profileDisplayName = computed(() => {
   if (profileFullName.value) {
@@ -44,6 +48,20 @@ const profileEmailAddress = computed(
     authenticatedUser.value?.email ||
     userProfile.value?.email ||
     t('profile.page.emailUnavailable'),
+)
+
+const passwordResetEmailAddress = computed(
+  () =>
+    authenticatedUser.value?.email?.trim() ||
+    userProfile.value?.email.trim() ||
+    '',
+)
+
+const canRequestPasswordResetEmail = computed(
+  () =>
+    isAuth0PasswordResetConfigured &&
+    authenticatedUser.value?.sub?.startsWith('auth0|') === true &&
+    Boolean(passwordResetEmailAddress.value),
 )
 
 const profileAvatarUrl = computed(
@@ -94,6 +112,28 @@ const handleProfileUpdate = async (profileUpdates: UpdateProfilePayload) => {
 
 const handleProfileRetry = () => {
   void profileStore.fetchUserProfile()
+}
+
+const handlePasswordResetEmailRequest = async () => {
+  if (
+    !canRequestPasswordResetEmail.value ||
+    isPasswordResetEmailRequestInProgress.value
+  ) {
+    return
+  }
+
+  isPasswordResetEmailRequestInProgress.value = true
+
+  try {
+    await authApi.requestAuth0PasswordResetEmail(
+      passwordResetEmailAddress.value,
+    )
+    showSuccessToast(t('profile.passwordReset.requestSuccess'))
+  } catch {
+    showErrorToast(t('profile.passwordReset.requestError'))
+  } finally {
+    isPasswordResetEmailRequestInProgress.value = false
+  }
 }
 
 onMounted(() => {
@@ -185,6 +225,13 @@ onMounted(() => {
         @cancel="handleProfileEditCancel"
         @edit="handleProfileEditRequest"
         @submit="handleProfileUpdate"
+      />
+
+      <ProfilePasswordResetPanel
+        v-if="canRequestPasswordResetEmail"
+        :email-address="passwordResetEmailAddress"
+        :is-requesting="isPasswordResetEmailRequestInProgress"
+        @request="handlePasswordResetEmailRequest"
       />
     </template>
   </section>
